@@ -128,11 +128,11 @@ class TaskController extends AdminController
         ];
         $form->switch('is_contract', __('是否签约'))->states($states)->default(0);
         $form->datetime('start_time', __('开始时间'))->default(date('Y-m-d H:i:s'));
-        $form->datetime('contract_time', __('Contract time'))->default(date('Y-m-d H:i:s'));
+        $form->datetime('contract_time', __('Contract time'))->default(null);
         $form->number('sort_order', __('Sort order'))->default(99);
 
-        //保存前回调
-        $form->saving(function (Form $form) {
+        //保存后回调
+        $form->saved(function (Form $form) {
             $is_contract = $form->model()->is_contract;
             if (!$is_contract) {
                 $form->contract_time=date('Y-m-d H:i:s',time());

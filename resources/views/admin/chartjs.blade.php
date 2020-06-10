@@ -1,75 +1,91 @@
-<canvas id="myChart"></canvas>
+<div id="myChart" style="height: 400px;width: 100%"></div>
+<script src="/vendor/echarts/echarts.min.js"></script>
+<script src="/vendor/echarts/macarons.js"></script>
+<script src="/vendor/echarts/china.js"></script>
 <script>
     $(function () {
-        var ctx = document.getElementById("myChart").getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-                datasets: [{
-                    label: '# of Votes',
-                    //数据类型 折线图
-                    type: "line",
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor:'rgba(54, 162, 235, 0.1)',
-                    borderColor:'rgba(255,99,132,1)',
-                    borderWidth: 1
-                },{
-                    label: '# of Votes',
-                    //数据类型 柱状图
-                    type: "bar",
-                    data: [16, 13, 11, 15, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'red',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-
-            options: {
-                //显示数值
-                "animation": {
-                    "duration": 1,
-                    "onComplete": function() {
-                        var chartInstance = this.chart,
-                            ctx = chartInstance.ctx;
-
-                        ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-                        //设置字体颜色
-                        ctx.fillStyle = "black";
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'bottom';
-
-                        this.data.datasets.forEach(function(dataset, i) {
-                            var meta = chartInstance.controller.getDatasetMeta(i);
-                            meta.data.forEach(function(bar, index) {
-                                var data = dataset.data[index];
-                                ctx.fillText(data, bar._model.x, bar._model.y - 5);
-                            });
-                        });
-                    }
+        $.get('/api/chartjs').done(function (data) {
+            var legend=[];
+            $.each(data.legend,function (i,item) {
+                legend[i]=item;
+            })
+            console.log(data);
+            var myChart = echarts.init(document.getElementById('myChart'), 'macarons');
+            myChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)'
                 },
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        }
-                    }]
-                }
-            }
+                legend: {
+                    orient: 'vertical',
+                    left: 10,
+                    data: data.legend
+                },
+                series: [
+                    {
+                        name: '对接人',
+                        type: 'pie',
+                        selectedMode: 'single',
+                        radius: [0, '30%'],
+
+                        label: {
+                            position: 'inner'
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: data.access
+                    },
+                    {
+                        name: '负责人',
+                        type: 'pie',
+                        radius: ['40%', '55%'],
+                        label: {
+                            formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ',
+                            backgroundColor: '#eee',
+                            borderColor: '#aaa',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            // shadowBlur:3,
+                            // shadowOffsetX: 2,
+                            // shadowOffsetY: 2,
+                            // shadowColor: '#999',
+                            // padding: [0, 7],
+                            rich: {
+                                a: {
+                                    color: '#999',
+                                    lineHeight: 22,
+                                    align: 'center'
+                                },
+                                // abg: {
+                                //     backgroundColor: '#333',
+                                //     width: '100%',
+                                //     align: 'right',
+                                //     height: 22,
+                                //     borderRadius: [4, 4, 0, 0]
+                                // },
+                                hr: {
+                                    borderColor: '#aaa',
+                                    width: '100%',
+                                    borderWidth: 0.5,
+                                    height: 0
+                                },
+                                b: {
+                                    fontSize: 16,
+                                    lineHeight: 33
+                                },
+                                per: {
+                                    color: '#eee',
+                                    backgroundColor: '#334455',
+                                    padding: [2, 4],
+                                    borderRadius: 2
+                                }
+                            }
+                        },
+                        data: data.principal
+                    }
+                ]
+            });
         });
     });
 </script>

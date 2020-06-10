@@ -28,9 +28,7 @@ class HomeController extends Controller
                             $column->append(new Box('签单情况统计', view('admin.chartjs')));
                         });
                         $row->column(6, function (Column $column) {
-                            $staffs = Staff::all()->pluck('name')->toArray();
-
-                            $column->append(new Box('签单情况统计', view('admin.simplejs', compact('staffs'))));
+                            $column->append(new Box('员工性别统计', view('admin.sex_count')));
                         });
                     });
                 });

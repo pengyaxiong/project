@@ -16,3 +16,20 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::group(['namespace' => 'Api'], function () {
+
+//会员性别统计
+    Route::get('sex_count', 'VisualizationController@sex_count');
+//签单情况统计
+    Route::get('chartjs', 'VisualizationController@chartjs');
+
+});
+
+
+
+Route::group(['middleware' => [],'namespace' => 'Wechat', 'prefix' => 'wechat', 'as' => 'wechat.'], function () {
+
+
+
+});

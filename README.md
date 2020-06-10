@@ -24,3 +24,6 @@
 
 ### composer require laravel-admin-ext/chartjs
 - php artisan vendor:publish --tag=laravel-admin-chartjs
+
+### composer require laravel-admin-ext/config
+- php artisan migrate
