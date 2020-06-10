@@ -27,3 +27,7 @@
 
 ### composer require laravel-admin-ext/config
 - php artisan migrate
+- php artisan admin:import config
+
+### composer require "overtrue/laravel-wechat:~4.0"
+- php artisan vendor:publish --provider="Overtrue\LaravelWeChat\ServiceProvider"
