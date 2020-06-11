@@ -52,10 +52,10 @@ class CustomerController extends AdminController
         $grid->column('updated_at', __('Updated at'));
 
         //禁用创建按钮
-        $grid->disableCreateButton();
+      //  $grid->disableCreateButton();
         $grid->actions(function ($actions) {
             $actions->disableView();
-            $actions->disableEdit();
+         //   $actions->disableEdit();
             $actions->disableDelete();
         });
 
@@ -122,8 +122,8 @@ class CustomerController extends AdminController
         $form->text('headimgurl', __('Headimgurl'));
         $form->text('tel', __('Tel'));
         $form->text('country', __('Country'));
-        $form->textarea('province', __('Province'));
-        $form->textarea('city', __('City'));
+        $form->text('province', __('Province'));
+        $form->text('city', __('City'));
         $form->email('email', __('Email'));
         $form->number('sort_order', __('Sort order'))->default(99);
         $form->textarea('remark', __('Remark'));

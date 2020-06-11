@@ -25,4 +25,9 @@ class Task extends Model
     {
         return $this->belongsTo(Staff::class);
     }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
 }

@@ -135,13 +135,18 @@ class TaskController extends AdminController
         $form->saved(function (Form $form) {
             $is_contract = $form->model()->is_contract;
             if (!$is_contract) {
-                $form->contract_time=date('Y-m-d H:i:s',time());
+                $form->contract_time = date('Y-m-d H:i:s', time());
 
-                Project::create([
-                    'company_id'=>$form->model()->company_id,
-                    'name'=>$form->model()->name,
-                    'contract_time'=>date('Y-m-d H:i:s',time())
-                ]);
+                $task_id = $form->model()->id;
+                $project = Project::where('task_id', $task_id)->first();
+                if (!$project) {
+                    Project::create([
+                        'company_id' => $form->model()->company_id,
+                        'task_id' => $form->model()->id,
+                        'name' => $form->model()->name,
+                        'contract_time' => date('Y-m-d H:i:s', time())
+                    ]);
+                }
             }
         });
         return $form;

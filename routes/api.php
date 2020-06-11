@@ -19,10 +19,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['namespace' => 'Api'], function () {
 
-//会员性别统计
+    //会员性别统计
     Route::get('sex_count', 'VisualizationController@sex_count');
-//签单情况统计
+    //签单情况统计
     Route::get('chartjs', 'VisualizationController@chartjs');
+    //方案签约率统计
+    Route::get('case_count', 'VisualizationController@case_count');
 
 });
 

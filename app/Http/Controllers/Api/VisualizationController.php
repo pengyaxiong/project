@@ -220,4 +220,22 @@ class VisualizationController extends Controller
         return $data;
 
     }
+
+    public function case_count()
+    {
+        //负责人
+        $principal = [];
+        $principals = Task::where('type', '方案')->select('principal_id')->distinct()->get();
+        foreach ($principals as $k => $v) {
+            $task=Task::where('principal_id', $v->principal_id)->count();
+            $contract=Task::where('principal_id', $v->principal_id)->where('is_contract', true)->count();
+
+            $principal['name'][$k] = Staff::find($v->principal_id)->name;
+            $principal['task'][$k] = $task;
+            $principal['contract'][$k] = $contract;
+            $principal['rate'][$k] = $task?$contract/$task:0;
+        }
+
+        return $principal;
+    }
 }

@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\ProjectCustomer;
 use App\Models\ProjectStaff;
 use App\Models\Staff;
+use App\Models\Task;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -34,6 +35,7 @@ class ProjectController extends AdminController
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
         $grid->column('company.name', __('所属公司'));
+        $grid->column('task.name', __('任务名称'));
         $grid->column('node', __('Node'))->hide();
         $grid->column('content', __('Content'))->hide();
         // 不存在的`full_name`字段
@@ -112,6 +114,7 @@ class ProjectController extends AdminController
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
         $show->field('company.name', __('所属公司'));
+        $show->field('task.name', __('任务名称'));
         $show->field('node', __('Node'))->as(function ($node) {
             return json_encode($node);
         });
@@ -143,6 +146,11 @@ class ProjectController extends AdminController
         $select_array = array_column($companies, 'name', 'id');
         //创建select
         $form->select('company_id', '所属公司')->options($select_array);
+
+        $tasks = Task::all()->toArray();
+        $select_task = array_column($tasks, 'name', 'id');
+        //创建select
+        $form->select('task_id', '任务名称')->options($select_task);
 
         $staffs = Staff::orderby('sort_order')->pluck('name', 'id')->toArray();
         $customers = Customer::orderby('sort_order')->pluck('name', 'id')->toArray();

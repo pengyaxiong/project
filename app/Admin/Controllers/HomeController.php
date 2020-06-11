@@ -34,6 +34,10 @@ class HomeController extends Controller
                 });
 
                 $row->column(12, function (Column $column) {
+                    $column->append(new Box('方案签约率统计', view('admin.case_count')));
+                });
+
+                $row->column(12, function (Column $column) {
                     $column->append(Dashboard::environment());
                 });
             });
