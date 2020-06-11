@@ -133,8 +133,9 @@ class TaskController extends AdminController
 
         //保存后回调
         $form->saved(function (Form $form) {
-            $is_contract = $form->is_contract;
-            if ($is_contract) {
+            $id = $form->model()->id;
+            $task=Task::find($id);
+            if (!$task->is_contract) {
                 $form->contract_time = date('Y-m-d H:i:s', time());
 
                 $task_id = $form->model()->id;

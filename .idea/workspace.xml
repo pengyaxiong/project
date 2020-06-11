@@ -57,9 +57,11 @@
       <file leaf-file-name="TaskController.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/TaskController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="395">
-              <caret line="136" column="16" lean-forward="false" selection-start-line="136" selection-start-column="16" selection-end-line="136" selection-end-column="16" />
-              <folding />
+            <state relative-caret-position="371">
+              <caret line="136" column="34" lean-forward="true" selection-start-line="136" selection-start-column="34" selection-end-line="136" selection-end-column="34" />
+              <folding>
+                <element signature="e#41#64#0#PHP" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -70,6 +72,7 @@
     <findStrings>
       <find>customer</find>
       <find>editable</find>
+      <find>Task</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -283,12 +286,12 @@
       <workItem from="1591837337339" duration="193000" />
       <workItem from="1591842023058" duration="6173000" />
       <workItem from="1591857086932" duration="1064000" />
-      <workItem from="1591870702399" duration="125000" />
+      <workItem from="1591870702399" duration="481000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="63631000" />
+    <option name="totallyTimeSpent" value="63987000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -633,6 +636,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="483">
           <caret line="23" column="28" lean-forward="false" selection-start-line="23" selection-start-column="28" selection-end-line="23" selection-end-column="28" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -659,9 +663,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/TaskController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="395">
-          <caret line="136" column="16" lean-forward="false" selection-start-line="136" selection-start-column="16" selection-end-line="136" selection-end-column="16" />
-          <folding />
+        <state relative-caret-position="371">
+          <caret line="136" column="34" lean-forward="true" selection-start-line="136" selection-start-column="34" selection-end-line="136" selection-end-column="34" />
+          <folding>
+            <element signature="e#41#64#0#PHP" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
