@@ -135,11 +135,9 @@ class TaskController extends AdminController
         $form->saved(function (Form $form) {
             $id = $form->model()->id;
             $task=Task::find($id);
-            if (!$task->is_contract) {
+            if ($task->is_contract) {
                 $form->contract_time = date('Y-m-d H:i:s', time());
-
-                $task_id = $form->model()->id;
-                $project = Project::where('task_id', $task_id)->first();
+                $project = Project::where('task_id', $id)->first();
                 if (!$project) {
                     Project::create([
                         'company_id' => $form->model()->company_id,
