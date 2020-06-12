@@ -23,6 +23,11 @@ class Staff extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
     public function principal_tasks()
     {
         return $this->hasMany(Task::class,'principal_id');

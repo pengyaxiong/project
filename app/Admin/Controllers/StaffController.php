@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Company;
+use App\Models\Department;
 use App\Models\Staff;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -30,6 +31,7 @@ class StaffController extends AdminController
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
         $grid->column('company.name', __('所属公司'));
+        $grid->column('department.name', __('所属部门'));
         $grid->column('mobile', __('Mobile'));
         $grid->column('sex', __('Sex'))->using([
             1 => '男',
@@ -58,6 +60,10 @@ class StaffController extends AdminController
             $companies = Company::all()->toArray();
             $select_array = array_column($companies, 'name', 'id');
             $filter->equal('company_id', __('所属公司'))->select($select_array);
+
+            $departments = Department::all()->toArray();
+            $select_array = array_column($departments, 'name', 'id');
+            $filter->equal('department_id', __('所属部门'))->select($select_array);
         });
 
         return $grid;
@@ -76,6 +82,7 @@ class StaffController extends AdminController
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
         $show->field('company.name', __('所属公司'));
+        $show->field('department_id', __('所属部门'));
         $show->field('mobile', __('Mobile'));
         $show->field('sex', __('Sex'));
         $show->field('sort_order', __('Sort order'));
@@ -102,6 +109,11 @@ class StaffController extends AdminController
         $select_array = array_column($companies, 'name', 'id');
         //创建select
         $form->select('company_id', '所属公司')->options($select_array);
+
+        $departments = Department::all()->toArray();
+        $select_array = array_column($departments, 'name', 'id');
+        //创建select
+        $form->select('department_id', '所属部门')->options($select_array);
         //创建select
         $form->select('sex', __('Sex'))->options([1=>'男',2=>'女',0=>'保密']);
         $form->number('sort_order', __('Sort order'))->default(99);

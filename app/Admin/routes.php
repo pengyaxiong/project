@@ -19,6 +19,8 @@ Route::group([
 
     $router->resource('customers', 'CustomerController');
 
+    $router->resource('departments', 'DepartmentController');
+
     $router->resource('nodes', 'NodeController');
 
     $router->resource('projects', 'ProjectController');

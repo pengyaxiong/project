@@ -25,6 +25,8 @@ Route::group(['namespace' => 'Api'], function () {
     Route::get('chartjs', 'VisualizationController@chartjs');
     //方案签约率统计
     Route::get('case_count', 'VisualizationController@case_count');
+    //任务周期比列
+    Route::get('task_days', 'VisualizationController@task_days');
 
 });
 

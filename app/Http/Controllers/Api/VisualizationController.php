@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Staff;
 use App\Models\Task;
 use DB, Cache;
@@ -227,15 +228,29 @@ class VisualizationController extends Controller
         $principal = [];
         $principals = Task::where('type', '方案')->select('principal_id')->distinct()->get();
         foreach ($principals as $k => $v) {
-            $task=Task::where('principal_id', $v->principal_id)->count();
-            $contract=Task::where('principal_id', $v->principal_id)->where('is_contract', true)->count();
+            $task = Task::where('principal_id', $v->principal_id)->count();
+            $contract = Task::where('principal_id', $v->principal_id)->where('is_contract', true)->count();
 
             $principal['name'][$k] = Staff::find($v->principal_id)->name;
             $principal['task'][$k] = $task;
             $principal['contract'][$k] = $contract;
-            $principal['rate'][$k] = $task?$contract/$task:0;
+            $principal['rate'][$k] = $task ? $contract / $task : 0;
         }
 
         return $principal;
+    }
+
+    public function task_days()
+    {
+
+       // $day = Task::select(\DB::raw('sum(days) as count, company_id'))->groupBy('company_id')->get()->pluck('count','company.name')->toArray();
+        $task=[];
+        $companies=Company::all();
+        foreach ($companies as  $k=>$company){
+            $task['company'][$k]=$company->name;
+            $task['days'][$k]['value']=Task::where('company_id', $company->id)->sum('days');
+            $task['days'][$k]['name']=$company->name;
+        }
+        return $task;
     }
 }

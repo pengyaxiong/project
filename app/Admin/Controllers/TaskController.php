@@ -10,6 +10,8 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends AdminController
 {
@@ -65,6 +67,18 @@ class TaskController extends AdminController
             $companies = Company::all()->toArray();
             $select_array = array_column($companies, 'name', 'id');
             $filter->equal('company_id', __('所属公司'))->select($select_array);
+        });
+
+        $grid->header(
+            function ($query) {
+
+            return new Box('周期比列', view('admin.task_days'));
+
+        });
+
+        $grid->footer(function ($query) {
+            $days=$query->sum('days');
+            return "<div style='padding: 5px;'>总时长 ： $days 天</div>";
         });
 
         return $grid;
@@ -136,14 +150,14 @@ class TaskController extends AdminController
             $id = $form->model()->id;
             $task=Task::find($id);
             if ($task->is_contract==1) {
-                $form->contract_time = date('Y-m-d H:i:s', time());
+                $contract_time = $task->contract_time?$task->contract_time:date('Y-m-d H:i:s', time());
                 $project = Project::where('task_id', $id)->first();
                 if (!$project) {
                     Project::create([
                         'company_id' => $form->model()->company_id,
                         'task_id' => $form->model()->id,
                         'name' => $form->model()->name,
-                        'contract_time' => date('Y-m-d H:i:s', time())
+                        'contract_time' => $contract_time
                     ]);
                 }
             }
