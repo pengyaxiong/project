@@ -12,6 +12,8 @@
             myChart.setOption({
                 title: {
                     //    text: '会员性别统计',
+                    //
+                    // subtext:'1-2',
                     x: 'center'
                 },
                 tooltip: {

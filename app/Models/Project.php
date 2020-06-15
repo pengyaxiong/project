@@ -37,6 +37,19 @@ class Project extends Model
         );
     }
 
+    public function nodes()
+    {
+        return $this->belongsToMany(Node::class,'wechat_project_node','project_id','node_id')->withPivot(
+            'node_id',
+            'staff_id',
+            'start_time',
+            'end_time',
+            'days',
+            'content',
+            'project_id'
+        );
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class);

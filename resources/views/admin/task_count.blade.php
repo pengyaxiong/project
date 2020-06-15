@@ -1,22 +1,26 @@
-<div id="task_days" style="height: 200px;width: 100%"></div>
+<div id="task_count" style="height: 400px;width: 100%"></div>
 <script src="/vendor/echarts/echarts.min.js"></script>
 <script src="/vendor/echarts/macarons.js"></script>
 <script src="/vendor/echarts/china.js"></script>
 <script>
     $(function () {
-         var   id="{{\Request::input('id')}}",
-              name="{{\Request::input('name')}}",
-             is_contract="{{\Request::input('is_contract')}}",
-             principal_id="{{Request::input('principal_id')}}",
-             access_id="{{\Request::input('access_id')}}";
-        $.get('/api/task_days?id='+id+'&name='+name+'&is_contract='+is_contract+'&principal_id='+principal_id+'&access_id='+access_id).done(function (data) {
-              console.log(data);
-            var myChart = echarts.init(document.getElementById('task_days'), 'macarons');
+        $.get('/api/task_count').done(function (data) {
+            console.log(data);
+            var type = [];      //类型
+            var sell = [];      //数据
+
+            $.each(data.tasks, function (k, v) {
+                type.push(v.principal.name);
+                sell.push({value: v.sum_num, name: v.principal.name})
+            })
+
+            var myChart = echarts.init(document.getElementById('task_count'), 'macarons');
 
             // 指定图表的配置项和数据
             myChart.setOption({
                 title: {
                     //    text: '会员性别统计',
+                    subtext: data.month_start + ' ~ ' + data.month_end,
                     x: 'center'
                 },
                 tooltip: {
@@ -26,15 +30,15 @@
                 legend: {
                     orient: 'vertical',
                     left: 'left',
-                    data: data.company
+                    data: type
                 },
                 series: [
                     {
-                        name: '时间周期(天)',
+                        name: '任务量（天）',
                         type: 'pie',
                         radius: '55%',
                         center: ['50%', '60%'],
-                        data: data.days,
+                        data: sell,
                         itemStyle: {
                             emphasis: {
                                 shadowBlur: 10,

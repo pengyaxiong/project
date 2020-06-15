@@ -16,6 +16,11 @@ class Task extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function node()
+    {
+        return $this->belongsTo(Node::class);
+    }
+
     public function principal()
     {
         return $this->belongsTo(Staff::class);

@@ -27,6 +27,8 @@ class NodeController extends AdminController
     {
         $grid = new Grid(new Node());
 
+        $grid->model()->orderby('sort_order');
+
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))->editable();
         $grid->column('department.name', __('所属部门'));
@@ -41,7 +43,18 @@ class NodeController extends AdminController
 
         });
 
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+            //  $actions->disableEdit();
+            $actions->disableDelete();
+        });
 
+        $grid->tools(function ($tools) {
+            // 禁用批量删除按钮
+            $tools->batch(function ($batch) {
+                $batch->disableDelete();
+            });
+        });
         return $grid;
     }
 

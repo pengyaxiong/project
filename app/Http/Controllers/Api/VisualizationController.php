@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Node;
 use App\Models\Staff;
 use App\Models\Task;
 use DB, Cache;
+use Illuminate\Http\Request;
 
 class VisualizationController extends Controller
 {
@@ -93,7 +95,7 @@ class VisualizationController extends Controller
      * 本月热门销量
      * @return mixed
      */
-    function top()
+    function task_count()
     {
         return \Cache::remember('xApi_visualization_top', 60, function () {
 //            DB::enableQueryLog();
@@ -101,14 +103,14 @@ class VisualizationController extends Controller
             $end = date("Y-m-d H:i:s", $this->month_end);
 
             //本月订单的id
-            $order = Order::whereBetween('created_at', [$start, $end])->pluck('id');
+            $task = Task::whereBetween('created_at', [$start, $end])->pluck('id');
 
             //对应热门商品,前10名. 语句较复杂,请自己return sql出来看
-            $products = OrderProduct::with('product')
-                ->select('product_id', \DB::raw('sum(num) as sum_num'))
-                ->whereIn('order_id', $order)
-                ->groupBy('product_id')
-                ->orderBy(\DB::raw('sum(num)'), 'desc')
+            $tasks = Task::with('principal')
+                ->select('principal_id', \DB::raw('sum(days) as sum_num'))
+                ->whereIn('id', $task)
+                ->groupBy('principal_id')
+                ->orderBy(\DB::raw('sum(days)'), 'desc')
                 ->take(5)
                 ->get();
 
@@ -118,7 +120,7 @@ class VisualizationController extends Controller
             $data = [
                 'month_start' => date("Y年m月d日", $this->month_start),
                 'month_end' => date("Y年m月d日", $this->month_end),
-                'products' => $products,
+                'tasks' => $tasks,
             ];
             return $data;
         });
@@ -226,7 +228,7 @@ class VisualizationController extends Controller
     {
         //负责人
         $principal = [];
-        $principals = Task::where('type', '方案')->select('principal_id')->distinct()->get();
+        $principals = Task::where('node_id', 1)->select('principal_id')->distinct()->get();
         foreach ($principals as $k => $v) {
             $task = Task::where('principal_id', $v->principal_id)->count();
             $contract = Task::where('principal_id', $v->principal_id)->where('is_contract', true)->count();
@@ -240,17 +242,47 @@ class VisualizationController extends Controller
         return $principal;
     }
 
-    public function task_days()
+    public function task_days(Request $request)
     {
+        $where = function ($query) use ($request) {
+            if ($request->has('id') && $request->id != null) {
+                $query->where('id', $request->id);
+            }
+            if ($request->has('name') && $request->name != null) {
+                $query->where('name', 'like', '%' . $request->name . '%');
+            }
+            if ($request->has('principal_id') && $request->principal_id != null) {
+                $query->where('principal_id', $request->principal_id);
+            }
+            if ($request->has('access_id') && $request->access_id != null) {
+                $query->where('access_id', $request->access_id);
+            }
+            if ($request->has('is_contract') && $request->is_contract != null) {
+                $query->where('is_contract', $request->is_contract);
+            }
 
-       // $day = Task::select(\DB::raw('sum(days) as count, company_id'))->groupBy('company_id')->get()->pluck('count','company.name')->toArray();
-        $task=[];
-        $companies=Company::all();
-        foreach ($companies as  $k=>$company){
-            $task['company'][$k]=$company->name;
-            $task['days'][$k]['value']=Task::where('company_id', $company->id)->sum('days');
-            $task['days'][$k]['name']=$company->name;
+        };
+        // $day = Task::select(\DB::raw('sum(days) as count, company_id'))->groupBy('company_id')->get()->pluck('count','company.name')->toArray();
+        $task = [];
+        $companies = Company::all();
+        foreach ($companies as $k => $company) {
+            $task['company'][$k] = $company->name;
+            $task['days'][$k]['value'] = Task::where($where)->where('company_id', $company->id)->sum('days');
+            $task['days'][$k]['name'] = $company->name;
         }
         return $task;
+    }
+
+    public function project_count()
+    {
+        //节点
+        $nodes = Node::all()->toArray();
+
+        foreach ($nodes as $key=>$node) {
+            $nodes[$key]['node']=$node['name'];
+        }
+
+
+        return $nodes;
     }
 }

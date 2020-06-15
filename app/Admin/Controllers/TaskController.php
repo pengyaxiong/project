@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Company;
+use App\Models\Node;
 use App\Models\Project;
 use App\Models\Staff;
 use App\Models\Task;
@@ -33,7 +34,7 @@ class TaskController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('company.name', __('所属公司'));
-        $grid->column('type', __('类型'));
+        $grid->column('node.name', __('类型'));
         $grid->column('name', __('Name'));
         $grid->column('principal.name', __('负责人'));
         $grid->column('access.name', __('对接人'));
@@ -96,7 +97,7 @@ class TaskController extends AdminController
 
         $show->field('id', __('Id'));
         $show->field('company_id', __('Company id'));
-        $show->field('type', __('Type'));
+        $show->field('node.name', __('类型'));
         $show->field('name', __('Name'));
         $show->field('principal_id', __('Principal id'));
         $show->field('access_id', __('Access id'));
@@ -126,10 +127,15 @@ class TaskController extends AdminController
         //创建select
         $form->select('company_id', '所属公司')->options($select_array);
 
+        $nodes = Node::all()->toArray();
+        $select_node = array_column($nodes, 'name', 'id');
+        //创建select
+        $form->select('node_id', '类型')->options($select_node);
+
+
         $staffs = Staff::all()->toArray();
         $staffs_array = array_column($staffs, 'name', 'id');
 
-        $form->text('type', __('Type'))->help('方案&案例设计&设计图&功能清单');
         $form->text('name', __('Name'));
         $form->select('principal_id', __('负责人'))->options($staffs_array);
         $form->select('access_id', __('对接人'))->options($staffs_array);

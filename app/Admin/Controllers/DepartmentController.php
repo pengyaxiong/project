@@ -27,6 +27,8 @@ class DepartmentController extends AdminController
     {
         $grid = new Grid(new Department());
 
+        $grid->model()->orderby('sort_order');
+
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))->editable();
         $grid->column('', __('部门节点'))->display(function (){

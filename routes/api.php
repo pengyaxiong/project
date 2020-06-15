@@ -27,6 +27,10 @@ Route::group(['namespace' => 'Api'], function () {
     Route::get('case_count', 'VisualizationController@case_count');
     //任务周期比列
     Route::get('task_days', 'VisualizationController@task_days');
+    //任务量统计
+    Route::get('task_count', 'VisualizationController@task_count');
+    //项目情况统计
+    Route::get('project_count', 'VisualizationController@project_count');
 
 });
 

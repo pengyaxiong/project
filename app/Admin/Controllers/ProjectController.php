@@ -4,8 +4,10 @@ namespace App\Admin\Controllers;
 
 use App\Models\Company;
 use App\Models\Customer;
+use App\Models\Node;
 use App\Models\Project;
 use App\Models\ProjectCustomer;
+use App\Models\ProjectNode;
 use App\Models\ProjectStaff;
 use App\Models\Staff;
 use App\Models\Task;
@@ -148,7 +150,9 @@ class ProjectController extends AdminController
         $form->select('company_id', '所属公司')->options($select_array);
 
         $tasks = Task::all()->toArray();
-        $select_task = array_column($tasks, 'name', 'id');
+        $select_ = array_prepend($tasks, ['id' => 0, 'name' => '其它']);
+        $select_task = array_column($select_, 'name', 'id');
+
         //创建select
         $form->select('task_id', '任务名称')->options($select_task);
 
@@ -173,11 +177,19 @@ class ProjectController extends AdminController
         $form->ueditor('content', __('Content'));
         $form->textarea('remark', __('Remark'));
 
-        $form->table('node', __('Node'), function ($table) {
-            $table->text('name', __('节点名称'));
-            $table->textarea('content', __('节点情况'));
-            $table->text('start', __('开始时间'));
-            $table->text('end', __('结束时间'));
+        $form->table('node', __('节点情况'), function ($table) {
+            $staffs=Staff::all()->toArray();
+            $select_staff = array_column($staffs, 'name', 'id');
+            $table->select('staff_id', '负责人')->options($select_staff);
+
+            $nodes=Node::all()->toArray();
+            $select_node = array_column($nodes, 'name', 'id');
+            $table->select('node_id', '节点')->options($select_node);
+
+            $table->datetime('start_time', '开始时间')->default(date('Y-m-d',time()));
+            $table->datetime('end_time', '结束时间')->default(date('Y-m-d',time()));
+            $table->number('days', '耗时')->help('天');
+            $table->textarea('content', '详情');
         });
 
         $form->decimal('money', __('Money'))->default(0.00);
@@ -190,7 +202,6 @@ class ProjectController extends AdminController
         $form->datetime('contract_time', __('Contract time'));
         $form->datetime('check_time', __('Check time'));
 
-
         //保存前回调
         $form->saving(function (Form $form) {
             $is_check = $form->model()->is_check;
@@ -200,6 +211,30 @@ class ProjectController extends AdminController
                 $form->check_time=null;
             }
         });
+
+        //保存后回调
+        $form->saved(function (Form $form) {
+            $id = $form->model()->id;
+            $node = array_filter(\Request('node'));
+//           dump($node);
+//           exit();
+            if (!empty($node)) {
+                ProjectNode::where('project_id',$id)->delete();
+                foreach ($node as $value) {
+                    ProjectNode::create([
+                        'staff_id' => $value['staff_id'],
+                        'node_id' => $value['node_id'],
+                        'project_id' => $id,
+                        'start_time' => $value['start_time'],
+                        'end_time' => $value['end_time'],
+                        'days' => $value['days'],
+                        'content' => $value['content'],
+                    ]);
+                }
+
+            }
+        });
+
         return $form;
     }
 }

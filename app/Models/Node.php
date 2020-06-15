@@ -17,4 +17,17 @@ class Node extends Model
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class,'wechat_project_node','project_id','node_id')->withPivot(
+            'project_id',
+            'staff_id',
+            'start_time',
+            'end_time',
+            'days',
+            'content',
+            'node_id'
+        );
+    }
 }

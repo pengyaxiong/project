@@ -25,16 +25,23 @@ class HomeController extends Controller
                 $row->column(12, function (Column $column) {
                     $column->row(function (Row $row) {
                         $row->column(6, function (Column $column) {
-                            $column->append(new Box('签单情况统计', view('admin.chartjs')));
+                            $column->append(new Box('任务情况统计', view('admin.chartjs')));
                         });
                         $row->column(6, function (Column $column) {
-                            $column->append(new Box('员工性别统计', view('admin.sex_count')));
+                            $column->append(new Box('本月任务量统计', view('admin.task_count')));
                         });
+//                        $row->column(6, function (Column $column) {
+//                            $column->append(new Box('员工性别统计', view('admin.sex_count')));
+//                        });
                     });
                 });
 
                 $row->column(12, function (Column $column) {
                     $column->append(new Box('方案签约率统计', view('admin.case_count')));
+                });
+
+                $row->column(12, function (Column $column) {
+                    $column->append(new Box('项目节点时间统计', view('admin.project_count')));
                 });
 
                 $row->column(12, function (Column $column) {
