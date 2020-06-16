@@ -218,7 +218,7 @@ class VisualizationController extends Controller
                 $rate = $done / $all;
             }
             $access[$k]['name'] = Staff::find($v->access_id)->name . '(签约率:' . round($rate, 2) . ')';
-            $access[$k]['value'] = Task::where('access_id', $v->access_id)->count();
+            $access[$k]['value'] = Task::where('access_id', $v->access_id)->where('node_id', 1)->count();
         }
 
         $legend = array_pluck($access, 'name');
