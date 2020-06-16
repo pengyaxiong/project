@@ -52,10 +52,10 @@ class CustomerController extends AdminController
         $grid->column('updated_at', __('Updated at'));
 
         //禁用创建按钮
-      //  $grid->disableCreateButton();
+        //  $grid->disableCreateButton();
         $grid->actions(function ($actions) {
             $actions->disableView();
-         //   $actions->disableEdit();
+            //   $actions->disableEdit();
             $actions->disableDelete();
         });
 
@@ -70,6 +70,29 @@ class CustomerController extends AdminController
                 0 => '其它'
             ];
             $filter->equal('sex', __('Sex'))->select($status_text);
+        });
+
+
+        $grid->export(function ($export) {
+
+            $export->filename('客户列表');
+
+            $export->originalValue(['name', 'openid','nickname','headimgurl','tel','remark']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
+
+           // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
+
+             $export->except(['sort_order', 'updated_at' ]); //用来指定哪些列不需要被导出
+
+            $export->column('sex', function ($value, $original) {
+                switch ($original){
+                    case 1:
+                        return '男';
+                    case 2:
+                        return '女';
+                    default:
+                        return '其它';
+                }
+            });
         });
 
         return $grid;
@@ -116,7 +139,7 @@ class CustomerController extends AdminController
 
         $form->text('name', __('Name'));
         $form->text('openid', __('Openid'));
-        $form->select('sex', __('Sex'))->options([1=>'男',2=>'女',0=>'保密']);
+        $form->select('sex', __('Sex'))->options([1 => '男', 2 => '女', 0 => '保密']);
         $form->text('language', __('Language'));
         $form->text('nickname', __('Nickname'));
         $form->text('headimgurl', __('Headimgurl'));

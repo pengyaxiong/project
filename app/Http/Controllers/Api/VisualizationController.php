@@ -272,6 +272,7 @@ class VisualizationController extends Controller
             $task['days'][$k]['value'] = Task::where($where)->where('company_id', $company->id)->sum('days');
             $task['days'][$k]['name'] = $company->name;
         }
+        $task['all']=Task::where($where)->sum('days');
         return $task;
     }
 

@@ -82,6 +82,27 @@ class TaskController extends AdminController
             return "<div style='padding: 5px;'>总时长 ： $days 天</div>";
         });
 
+
+        $grid->export(function ($export) {
+
+            $export->filename('任务列表');
+
+            $export->originalValue(['']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
+
+            // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
+
+            $export->except(['sort_order', 'updated_at' ]); //用来指定哪些列不需要被导出
+
+            $export->column('is_contract', function ($value, $original) {
+                switch ($original){
+                    case 1:
+                        return '是';
+                    default:
+                        return '否';
+                }
+            });
+        });
+
         return $grid;
     }
 

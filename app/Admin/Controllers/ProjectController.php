@@ -59,10 +59,10 @@ class ProjectController extends AdminController
             'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
         ];
-        $grid->column('is_check', __('Is check'))->switch($states);
+        $grid->column('is_check', __('是否交付'))->switch($states);
 
         $grid->column('contract_time', __('Contract time'))->editable('datetime');
-        $grid->column('check_time', __('Check time'));
+        $grid->column('check_time', __('交付时间'));
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
@@ -71,10 +71,10 @@ class ProjectController extends AdminController
             $filter->like('name', __('Name'));
             $filter->between('contract_time', __('Contract time'))->date();
             $status_text = [
-                1 => '审核',
-                0 => '未审核'
+                1 => '交付',
+                0 => '未交付'
             ];
-            $filter->equal('is_check', __('Is check'))->select($status_text);
+            $filter->equal('is_check', __('是否交付'))->select($status_text);
 
             $companies = Company::all()->toArray();
             $select_array = array_column($companies, 'name', 'id');
@@ -99,10 +99,54 @@ class ProjectController extends AdminController
 
         });
 
+        $grid->export(function ($export) {
+
+            $export->filename('项目列表');
+
+            $export->originalValue(['money','contract_time']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
+
+            // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
+
+            $export->except(['sort_order', 'updated_at' ]); //用来指定哪些列不需要被导出
+            $export->column('customer_name', function ($value, $original) {
+                return $this->cutstr_html($value);
+            });
+            $export->column('staff_name', function ($value, $original) {
+                return $this->cutstr_html($value);
+            });
+            $export->column('is_check', function ($value, $original) {
+                switch ($original){
+                    case 1:
+                        return '是';
+                    default:
+                        return '否';
+                }
+            });
+        });
 
         return $grid;
     }
 
+    //去掉文本中的HTML标签
+    public function cutstr_html($string, $length = 0, $ellipsis = '…')
+    {
+        $string = strip_tags($string);
+        $string = preg_replace('/\n/is', '', $string);
+        $string = preg_replace('/ |　/is', '', $string);
+        $string = preg_replace('/ /is', '', $string);
+        $string = preg_replace('/<br \/>([\S]*?)<br \/>/','<p>$1<\/p>',$string);
+        preg_match_all("/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|\xe0[\xa0-\xbf][\x80-\xbf]|[\xe1-\xef][\x80-\xbf][\x80-\xbf]|\xf0[\x90-\xbf][\x80-\xbf][\x80-\xbf]|[\xf1-\xf7][\x80-\xbf][\x80-\xbf][\x80-\xbf]/", $string, $string);
+        if (is_array($string) && !empty($string[0])) {
+            if (is_numeric($length) && $length) {
+                $string = join('', array_slice($string[0], 0, $length)) . $ellipsis;
+            } else {
+                $string = implode('', $string[0]);
+            }
+        } else {
+            $string = '';
+        }
+        return $string;
+    }
     /**
      * Make a show builder.
      *
@@ -124,9 +168,9 @@ class ProjectController extends AdminController
         $show->field('remark', __('Remark'));
         $show->field('money', __('Money'));
         $show->field('sort_order', __('Sort order'));
-        $show->field('is_check', __('Is check'));
+        $show->field('is_check', __('是否交付'));
         $show->field('contract_time', __('Contract time'));
-        $show->field('check_time', __('Check time'));
+        $show->field('check_time', __('交付时间'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
 
@@ -198,9 +242,9 @@ class ProjectController extends AdminController
             'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
         ];
-        $form->switch('is_check', __('Is check'))->states($states)->default(0);
+        $form->switch('is_check', __('是否交付'))->states($states)->default(0);
         $form->datetime('contract_time', __('Contract time'));
-        $form->datetime('check_time', __('Check time'));
+        $form->datetime('check_time', __('交付时间'));
 
         //保存前回调
         $form->saving(function (Form $form) {

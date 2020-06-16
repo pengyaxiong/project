@@ -16,7 +16,7 @@
             // 指定图表的配置项和数据
             myChart.setOption({
                 title: {
-                    //    text: '会员性别统计',
+                    text: '总时长'+data.all+'天',
                     x: 'center'
                 },
                 tooltip: {
