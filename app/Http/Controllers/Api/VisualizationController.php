@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Node;
+use App\Models\Project;
+use App\Models\ProjectNode;
 use App\Models\Staff;
 use App\Models\Task;
 use DB, Cache;
@@ -275,14 +277,29 @@ class VisualizationController extends Controller
 
     public function project_count()
     {
-        //节点
-        $nodes = Node::all()->toArray();
 
-        foreach ($nodes as $key=>$node) {
-            $nodes[$key]['node']=$node['name'];
+        $nodes = Node::all()->pluck('name')->toArray();
+        $nodes_id = Node::all()->pluck('id')->toArray();
+        $projects = Project::all()->pluck('name')->toArray();
+        $projects_id = Project::all()->pluck('id')->toArray();
+        $series = [];
+        $data_arr = [];
+        $label = array('show' => true, 'position' => 'insideRight');
+        foreach ($nodes_id as $k => $v) {
+            foreach ($projects_id as $key=>$project){
+                $data_arr[$key]=ProjectNode::where('node_id',$v)->where('project_id',$project)->sum('days');
+            }
+            $series[$k]['name'] = Node::find($v)->name;
+            $series[$k]['type'] = 'bar';
+            $series[$k]['data'] = $data_arr;
+            $series[$k]['label'] = $label;
         }
+        $data = [
+            'node' => $nodes,
+            'project' => $projects,
+            'series' => $series,
+        ];
 
-
-        return $nodes;
+        return $data;
     }
 }
