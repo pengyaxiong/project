@@ -210,8 +210,8 @@ class VisualizationController extends Controller
         $access = [];
         $accesses = Task::where('access_id', '>',0)->select('access_id')->distinct()->get();
         foreach ($accesses as $k => $v) {
-            $all=Task::where('access_id', $v->access_id)->count();
-            $done=Task::where('access_id', $v->access_id)->where('is_contract', true)->count();
+            $all=Task::where('access_id', $v->access_id)->where('node_id', 1)->count();
+            $done=Task::where('access_id', $v->access_id)->where('node_id', 1)->where('is_contract', true)->count();
 
             $access[$k]['name'] = Staff::find($v->access_id)->name.'(签约率:'.round($done/$all,2).')';
             $access[$k]['value'] = Task::where('access_id', $v->access_id)->count();
@@ -223,7 +223,7 @@ class VisualizationController extends Controller
         $contract = [];
         foreach ($accesses as $k => $v) {
             $contract[$k]['name'] = Staff::find($v->access_id)->name;
-            $contract[$k]['value'] = Task::where('access_id', $v->access_id)->where('is_contract', true)->count();
+            $contract[$k]['value'] = Task::where('access_id', $v->access_id)->where('node_id', 1)->where('is_contract', true)->count();
         }
 
         $data = [
