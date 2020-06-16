@@ -32,10 +32,24 @@ class NodeController extends AdminController
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))->editable();
         $grid->column('department.name', __('所属部门'));
+        $states = [
+            'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
+            'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+        ];
+        $grid->column('is_task', __('任务节点'))->switch($states);
+        $grid->column('is_project', __('项目节点'))->switch($states);
+
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
 
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));
+
+            $status_text = [
+                1 => '是',
+                0 => '否'
+            ];
+            $filter->equal('is_task', __('任务节点'))->select($status_text);
+            $filter->equal('is_project', __('项目节点'))->select($status_text);
 
             $departments = Department::all()->toArray();
             $select_array = array_column($departments, 'name', 'id');
@@ -86,6 +100,13 @@ class NodeController extends AdminController
         $form = new Form(new Node());
 
         $form->text('name', __('Name'))->rules('required');
+
+        $states = [
+            'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
+            'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+        ];
+        $form->switch('is_task', __('任务节点'))->states($states)->default(0);
+        $form->switch('is_project', __('项目节点'))->states($states)->default(0);
 
         $departments = Department::all()->toArray();
         $select_array = array_column($departments, 'name', 'id');

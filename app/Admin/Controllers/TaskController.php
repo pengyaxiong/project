@@ -127,7 +127,7 @@ class TaskController extends AdminController
         //创建select
         $form->select('company_id', '所属公司')->options($select_array);
 
-        $nodes = Node::all()->toArray();
+        $nodes = Node::where('is_task',true)->get()->toArray();
         $select_node = array_column($nodes, 'name', 'id');
         //创建select
         $form->select('node_id', '类型')->options($select_node);

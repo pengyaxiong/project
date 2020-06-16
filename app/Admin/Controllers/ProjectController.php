@@ -182,7 +182,7 @@ class ProjectController extends AdminController
             $select_staff = array_column($staffs, 'name', 'id');
             $table->select('staff_id', '负责人')->options($select_staff);
 
-            $nodes=Node::all()->toArray();
+            $nodes=Node::where('is_project',true)->get()->toArray();
             $select_node = array_column($nodes, 'name', 'id');
             $table->select('node_id', '节点')->options($select_node);
 

@@ -278,8 +278,8 @@ class VisualizationController extends Controller
     public function project_count()
     {
 
-        $nodes = Node::all()->pluck('name')->toArray();
-        $nodes_id = Node::all()->pluck('id')->toArray();
+        $nodes = Node::where('is_project',true)->get()->pluck('name')->toArray();
+        $nodes_id = Node::where('is_project',true)->get()->pluck('id')->toArray();
         $projects = Project::all()->pluck('name')->toArray();
         $projects_id = Project::all()->pluck('id')->toArray();
         $series = [];
