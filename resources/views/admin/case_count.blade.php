@@ -45,7 +45,7 @@
                         name: '方案数&签约数',
                         min: 0,
                         max: 50,
-                        interval: 2,
+                        interval: 5,
                         axisLabel: {
                             formatter: '{value}'
                         }
