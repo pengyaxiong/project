@@ -208,7 +208,7 @@ class VisualizationController extends Controller
         }
         //对接人
         $access = [];
-        $accesses = Task::where('access_id', '>', 0)->select('access_id')->distinct()->get();
+        $accesses = Task::where('node_id', 1)->select('access_id')->distinct()->get();
         foreach ($accesses as $k => $v) {
             $all = Task::where('access_id', $v->access_id)->where('node_id', 1)->count();
             $done = Task::where('access_id', $v->access_id)->where('node_id', 1)->where('is_contract', true)->count();
