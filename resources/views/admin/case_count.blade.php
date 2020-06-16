@@ -44,8 +44,8 @@
                         type: 'value',
                         name: '方案数&签约数',
                         min: 0,
-                        max: 10,
-                        interval: 1,
+                        max: 50,
+                        interval: 2,
                         axisLabel: {
                             formatter: '{value}'
                         }
