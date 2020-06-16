@@ -208,18 +208,29 @@ class VisualizationController extends Controller
         }
         //对接人
         $access = [];
-        $accesses = Task::where('is_contract', true)->select('access_id')->distinct()->get();
+        $accesses = Task::where('access_id', '>',0)->select('access_id')->distinct()->get();
         foreach ($accesses as $k => $v) {
-            $access[$k]['name'] = Staff::find($v->access_id)->name;
+            $all=Task::where('access_id', $v->access_id)->count();
+            $done=Task::where('access_id', $v->access_id)->where('is_contract', true)->count();
+
+            $access[$k]['name'] = Staff::find($v->access_id)->name.'(签约率:'.round($done/$all,2).')';
             $access[$k]['value'] = Task::where('access_id', $v->access_id)->count();
         }
 
-        $legend = array_pluck($principal, 'name');
+        $legend = array_pluck($access, 'name');
+
+        //签约数量
+        $contract = [];
+        foreach ($accesses as $k => $v) {
+            $contract[$k]['name'] = Staff::find($v->access_id)->name;
+            $contract[$k]['value'] = Task::where('access_id', $v->access_id)->where('is_contract', true)->count();
+        }
 
         $data = [
             'principal' => $principal,
             'access' => $access,
             'legend' => $legend,
+            'contract' => $contract,
         ];
 
         return $data;

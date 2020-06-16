@@ -23,7 +23,7 @@
                 },
                 series: [
                     {
-                        name: '对接人',
+                        name: '签约数量',
                         type: 'pie',
                         selectedMode: 'single',
                         radius: [0, '30%'],
@@ -34,10 +34,10 @@
                         labelLine: {
                             show: false
                         },
-                        data: data.access
+                        data: data.contract
                     },
                     {
-                        name: '负责人',
+                        name: '任务数量',
                         type: 'pie',
                         radius: ['40%', '55%'],
                         label: {
@@ -82,7 +82,7 @@
                                 }
                             }
                         },
-                        data: data.principal
+                        data: data.access
                     }
                 ]
             });
