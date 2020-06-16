@@ -208,12 +208,16 @@ class VisualizationController extends Controller
         }
         //对接人
         $access = [];
-        $accesses = Task::where('access_id', '>',0)->select('access_id')->distinct()->get();
+        $accesses = Task::where('access_id', '>', 0)->select('access_id')->distinct()->get();
         foreach ($accesses as $k => $v) {
-            $all=Task::where('access_id', $v->access_id)->where('node_id', 1)->count();
-            $done=Task::where('access_id', $v->access_id)->where('node_id', 1)->where('is_contract', true)->count();
-
-            $access[$k]['name'] = Staff::find($v->access_id)->name.'(签约率:'.round($done/$all,2).')';
+            $all = Task::where('access_id', $v->access_id)->where('node_id', 1)->count();
+            $done = Task::where('access_id', $v->access_id)->where('node_id', 1)->where('is_contract', true)->count();
+            if ($all == 0) {
+                $rate = 0;
+            } else {
+                $rate = $done / $all;
+            }
+            $access[$k]['name'] = Staff::find($v->access_id)->name . '(签约率:' . round($rate, 2) . ')';
             $access[$k]['value'] = Task::where('access_id', $v->access_id)->count();
         }
 
@@ -283,23 +287,23 @@ class VisualizationController extends Controller
             $task['days'][$k]['value'] = Task::where($where)->where('company_id', $company->id)->sum('days');
             $task['days'][$k]['name'] = $company->name;
         }
-        $task['all']=Task::where($where)->sum('days');
+        $task['all'] = Task::where($where)->sum('days');
         return $task;
     }
 
     public function project_count()
     {
 
-        $nodes = Node::where('is_project',true)->get()->pluck('name')->toArray();
-        $nodes_id = Node::where('is_project',true)->get()->pluck('id')->toArray();
+        $nodes = Node::where('is_project', true)->get()->pluck('name')->toArray();
+        $nodes_id = Node::where('is_project', true)->get()->pluck('id')->toArray();
         $projects = Project::all()->pluck('name')->toArray();
         $projects_id = Project::all()->pluck('id')->toArray();
         $series = [];
         $data_arr = [];
         $label = array('show' => true, 'position' => 'insideRight');
         foreach ($nodes_id as $k => $v) {
-            foreach ($projects_id as $key=>$project){
-                $data_arr[$key]=ProjectNode::where('node_id',$v)->where('project_id',$project)->sum('days');
+            foreach ($projects_id as $key => $project) {
+                $data_arr[$key] = ProjectNode::where('node_id', $v)->where('project_id', $project)->sum('days');
             }
             $series[$k]['name'] = Node::find($v)->name;
             $series[$k]['type'] = 'bar';
