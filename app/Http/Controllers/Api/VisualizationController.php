@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Department;
 use App\Models\Node;
 use App\Models\Project;
 use App\Models\ProjectNode;
@@ -338,7 +339,8 @@ class VisualizationController extends Controller
         //员工
         $staffs = Staff::all()->pluck('name')->toArray();
 
-        $staffs_ = Staff::all();
+        $department_ids=Node::wherein('id',$nodes)->pluck('department_id')->toarray();
+        $staffs_ = Staff::wherein('department_id',$department_ids)->get();
 
         $staff_project_arr = [];
         foreach ($projects_ as $key => $project) {
