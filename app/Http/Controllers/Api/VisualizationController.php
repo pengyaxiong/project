@@ -339,7 +339,8 @@ class VisualizationController extends Controller
         //员工
 
 
-        $department_ids=Node::wherein('id',$nodes)->pluck('department_id')->toarray();
+        $department_ids=Node::wherein('name',$nodes)->pluck('department_id')->toarray();
+
         $staffs_ = Staff::wherein('department_id',$department_ids)->get();
 
         $staffs = Staff::wherein('department_id',$department_ids)->get()->pluck('name')->toArray();
