@@ -45,6 +45,10 @@ class HomeController extends Controller
                 });
 
                 $row->column(12, function (Column $column) {
+                    $column->append(new Box('员工项目情况分析', view('admin.staff_project')));
+                });
+
+                $row->column(12, function (Column $column) {
                     $column->append(Dashboard::environment());
                 });
             });

@@ -318,4 +318,46 @@ class VisualizationController extends Controller
 
         return $data;
     }
+
+    /**
+     * 员工项目情况分析图
+     */
+    public function staff_project()
+    {
+        //项目
+        $projects = Project::all()->pluck('name')->toArray();
+        $projects_ = Project::all();
+        //项目节点
+        $nodes = Node::where('is_project', true)->pluck('name')->toArray();
+        $nodes_ = Node::where('is_project', true)->get();
+        $node_arr = [];
+        foreach ($nodes as $k => $node) {
+            $node_arr[$k]['name'] = $node;
+            $node_arr[$k]['type'] = 'bar';
+        }
+        //员工
+        $staffs = Staff::all()->pluck('name')->toArray();
+
+        $staffs_ = Staff::all();
+
+        $staff_project_arr = [];
+        foreach ($projects_ as $key => $project) {
+            $staff_project_arr[$key]['title']=['text'=>$project->name];
+            foreach ($nodes_ as $k=>$node){
+                foreach ($staffs_ as $kk=>$staff) {
+                    $staff_project_arr[$key]['series'][$k]['data'][$kk] = ProjectNode::where('node_id', $node->id)->where('project_id', $project->id)->where('staff_id', $staff->id)->sum('days');
+                }
+            }
+        }
+
+        $data = [
+            'projects' => $projects,
+            'nodes' => $nodes,
+            'node_arr' => $node_arr,
+            'staffs' => $staffs,
+            'staff_project_arr' => $staff_project_arr,
+        ];
+
+        return $data;
+    }
 }
