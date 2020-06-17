@@ -337,10 +337,12 @@ class VisualizationController extends Controller
             $node_arr[$k]['type'] = 'bar';
         }
         //员工
-        $staffs = Staff::all()->pluck('name')->toArray();
+
 
         $department_ids=Node::wherein('id',$nodes)->pluck('department_id')->toarray();
         $staffs_ = Staff::wherein('department_id',$department_ids)->get();
+
+        $staffs = Staff::wherein('department_id',$department_ids)->get()->pluck('name')->toArray();
 
         $staff_project_arr = [];
         foreach ($projects_ as $key => $project) {
