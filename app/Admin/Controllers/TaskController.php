@@ -53,7 +53,7 @@ class TaskController extends AdminController
 
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));
-            $filter->between('start_time', __('开始时间'))->date();
+            $filter->between('start_time', __('开始时间'))->datetime();
             $status_text = [
                 1 => '签约',
                 0 => '未签约'

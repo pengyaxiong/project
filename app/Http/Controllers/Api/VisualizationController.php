@@ -114,7 +114,7 @@ class VisualizationController extends Controller
                 ->whereIn('id', $task)
                 ->groupBy('principal_id')
                 ->orderBy(\DB::raw('sum(days)'), 'desc')
-                ->take(5)
+             //   ->take(5)
                 ->get();
 
 
@@ -279,6 +279,13 @@ class VisualizationController extends Controller
                 $query->where('is_contract', $request->is_contract);
             }
 
+            if ($request->has('end') && $request->end != null) {
+                $query->where('start_time','<=', $request->end);
+            }
+
+            if ($request->has('start') && $request->start != null) {
+                $query->where('start_time','>=', $request->start);
+            }
         };
         // $day = Task::select(\DB::raw('sum(days) as count, company_id'))->groupBy('company_id')->get()->pluck('count','company.name')->toArray();
         $task = [];
