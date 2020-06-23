@@ -114,7 +114,7 @@ class VisualizationController extends Controller
                 ->whereIn('id', $task)
                 ->groupBy('principal_id')
                 ->orderBy(\DB::raw('sum(days)'), 'desc')
-             //   ->take(5)
+                //   ->take(5)
                 ->get();
 
 
@@ -242,6 +242,24 @@ class VisualizationController extends Controller
 
     }
 
+    public function task_rate()
+    {
+        //对接人
+        $access = [];
+        $accesses = Task::where('node_id', 1)->select('access_id')->distinct()->get();
+        foreach ($accesses as $k => $v) {
+            $task = Task::where('access_id', $v->access_id)->count();
+            $contract = Task::where('access_id', $v->access_id)->where('is_contract', true)->count();
+
+            $access['name'][$k] = Staff::find($v->access_id)->name;
+            $access['task'][$k] = $task;
+            $access['contract'][$k] = $contract;
+            $access['rate'][$k] = $task ? $contract / $task : 0;
+        }
+
+        return $access;
+    }
+
     public function case_count()
     {
         //负责人
@@ -280,11 +298,11 @@ class VisualizationController extends Controller
             }
 
             if ($request->has('end') && $request->end != null) {
-                $query->where('start_time','<=', $request->end);
+                $query->where('start_time', '<=', $request->end);
             }
 
             if ($request->has('start') && $request->start != null) {
-                $query->where('start_time','>=', $request->start);
+                $query->where('start_time', '>=', $request->start);
             }
         };
         // $day = Task::select(\DB::raw('sum(days) as count, company_id'))->groupBy('company_id')->get()->pluck('count','company.name')->toArray();
@@ -346,17 +364,17 @@ class VisualizationController extends Controller
         //员工
 
 
-        $department_ids=Node::wherein('name',$nodes)->pluck('department_id')->toarray();
+        $department_ids = Node::wherein('name', $nodes)->pluck('department_id')->toarray();
 
-        $staffs_ = Staff::wherein('department_id',$department_ids)->get();
+        $staffs_ = Staff::wherein('department_id', $department_ids)->get();
 
-        $staffs = Staff::wherein('department_id',$department_ids)->get()->pluck('name')->toArray();
+        $staffs = Staff::wherein('department_id', $department_ids)->get()->pluck('name')->toArray();
 
         $staff_project_arr = [];
         foreach ($projects_ as $key => $project) {
-            $staff_project_arr[$key]['title']=['text'=>$project->name];
-            foreach ($nodes_ as $k=>$node){
-                foreach ($staffs_ as $kk=>$staff) {
+            $staff_project_arr[$key]['title'] = ['text' => $project->name];
+            foreach ($nodes_ as $k => $node) {
+                foreach ($staffs_ as $kk => $staff) {
                     $staff_project_arr[$key]['series'][$k]['data'][$kk] = ProjectNode::where('node_id', $node->id)->where('project_id', $project->id)->where('staff_id', $staff->id)->sum('days');
                 }
             }

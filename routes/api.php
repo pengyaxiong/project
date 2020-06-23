@@ -23,6 +23,7 @@ Route::group(['namespace' => 'Api'], function () {
     Route::get('sex_count', 'VisualizationController@sex_count');
     //签单情况统计
     Route::get('chartjs', 'VisualizationController@chartjs');
+    Route::get('task_rate', 'VisualizationController@task_rate');
     //方案签约率统计
     Route::get('case_count', 'VisualizationController@case_count');
     //任务周期比列
