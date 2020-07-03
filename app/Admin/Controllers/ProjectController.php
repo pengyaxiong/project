@@ -15,6 +15,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Widgets\Table;
 
 class ProjectController extends AdminController
 {
@@ -82,6 +83,22 @@ class ProjectController extends AdminController
                 $html[]='<span class="label" style="background-color: #00b7ee">'.$name.'</span><span class="label label-default">'.$node_name.$v["days"].'天</span>';
             }
             return implode('&nbsp;',$html);
+        })->expand(function ($model) {
+
+            $project_nodes = ProjectNode::where('project_id',$model->id)->get()->map(function ($model) {
+                $nodes=[
+                    'id'=>$model->id,
+                    'node_name'=>Node::find($model->node_id)->name,
+                    'staff_name'=>Staff::find($model->staff_id)->name,
+                    'start_time'=>$model->start_time,
+                    'end_time'=>$model->end_time,
+                    'days'=>$model->days,
+                    'content'=>$model->content,
+                ];
+                return $nodes;
+            });
+
+            return new Table(['ID', '节点','负责人','开始时间', '结束时间','耗时(天)','详情'], $project_nodes->toArray());
         });
 
         $grid->column('staff_name', '项目人员')->display(function () {
