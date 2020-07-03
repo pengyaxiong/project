@@ -245,7 +245,7 @@ class ProjectController extends AdminController
                     'start_time'=>$v['start_time'],
                     'end_time'=>$v['end_time'],
                     'days'=>$v['days'],
-                    'content'=>$v['content'],
+                    'content'=>isset($v['content'])?$v['content']:'',
                 ];
             }
 
