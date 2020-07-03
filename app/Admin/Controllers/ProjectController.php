@@ -44,7 +44,9 @@ class ProjectController extends AdminController
         $grid = new Grid(new Project());
 
         $grid->column('id', __('Id'));
-        $grid->column('name', __('Name'));
+        $grid->column('name', __('Name'))->display(function (){
+            return '<a href="/admin/projects/'.$this->id.'" target="_blank">'.$this->name.'</a>';
+        });
         $grid->column('company.name', __('所属公司'));
         $grid->column('task.name', __('任务名称'));
         $grid->column('grade', __('优先级'))->using($this->grade)->label([
@@ -68,6 +70,13 @@ class ProjectController extends AdminController
             $customer_name=Customer::wherein('id',$customer_ids)->pluck('name')->toArray();
             return $customer_name;
         })->label('default');
+
+
+        $grid->column('staff_name', '项目负责人')->display(function () {
+            $staff_ids = ProjectStaff::where('project_id', $this->id)->pluck('staff_id')->toArray();
+            $staff_name=Staff::wherein('id',$staff_ids)->pluck('name')->toArray();
+            return $staff_name;
+        })->label();
 
         $grid->column('node', __('Node'))->display(function ($node) {
             $html=[];
@@ -102,14 +111,9 @@ class ProjectController extends AdminController
                 return $nodes;
             });
 
-            return new Table(['ID', '节点','负责人','开始时间', '结束时间','耗时(天)','详情'], $project_nodes->toArray());
+            return new Table(['ID', '节点','项目负责人','开始时间', '结束时间','耗时(天)','详情'], $project_nodes->toArray());
         });
 
-        $grid->column('staff_name', '项目人员')->display(function () {
-            $staff_ids = ProjectStaff::where('project_id', $this->id)->pluck('staff_id')->toArray();
-            $staff_name=Staff::wherein('id',$staff_ids)->pluck('name')->toArray();
-            return $staff_name;
-        })->label()->hide();
 
         $grid->column('days', __('总天数'))->display(function ($days){
             $result=ProjectNode::where('project_id',$this->id)->sum('days');
@@ -161,7 +165,7 @@ class ProjectController extends AdminController
                     $query->where('name', 'like', "%{$this->input}%");
                 });
 
-            }, '项目人员');
+            }, '项目负责人');
 
         });
 
@@ -229,8 +233,23 @@ class ProjectController extends AdminController
         $show->field('task.name', __('任务名称'));
         $show->field('grade', __('优先级'))->using($this->grade);
         $show->field('status', __('Status'))->using($this->status);
-        $show->field('node', __('Node'))->as(function ($node) {
-            return json_encode($node);
+        $show->field('node', __('Node'))->as(function ($nodes) {
+            foreach ($nodes as $k=>$v){
+                $staff=Staff::find($v['staff_id']);
+                $node=Node::find($v['node_id']);
+                $staff_name=isset($staff)?$staff->name:'';
+                $node_name=isset($node)?$node->name:'';
+                $nodes[$k]=[
+                    'node_name'=>$node_name,
+                    'staff_name'=>$staff_name,
+                    'start_time'=>$v['start_time'],
+                    'end_time'=>$v['end_time'],
+                    'days'=>$v['days'],
+                    'content'=>$v['content'],
+                ];
+            }
+
+           return new Table(['节点','项目负责人','开始时间', '结束时间','耗时(天)','详情'], $nodes);
         });
         $show->field('content', __('Content'));
         $show->field('remark', __('Remark'));
@@ -277,12 +296,12 @@ class ProjectController extends AdminController
 
             $form->multipleSelect('customers', __('商务'))
                 ->options($customers)->default($customer_ids);
-            $form->multipleSelect('staffs', __('项目人员'))
+            $form->multipleSelect('staffs', __('项目负责人'))
                 ->options($staffs)->default($staff_ids);
         } else {
             $form->multipleSelect('customers', __('商务'))
                 ->options($customers);
-            $form->multipleSelect('staffs', __('项目人员'))
+            $form->multipleSelect('staffs', __('项目负责人'))
                 ->options($staffs);
         }
 
@@ -295,7 +314,7 @@ class ProjectController extends AdminController
         $form->table('node', __('节点情况'), function ($table) {
             $staffs=Staff::all()->toArray();
             $select_staff = array_column($staffs, 'name', 'id');
-            $table->select('staff_id', '负责人')->options($select_staff);
+            $table->select('staff_id', '项目负责人')->options($select_staff);
 
             $nodes=Node::where('is_project',true)->get()->toArray();
             $select_node = array_column($nodes, 'name', 'id');
