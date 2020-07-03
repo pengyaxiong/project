@@ -45,7 +45,7 @@ class ProjectController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))->display(function (){
-            return '<a href="/admin/projects/'.$this->id.'" target="_blank">'.$this->name.'</a>';
+            return '<a href="/admin/projects/'.$this->id.'/edit" target="_blank">'.$this->name.'</a>';
         });
         $grid->column('company.name', __('所属公司'));
         $grid->column('task.name', __('任务名称'));
@@ -134,7 +134,7 @@ class ProjectController extends AdminController
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
-
+        $grid->fixColumns(3, -1);
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));
             $filter->between('contract_time', __('Contract time'))->date();
