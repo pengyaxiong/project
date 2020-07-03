@@ -134,7 +134,7 @@ class ProjectController extends AdminController
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
-        $grid->fixColumns(3, -1);
+       // $grid->fixColumns(3, -1);
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));
             $filter->between('contract_time', __('Contract time'))->date();
