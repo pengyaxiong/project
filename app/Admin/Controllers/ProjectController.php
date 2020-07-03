@@ -62,7 +62,7 @@ class ProjectController extends AdminController
         $grid->column('node', __('Node'))->display(function ($node) {
             $html=[];
             foreach ($node as $k=>$v){
-                if(!isset($v["staff_id"])){
+                if(!isset($v["staff_id"]) || !isset($v["days"])){
                     continue;
                 }
                 $name=Staff::find($v["staff_id"])->name;
