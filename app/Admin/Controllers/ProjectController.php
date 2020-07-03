@@ -63,10 +63,10 @@ class ProjectController extends AdminController
             $html=[];
             foreach ($node as $k=>$v){
                 if(!isset($v["staff_id"]) || !isset($v["days"])){
-                   // continue;
-                    return false;
+                    continue;
                 }
-                $name=Staff::find($v["staff_id"])->name;
+                $staff=Staff::find($v["staff_id"]);
+                $name=isset($staff->name)?$staff->name:$v["name"];
                 $html[]='<span class="label label-success">'.$name.'</span><span class="label label-danger">'.$v["days"].'天</span>';
             }
             return implode('&nbsp;',$html);
