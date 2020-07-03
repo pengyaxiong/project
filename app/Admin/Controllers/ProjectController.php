@@ -66,8 +66,11 @@ class ProjectController extends AdminController
                     continue;
                 }
                 $staff=Staff::find($v["staff_id"]);
+                $node_=Node::find($v["node_id"]);
                 $name=isset($staff)?$staff->name:'';
-                $html[]='<span class="label label-success">'.$name.'</span><span class="label label-danger">'.$v["days"].'天</span>';
+                $node_name=isset($node_)?$node_->name:'';
+
+                $html[]='<span class="label label-success">'.$name.'</span><span class="label label-danger">'.$node_name.$v["days"].'天</span>';
             }
             return implode('&nbsp;',$html);
         });
@@ -117,6 +120,8 @@ class ProjectController extends AdminController
             $select_array = array_column($companies, 'name', 'id');
             $filter->equal('company_id', __('所属公司'))->select($select_array);
 
+            $filter->equal('grade', __('优先级'))->select($this->grade);
+            $filter->equal('status', __('Status'))->select($this->status);
 
             $filter->where(function ($query) {
 
