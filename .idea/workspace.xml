@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/app/Admin/Controllers/ProjectController.php" line="264" />
+    <bookmark url="file://$PROJECT_DIR$/app/Admin/Controllers/ProjectController.php" line="267" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ac8ea5c0-4900-4615-b446-56859d0772a0" name="Default" comment="" />
@@ -62,11 +62,11 @@
       <file leaf-file-name="ProjectController.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/ProjectController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="546">
-              <caret line="76" column="56" lean-forward="true" selection-start-line="76" selection-start-column="56" selection-end-line="76" selection-end-column="56" />
+            <state relative-caret-position="399">
+              <caret line="75" column="17" lean-forward="true" selection-start-line="75" selection-start-column="17" selection-end-line="75" selection-end-column="17" />
               <folding>
                 <element signature="e#41#64#0#PHP" expanded="true" />
-                <marker date="1593747488502" expanded="true" signature="6302:6344" ph="..." />
+                <marker date="1593763874191" expanded="true" signature="52337:52362" ph="..." />
               </folding>
             </state>
           </provider>
@@ -94,7 +94,11 @@
       <find>task_count</find>
       <find>chartjs</find>
       <find>getImagesAttribute</find>
+      <find>甲方人员</find>
     </findStrings>
+    <replaceStrings>
+      <replace>商务</replace>
+    </replaceStrings>
     <dirStrings>
       <dir>C:\laragon\www\project\app\Admin\Controllers</dir>
       <dir>C:\laragon\www\project</dir>
@@ -283,12 +287,12 @@
       <workItem from="1592965326864" duration="58000" />
       <workItem from="1593427453018" duration="741000" />
       <workItem from="1593575649841" duration="4188000" />
-      <workItem from="1593737778336" duration="8496000" />
+      <workItem from="1593737778336" duration="11950000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="154427000" />
+    <option name="totallyTimeSpent" value="157881000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
@@ -695,11 +699,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/ProjectController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="546">
-          <caret line="76" column="56" lean-forward="true" selection-start-line="76" selection-start-column="56" selection-end-line="76" selection-end-column="56" />
+        <state relative-caret-position="399">
+          <caret line="75" column="17" lean-forward="true" selection-start-line="75" selection-start-column="17" selection-end-line="75" selection-end-column="17" />
           <folding>
             <element signature="e#41#64#0#PHP" expanded="true" />
-            <marker date="1593747488502" expanded="true" signature="6302:6344" ph="..." />
+            <marker date="1593763874191" expanded="true" signature="52337:52362" ph="..." />
           </folding>
         </state>
       </provider>
