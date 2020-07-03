@@ -66,7 +66,7 @@ class ProjectController extends AdminController
                     continue;
                 }
                 $staff=Staff::find($v["staff_id"]);
-                $name=isset($staff->name)?$staff->name:$v["name"];
+                $name=isset($staff)?$staff->name:'';
                 $html[]='<span class="label label-success">'.$name.'</span><span class="label label-danger">'.$v["days"].'天</span>';
             }
             return implode('&nbsp;',$html);
