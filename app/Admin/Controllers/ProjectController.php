@@ -62,6 +62,9 @@ class ProjectController extends AdminController
         $grid->column('node', __('Node'))->display(function ($node) {
             $html=[];
             foreach ($node as $k=>$v){
+                if(!$v["staff_id"]){
+                    continue;
+                }
                 $name=Staff::find($v["staff_id"])->name;
                 $html[]='<span class="label label-success">'.$name.'</span><span class="label label-danger">'.$v["days"].'天</span>';
             }
