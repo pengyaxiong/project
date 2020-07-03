@@ -86,8 +86,8 @@ class ProjectController extends AdminController
         })->expand(function ($model) {
 
             $project_nodes = ProjectNode::where('project_id',$model->id)->get()->map(function ($model) {
-                $staff=Staff::find($model->node_id);
-                $node=Node::find($model->staff_id);
+                $staff=Staff::find($model->staff_id);
+                $node=Node::find($model->node_id);
                 $staff_name=isset($staff)?$staff->name:'';
                 $node_name=isset($node)?$node->name:'';
                 $nodes=[
