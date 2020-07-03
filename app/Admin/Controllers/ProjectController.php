@@ -24,6 +24,14 @@ class ProjectController extends AdminController
      * @var string
      */
     protected $title = '项目管理';
+    protected $grade=[];
+    protected $status=[];
+    public function __construct()
+    {
+
+        $this->grade =[1=>'A',2=>'B',3=>'C',4=>'D',5=>'E'];
+        $this->status =[1=>'已立项',2=>'进行中',3=>'已暂停',4=>'已结项'];
+    }
 
     /**
      * Make a grid builder.
@@ -38,7 +46,27 @@ class ProjectController extends AdminController
         $grid->column('name', __('Name'));
         $grid->column('company.name', __('所属公司'));
         $grid->column('task.name', __('任务名称'));
-        $grid->column('node', __('Node'))->hide();
+        $grid->column('grade', __('优先级'))->using($this->grade)->label([
+            1 => 'default',
+            2 => 'info',
+            3 => 'warning',
+            4 => 'success',
+            5 => 'danger',
+        ]);
+        $grid->column('status', __('Status'))->using($this->status)->label([
+            1 => 'info',
+            2 => 'success',
+            3 => 'danger',
+            4 => 'default',
+        ]);
+        $grid->column('node', __('Node'))->display(function ($node) {
+            $html=[];
+            foreach ($node as $k=>$v){
+                $name=Staff::find($v["staff_id"])->name;
+                $html[]='<span class="label label-success">'.$name.'</span><span class="label label-danger">'.$v["days"].'天</span>';
+            }
+            return implode('&nbsp;',$html);
+        });
         $grid->column('content', __('Content'))->hide();
         // 不存在的`full_name`字段
         $grid->column('customer_name', '甲方人员')->display(function () {
@@ -51,6 +79,11 @@ class ProjectController extends AdminController
             $staff_name=Staff::wherein('id',$staff_ids)->pluck('name')->toArray();
             return $staff_name;
         })->label();
+
+        $grid->column('days', __('总天数'))->display(function ($days){
+            $result=ProjectNode::where('project_id',$this->id)->sum('days');
+            return $result;
+        });
 
         $grid->column('remark', __('Remark'));
         $grid->column('money', __('Money'))->editable();
@@ -161,6 +194,8 @@ class ProjectController extends AdminController
         $show->field('name', __('Name'));
         $show->field('company.name', __('所属公司'));
         $show->field('task.name', __('任务名称'));
+        $show->field('grade', __('优先级'))->using($this->grade);
+        $show->field('status', __('Status'))->using($this->status);
         $show->field('node', __('Node'))->as(function ($node) {
             return json_encode($node);
         });
@@ -217,6 +252,9 @@ class ProjectController extends AdminController
             $form->multipleSelect('staffs', __('项目人员'))
                 ->options($staffs);
         }
+
+        $form->radio('grade', '优先级')->options($this->grade)->default(1);
+        $form->radio('status', __('Status'))->options($this->status)->default(1);
 
         $form->ueditor('content', __('Content'));
         $form->textarea('remark', __('Remark'));
