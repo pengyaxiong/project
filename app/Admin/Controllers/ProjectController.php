@@ -25,13 +25,16 @@ class ProjectController extends AdminController
      * @var string
      */
     protected $title = '项目管理';
-    protected $grade=[];
-    protected $status=[];
+    protected $grade = [];
+    protected $status = [];
+    protected $node_status = [];
+
     public function __construct()
     {
 
-        $this->grade =[1=>'A',2=>'B',3=>'C',4=>'D',5=>'E'];
-        $this->status =[1=>'已立项',2=>'进行中',3=>'已暂停',4=>'已结项'];
+        $this->grade = [1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E'];
+        $this->status = [1 => '已立项', 2 => '进行中', 3 => '已暂停', 4 => '已结项'];
+        $this->node_status = [1 => '未开始', 2 => '进行中', 3 => '已完成'];
     }
 
     /**
@@ -44,8 +47,8 @@ class ProjectController extends AdminController
         $grid = new Grid(new Project());
 
         $grid->column('id', __('Id'));
-        $grid->column('name', __('Name'))->display(function (){
-            return '<a href="/admin/projects/'.$this->id.'/edit" target="_blank">'.$this->name.'</a>';
+        $grid->column('name', __('Name'))->display(function () {
+            return '<a href="/admin/projects/' . $this->id . '/edit" target="_blank">' . $this->name . '</a>';
         });
         $grid->column('company.name', __('所属公司'));
         $grid->column('task.name', __('任务名称'));
@@ -56,67 +59,91 @@ class ProjectController extends AdminController
             4 => 'success',
             5 => 'danger',
         ]);
-        $grid->column('status', __('Status'))->using($this->status)->label([
-            1 => 'info',
-            2 => 'success',
-            3 => 'danger',
-            4 => 'default',
-        ]);
+        $grid->column('status', __('Status'))->using($this->status)->display(function () {
+            $status = $this->status;
+            switch ($status) {
+                case 1:
+                    return '<span class="label" style="color: #444; background-color: #AEDAFF"><i class="fa fa-plus-circle"></i>&nbsp;已立项</span>';
+                case 2:
+                    return '<span class="label" style="color: #444; background-color: #8EFFB9"><i class="fa fa-paper-plane-o"></i>&nbsp;进行中</span>';
+                case 3:
+                    return '<span class="label" style="color: #444; background-color: #FFA3BE"><i class="fa fa-pause-circle"></i>&nbsp;已暂停</span>';
+                case 4:
+                    return '<span class="label" style="color: #444; background-color: #d2d6de"><i class="fa fa-power-off"></i>&nbsp;已结项</span>';
+            }
+        });
 
         $grid->column('content', __('Content'))->hide();
         // 不存在的`full_name`字段
         $grid->column('customer_name', '商务')->display(function () {
             $customer_ids = ProjectCustomer::where('project_id', $this->id)->pluck('customer_id')->toArray();
-            $customer_name=Customer::wherein('id',$customer_ids)->pluck('name')->toArray();
+            $customer_name = Customer::wherein('id', $customer_ids)->pluck('name')->toArray();
             return $customer_name;
-        })->label('success');
+        })->map(function ($customer_name) {
+            return $customer_name;
+        })->implode(',');
 
 
         $grid->column('staff_name', '项目负责人')->display(function () {
             $staff_ids = ProjectStaff::where('project_id', $this->id)->pluck('staff_id')->toArray();
-            $staff_name=Staff::wherein('id',$staff_ids)->pluck('name')->toArray();
+            $staff_name = Staff::wherein('id', $staff_ids)->pluck('name')->toArray();
             return $staff_name;
-        })->label();
+        })->map(function ($staff_name) {
+            return $staff_name;
+        })->implode(',');
+
 
         $grid->column('node', __('Node'))->display(function ($node) {
-            $html=[];
-            foreach ($node as $k=>$v){
-                if(!isset($v["staff_id"]) || !isset($v["days"])){
+            $html = [];
+            foreach ($node as $k => $v) {
+                if (!isset($v["staff_id"]) || !isset($v["days"])) {
                     continue;
                 }
-                $staff=Staff::find($v["staff_id"]);
-                $node_=Node::find($v["node_id"]);
-                $name=isset($staff)?$staff->name:'';
-                $node_name=isset($node_)?$node_->name:'';
+                $staff = Staff::find($v["staff_id"]);
+                $node_ = Node::find($v["node_id"]);
+                $name = isset($staff) ? $staff->name : '';
+                $node_name = isset($node_) ? $node_->name : '';
 
-                $html[]='<span class="label" style="background-color: #00b7ee">'.$name.'</span><span class="label label-default">'.$node_name.$v["days"].'天</span>';
+                $html[] = '<span class="label" style="background-color: #00b7ee">' . $name . '</span><span class="label label-default">' . $node_name . $v["days"] . '天</span>';
             }
-            return implode('&nbsp;',$html);
+            return implode('&nbsp;', $html);
         })->expand(function ($model) {
 
-            $project_nodes = ProjectNode::where('project_id',$model->id)->get()->map(function ($model) {
-                $staff=Staff::find($model->staff_id);
-                $node=Node::find($model->node_id);
-                $staff_name=isset($staff)?$staff->name:'';
-                $node_name=isset($node)?$node->name:'';
-                $nodes=[
-                    'id'=>$model->id,
-                    'node_name'=>$node_name,
-                    'staff_name'=>$staff_name,
-                    'start_time'=>$model->start_time,
-                    'end_time'=>$model->end_time,
-                    'days'=>$model->days,
-                    'content'=>$model->content,
+            $project_nodes = ProjectNode::where('project_id', $model->id)->get()->map(function ($model) {
+                $staff = Staff::find($model->staff_id);
+                $node = Node::find($model->node_id);
+                $staff_name = isset($staff) ? $staff->name : '';
+                $node_name = isset($node) ? $node->name : '';
+
+                $node_status = $model->status;
+                $status = '';
+                if ($node_status == 2) {
+                    $status = '<span class="label" style="color: #444; background-color: #DFFA99"><i class="fa fa-clock-o"></i>&nbsp;进行中</span>';
+                } else if ($node_status == 3) {
+                    $status = '<span class="label" style="color: #444; background-color: #87FAC1"><i class="fa fa-check-circle-o"></i>&nbsp;已完成</span>';
+                } else {
+                    $status = '<span class="label" style="color: #444; background-color: #FAC0D6"><i class="fa fa-frown-o"></i>&nbsp;未开始</span>';
+                }
+
+                $nodes = [
+                    'id' => $model->id,
+                    'node_name' => $node_name,
+                    'node_status' => $status,
+                    'staff_name' => $staff_name,
+                    'start_time' => $model->start_time,
+                    'end_time' => $model->end_time,
+                    'days' => $model->days,
+                    'content' => $model->content,
                 ];
                 return $nodes;
             });
 
-            return new Table(['ID', '节点','项目负责人','开始时间', '结束时间','耗时(天)','详情'], $project_nodes->toArray());
+            return new Table(['ID', '节点', '状态', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
         });
 
 
-        $grid->column('days', __('总天数'))->display(function ($days){
-            $result=ProjectNode::where('project_id',$this->id)->sum('days');
+        $grid->column('days', __('总天数'))->display(function ($days) {
+            $result = ProjectNode::where('project_id', $this->id)->sum('days');
             return $result;
         });
 
@@ -134,7 +161,7 @@ class ProjectController extends AdminController
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
-       // $grid->fixColumns(3, -1);
+        // $grid->fixColumns(3, -1);
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));
             $filter->between('contract_time', __('Contract time'))->date();
@@ -173,11 +200,11 @@ class ProjectController extends AdminController
 
             $export->filename('项目列表');
 
-            $export->originalValue(['money','contract_time']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
+            $export->originalValue(['money', 'contract_time']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
 
             // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
 
-            $export->except(['sort_order', 'updated_at' ]); //用来指定哪些列不需要被导出
+            $export->except(['sort_order', 'updated_at']); //用来指定哪些列不需要被导出
             $export->column('customer_name', function ($value, $original) {
                 return $this->cutstr_html($value);
             });
@@ -185,7 +212,7 @@ class ProjectController extends AdminController
                 return $this->cutstr_html($value);
             });
             $export->column('is_check', function ($value, $original) {
-                switch ($original){
+                switch ($original) {
                     case 1:
                         return '是';
                     default:
@@ -204,7 +231,7 @@ class ProjectController extends AdminController
         $string = preg_replace('/\n/is', '', $string);
         $string = preg_replace('/ |　/is', '', $string);
         $string = preg_replace('/ /is', '', $string);
-        $string = preg_replace('/<br \/>([\S]*?)<br \/>/','<p>$1<\/p>',$string);
+        $string = preg_replace('/<br \/>([\S]*?)<br \/>/', '<p>$1<\/p>', $string);
         preg_match_all("/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|\xe0[\xa0-\xbf][\x80-\xbf]|[\xe1-\xef][\x80-\xbf][\x80-\xbf]|\xf0[\x90-\xbf][\x80-\xbf][\x80-\xbf]|[\xf1-\xf7][\x80-\xbf][\x80-\xbf][\x80-\xbf]/", $string, $string);
         if (is_array($string) && !empty($string[0])) {
             if (is_numeric($length) && $length) {
@@ -217,6 +244,7 @@ class ProjectController extends AdminController
         }
         return $string;
     }
+
     /**
      * Make a show builder.
      *
@@ -234,22 +262,22 @@ class ProjectController extends AdminController
         $show->field('grade', __('优先级'))->using($this->grade);
         $show->field('status', __('Status'))->using($this->status);
         $show->field('node', __('Node'))->as(function ($nodes) {
-            foreach ($nodes as $k=>$v){
-                $staff=Staff::find($v['staff_id']);
-                $node=Node::find($v['node_id']);
-                $staff_name=isset($staff)?$staff->name:'';
-                $node_name=isset($node)?$node->name:'';
-                $nodes[$k]=[
-                    'node_name'=>$node_name,
-                    'staff_name'=>$staff_name,
-                    'start_time'=>$v['start_time'],
-                    'end_time'=>$v['end_time'],
-                    'days'=>$v['days'],
-                    'content'=>isset($v['content'])?$v['content']:'',
+            foreach ($nodes as $k => $v) {
+                $staff = Staff::find($v['staff_id']);
+                $node = Node::find($v['node_id']);
+                $staff_name = isset($staff) ? $staff->name : '';
+                $node_name = isset($node) ? $node->name : '';
+                $nodes[$k] = [
+                    'node_name' => $node_name,
+                    'staff_name' => $staff_name,
+                    'start_time' => $v['start_time'],
+                    'end_time' => $v['end_time'],
+                    'days' => $v['days'],
+                    'content' => isset($v['content']) ? $v['content'] : '',
                 ];
             }
 
-           return new Table(['节点','项目负责人','开始时间', '结束时间','耗时(天)','详情'], $nodes);
+            return new Table(['节点', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $nodes);
         });
         $show->field('content', __('Content'));
         $show->field('remark', __('Remark'));
@@ -312,16 +340,18 @@ class ProjectController extends AdminController
         $form->textarea('remark', __('Remark'));
 
         $form->table('node', __('节点情况'), function ($table) {
-            $staffs=Staff::all()->toArray();
+            $staffs = Staff::all()->toArray();
             $select_staff = array_column($staffs, 'name', 'id');
             $table->select('staff_id', '项目负责人')->options($select_staff);
 
-            $nodes=Node::where('is_project',true)->get()->toArray();
+            $nodes = Node::where('is_project', true)->get()->toArray();
             $select_node = array_column($nodes, 'name', 'id');
             $table->select('node_id', '节点')->options($select_node);
 
-            $table->datetime('start_time', '开始时间')->default(date('Y-m-d',time()));
-            $table->datetime('end_time', '结束时间')->default(date('Y-m-d',time()));
+            $table->select('status', '状态')->options($this->node_status);
+
+            $table->datetime('start_time', '开始时间')->default(date('Y-m-d', time()));
+            $table->datetime('end_time', '结束时间')->default(date('Y-m-d', time()));
             $table->number('days', '耗时')->help('天');
             $table->textarea('content', '详情');
         });
@@ -340,9 +370,9 @@ class ProjectController extends AdminController
         $form->saving(function (Form $form) {
             $is_check = $form->model()->is_check;
             if (!$is_check) {
-                $form->check_time=date('Y-m-d H:i:s',time());
-            }else{
-                $form->check_time=null;
+                $form->check_time = date('Y-m-d H:i:s', time());
+            } else {
+                $form->check_time = null;
             }
         });
 
@@ -353,11 +383,12 @@ class ProjectController extends AdminController
 //           dump($node);
 //           exit();
             if (!empty($node)) {
-                ProjectNode::where('project_id',$id)->delete();
+                ProjectNode::where('project_id', $id)->delete();
                 foreach ($node as $value) {
                     ProjectNode::create([
                         'staff_id' => $value['staff_id'],
                         'node_id' => $value['node_id'],
+                        'status' => $value['status'],
                         'project_id' => $id,
                         'start_time' => $value['start_time'],
                         'end_time' => $value['end_time'],
