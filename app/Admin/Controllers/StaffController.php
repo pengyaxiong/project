@@ -70,8 +70,8 @@ class StaffController extends AdminController
                 }
 
                 $nodes = [
-                    'project_id' => $project->id,
-                    'project_name' => '<a target="_blank" href="/admin/projects/' . $project->id . '/edit">' . $project->name . '</a>',
+                    'project_id' => isset($project) ?$project->id : '',
+                    'project_name' => isset($project) ?'<a target="_blank" href="/admin/projects/' . $project->id . '/edit">' . $project->name . '</a>': '',
                     'project_status' => $project_status,
                     'node_name' => $node_name,
                     'node_status' => $status,
