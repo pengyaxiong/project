@@ -48,7 +48,7 @@ class ProjectController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))->display(function () {
-            return '<a href="/admin/projects/' . $this->id . '/edit" target="_blank">' . $this->name . '</a>';
+            return '<a href="/admin/projects/' . $this->id . '/edit">' . $this->name . '</a>';
         });
         $grid->column('company.name', __('所属公司'));
         $grid->column('task.name', __('任务名称'));
@@ -147,7 +147,7 @@ class ProjectController extends AdminController
             return $result;
         });
 
-        $grid->column('remark', __('Remark'))->width(288);
+        $grid->column('remark', __('Remark'))->width(288)->editable('textarea');
         $grid->column('money', __('Money'))->editable();
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
         $states = [
