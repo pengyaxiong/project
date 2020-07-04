@@ -21,6 +21,18 @@ class Project extends Model
         $this->attributes['node'] = json_encode(array_values($node));
     }
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleted(function ($model)
+        {
+            //这样可以拿到当前操作id
+            $project_id=$model->id;
+            ProjectNode::where('project_id',$project_id)->delete();
+        });
+    }
+
     public function staffs()
     {
         return $this->belongsToMany(Staff::class,'wechat_project_staff','project_id','staff_id')->withPivot(
