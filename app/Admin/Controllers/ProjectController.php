@@ -63,13 +63,13 @@ class ProjectController extends AdminController
             $status = $this->status;
             switch ($status) {
                 case 1:
-                    return '<span class="label" style="color: #444; background-color: #AEDAFF"><i class="fa fa-plus-circle"></i>&nbsp;已立项</span>';
+                    return '<span class="label" style="font-weight:unset; color: #444; background-color: #AEDAFF"><i class="fa fa-plus-circle"></i>&nbsp;已立项</span>';
                 case 2:
-                    return '<span class="label" style="color: #444; background-color: #8EFFB9"><i class="fa fa-paper-plane-o"></i>&nbsp;进行中</span>';
+                    return '<span class="label" style="font-weight:unset; color: #444; background-color: #8EFFB9"><i class="fa fa-paper-plane-o"></i>&nbsp;进行中</span>';
                 case 3:
-                    return '<span class="label" style="color: #444; background-color: #FFA3BE"><i class="fa fa-pause-circle"></i>&nbsp;已暂停</span>';
+                    return '<span class="label" style="font-weight:unset; color: #444; background-color: #FFA3BE"><i class="fa fa-pause-circle"></i>&nbsp;已暂停</span>';
                 case 4:
-                    return '<span class="label" style="color: #444; background-color: #d2d6de"><i class="fa fa-power-off"></i>&nbsp;已结项</span>';
+                    return '<span class="label" style="font-weight:unset; color: #444; background-color: #d2d6de"><i class="fa fa-power-off"></i>&nbsp;已结项</span>';
             }
         });
 
@@ -106,7 +106,7 @@ class ProjectController extends AdminController
 
                 $html[] = '<span class="label" style="background-color: #00b7ee">' . $name . '</span><span class="label label-default">' . $node_name . $v["days"] . '天</span>';
             }
-            return implode('&nbsp;', $html);
+            return '点击查看';implode('&nbsp;', $html);
         })->expand(function ($model) {
 
             $project_nodes = ProjectNode::where('project_id', $model->id)->get()->map(function ($model) {
@@ -118,11 +118,11 @@ class ProjectController extends AdminController
                 $node_status = $model->status;
                 $status = '';
                 if ($node_status == 2) {
-                    $status = '<span class="label" style="color: #444; background-color: #DFFA99"><i class="fa fa-clock-o"></i>&nbsp;进行中</span>';
+                    $status = '<span class="label" style="font-weight:unset; color: #444; background-color: #DFFA99"><i class="fa fa-clock-o"></i>&nbsp;进行中</span>';
                 } else if ($node_status == 3) {
-                    $status = '<span class="label" style="color: #444; background-color: #87FAC1"><i class="fa fa-check-circle-o"></i>&nbsp;已完成</span>';
+                    $status = '<span class="label" style="font-weight:unset; color: #444; background-color: #87FAC1"><i class="fa fa-check-circle-o"></i>&nbsp;已完成</span>';
                 } else {
-                    $status = '<span class="label" style="color: #444; background-color: #FAC0D6"><i class="fa fa-frown-o"></i>&nbsp;未开始</span>';
+                    $status = '<span class="label" style="font-weight:unset; color: #444; background-color: #FAC0D6"><i class="fa fa-frown-o"></i>&nbsp;未开始</span>';
                 }
 
                 $nodes = [
