@@ -55,20 +55,23 @@ class StaffController extends AdminController
                     $status = '<span class="label" style="font-weight:unset; color: #444; background-color: #FAC0D6"><i class="fa fa-frown-o"></i>&nbsp;未开始</span>';
                 }
                 $project_status = '';
-                $pstatus = $project->status;
+                $pstatus = isset($project) ? $project->status : '';
+
                 if ($pstatus == 2) {
                     $project_status = '<span class="label" style="font-weight:unset; color: #444; background-color: #8EFFB9"><i class="fa fa-paper-plane-o"></i>&nbsp;进行中</span>';
                 } elseif ($pstatus == 3) {
                     $project_status = '<span class="label" style="font-weight:unset; color: #444; background-color: #FFA3BE"><i class="fa fa-pause-circle"></i>&nbsp;已暂停</span>';
                 } elseif ($pstatus == 4) {
                     $project_status = '<span class="label" style="font-weight:unset; color: #444; background-color: #d2d6de"><i class="fa fa-power-off"></i>&nbsp;已结项</span>';
-                } else {
+                } elseif ($pstatus == 1) {
                     $project_status = '<span class="label" style="font-weight:unset; color: #444; background-color: #AEDAFF"><i class="fa fa-plus-circle"></i>&nbsp;已立项</span>';
+                }else{
+                    $project_status ='';
                 }
 
                 $nodes = [
                     'project_id' => $project->id,
-                    'project_name' => '<a target="_blank" href="/admin/projects/' . $project->id . '/edit">'.$project->name.'</a>',
+                    'project_name' => '<a target="_blank" href="/admin/projects/' . $project->id . '/edit">' . $project->name . '</a>',
                     'project_status' => $project_status,
                     'node_name' => $node_name,
                     'node_status' => $status,
