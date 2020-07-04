@@ -23,6 +23,10 @@ class HomeController extends Controller
             ->row(function (Row $row) {
 
                 $row->column(12, function (Column $column) {
+                    $column->append(new Box('项目状态统计', view('admin.project_status')));
+                });
+
+                $row->column(12, function (Column $column) {
                     $column->row(function (Row $row) {
 //                        $row->column(6, function (Column $column) {
 //                            $column->append(new Box('任务签约情况统计', view('admin.chartjs')));

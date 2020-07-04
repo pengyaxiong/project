@@ -390,4 +390,18 @@ class VisualizationController extends Controller
 
         return $data;
     }
+
+    public function project_status()
+    {
+        $status_1 = Project::where('status', 1)->count();
+        $status_2 = Project::where('status', 2)->count();
+        $status_3 = Project::where('status', 3)->count();
+        $status_4 = Project::where('status', 4)->count();
+        $status_5 = Project::where('is_check', 1)->count();
+
+        $data = [$status_1,$status_2,$status_3,$status_4,$status_5];
+
+        return $data;
+
+    }
 }
