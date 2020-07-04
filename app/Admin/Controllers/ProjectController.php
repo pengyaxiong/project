@@ -147,7 +147,7 @@ class ProjectController extends AdminController
             return $result;
         });
 
-        $grid->column('remark', __('Remark'));
+        $grid->column('remark', __('Remark'))->width(288);
         $grid->column('money', __('Money'))->editable();
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
         $states = [
