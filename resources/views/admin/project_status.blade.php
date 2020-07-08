@@ -2,6 +2,7 @@
     .panel-body {
         padding: 15px;
     }
+
     .panel {
         border-radius: 2px;
         box-shadow: none;
@@ -9,6 +10,7 @@
         background-color: #fff;
         border: 1px solid transparent;
     }
+
     .circle-icon {
         float: left;
         margin-right: 15px;
@@ -25,9 +27,11 @@
     <div class="col-md-2 col-sm-6 col-xs-12">
         <section class="panel">
             <div class="panel-body">
-                <div class="circle-icon btn-primary">
-                    <i class="fa fa-plus-circle"></i>
-                </div>
+                <a href="/admin/projects?status=1">
+                    <div class="circle-icon btn-primary">
+                        <i class="fa fa-plus-circle"></i>
+                    </div>
+                </a>
                 <div>
                     <h3 class="no-margin" id="s1"></h3> 已立项
                 </div>
@@ -37,9 +41,11 @@
     <div class="col-md-2 col-sm-6 col-xs-12">
         <section class="panel">
             <div class="panel-body">
-                <div class="circle-icon btn-warning">
-                    <i class="fa fa-paper-plane-o"></i>
-                </div>
+                <a href="/admin/projects?status=2">
+                    <div class="circle-icon btn-warning">
+                        <i class="fa fa-paper-plane-o"></i>
+                    </div>
+                </a>
                 <div>
                     <h3 class="no-margin" id="s2"></h3> 进行中
                 </div>
@@ -49,9 +55,11 @@
     <div class="col-md-2 col-sm-6 col-xs-12">
         <section class="panel">
             <div class="panel-body">
-                <div class="circle-icon btn-danger">
-                    <i class="fa fa-pause-circle"></i>
-                </div>
+                <a href="/admin/projects?status=3">
+                    <div class="circle-icon btn-danger">
+                        <i class="fa fa-pause-circle"></i>
+                    </div>
+                </a>
                 <div>
                     <h3 class="no-margin" id="s3"></h3> 已暂停
                 </div>
@@ -61,9 +69,11 @@
     <div class="col-md-2 col-sm-6 col-xs-12">
         <section class="panel">
             <div class="panel-body">
-                <div class="circle-icon" style="background-color: #d2d6de">
-                    <i class="fa fa-power-off"></i>
-                </div>
+                <a href="/admin/projects?status=4">
+                    <div class="circle-icon" style="background-color: #d2d6de">
+                        <i class="fa fa-power-off"></i>
+                    </div>
+                </a>
                 <div>
                     <h3 class="no-margin" id="s4"></h3> 已结项
                 </div>
@@ -73,9 +83,11 @@
     <div class="col-md-2 col-sm-6 col-xs-12">
         <section class="panel">
             <div class="panel-body">
-                <div class="circle-icon btn-success">
-                    <i class="glyphicon glyphicon-ok-circle"></i>
-                </div>
+                <a href="/admin/projects?is_check=1">
+                    <div class="circle-icon btn-success">
+                        <i class="glyphicon glyphicon-ok-circle"></i>
+                    </div>
+                </a>
                 <div>
                     <h3 class="no-margin" id="s5"></h3> 已交付
                 </div>
