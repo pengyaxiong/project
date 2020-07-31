@@ -158,11 +158,13 @@ class ProjectController extends AdminController
 
         $grid->column('contract_time', __('Contract time'))->editable('datetime');
         $grid->column('check_time', __('交付时间'));
+        $grid->column('y_check_time', __('预计交付时间'));
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
         // $grid->fixColumns(3, -1);
         $grid->filter(function ($filter) {
+
             $filter->like('name', __('Name'));
             $filter->between('contract_time', __('Contract time'))->date();
             $status_text = [
@@ -286,6 +288,7 @@ class ProjectController extends AdminController
         $show->field('is_check', __('是否交付'));
         $show->field('contract_time', __('Contract time'));
         $show->field('check_time', __('交付时间'));
+        $show->field('y_check_time', __('预计交付时间'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
 
@@ -365,6 +368,7 @@ class ProjectController extends AdminController
         $form->switch('is_check', __('是否交付'))->states($states)->default(0);
         $form->datetime('contract_time', __('Contract time'));
         $form->datetime('check_time', __('交付时间'));
+        $form->datetime('y_check_time', __('预计交付时间'));
 
         //保存前回调
         $form->saving(function (Form $form) {
