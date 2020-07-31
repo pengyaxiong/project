@@ -156,9 +156,9 @@ class ProjectController extends AdminController
         ];
         $grid->column('is_check', __('是否交付'))->switch($states);
 
-        $grid->column('contract_time', __('Contract time'))->editable('datetime');
+        $grid->column('contract_time', __('Contract time'))->editable('date');
         $grid->column('check_time', __('交付时间'));
-        $grid->column('y_check_time', __('预计交付时间'));
+        $grid->column('y_check_time', __('预计交付时间'))->editable('date');
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
