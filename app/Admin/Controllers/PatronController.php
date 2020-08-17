@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\Patron\PatronBatchCheck;
+use App\Admin\Actions\Patron\PatronCheck;
 use App\Models\Customer;
 use App\Models\Patron;
 use Encore\Admin\Controllers\AdminController;
@@ -54,7 +56,7 @@ class PatronController extends AdminController
         $grid->column('money', __('预算'));
 
         $grid->column('status', __('Status'))->using([
-            0=>'待签约',1=>'已签约'
+            0=>'待签约',1=>'已签约',2=>'已审核'
         ])->display(function () {
             $status = $this->status;
             switch ($status) {
@@ -62,6 +64,8 @@ class PatronController extends AdminController
                     return '<span class="label" style="font-weight:unset; color: #444; background-color: #f0ad1499"><i class="fa fa-plus-circle"></i>&nbsp;待签约</span>';
                 case 1:
                     return '<span class="label" style="font-weight:unset; color: #444; background-color: #8EFFB9"><i class="fa fa-paper-plane-o"></i>&nbsp;已签约</span>';
+                case 2:
+                    return '<span class="label" style="font-weight:unset; color: #444; background-color: #FFA3BE"><i class="fa fa-pause-circle"></i>&nbsp;已审核</span>';
             }
         });
         $grid->column('start_time', __('开始时间'));
@@ -90,10 +94,19 @@ class PatronController extends AdminController
             $filter->equal('from', __('From'))->select($status_text);
             $status_text = [
                 1 => '已签约',
-                0 => '待签约'
+                0 => '待签约',2=>'已审核'
             ];
             $filter->equal('status', __('Status'))->select($status_text);
         });
+
+        $grid->actions(function ($actions) {
+            $actions->add(new PatronCheck());
+        });
+
+//        $grid->batchActions(function ($batch) {
+//            $batch->add(new PatronBatchCheck());
+//        });
+
         return $grid;
     }
 
@@ -158,11 +171,7 @@ class PatronController extends AdminController
         $form->text('job', __('Job'));
         $form->select('need', __('Need'))->options([0=>'APP',1=>'小程序',2=>'网站',3=>'系统软件',4=>'其它']);
         $form->decimal('money', __('预算'))->default(1000.00);
-        $states = [
-            'on' => ['value' => 1, 'text' => '已签约', 'color' => 'success'],
-            'off' => ['value' => 0, 'text' => '待签约', 'color' => 'danger'],
-        ];
-        $form->switch('status', __('Status'))->states($states)->default(0);
+        $form->switch('status', __('Status'))->options([0=>'待签约',1=>'已签约',2=>'已审核']);
         $form->datetime('start_time', __('开始时间'))->default(date('Y-m-d H:i:s'));
         $form->textarea('relation', __('客户关系'));
         $form->table('follow', __('跟进记录'), function ($table) {

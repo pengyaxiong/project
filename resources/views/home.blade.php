@@ -41,7 +41,7 @@
                         <li class="list-group-item">
                             <span class="label label-primary">{{$patron['need']}}</span>
                             <span class="label label-success">{{$patron['money']}}</span>
-                            <span class="{{$patron['status']?'badge':'badge_ is_something'}}" data-id="{{$patron['id']}}" data-attr="status">{{$patron['status']?'已签约':'待签约'}}</span>
+                            <span class="{{$patron['status']?'badge':'badge_ is_something'}}" data-id="{{$patron['id']}}" data-attr="status">{{$patron['status']?$patron['status']==1?'已签约':'已审核':'待签约'}}</span>
                             <a href="{{route('patron.edit',$patron['id'])}}">
                                 {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
                             </a>
