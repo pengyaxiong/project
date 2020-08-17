@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -26,6 +27,29 @@ class LoginController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
+
+    /**
+     * 改为用户名登录
+     * @return string
+     */
+    public function username()
+    {
+        return 'tel';
+    }
+
+    public function authenticated(Request $request, $user)
+    {
+        if ($user->status == 0) {
+
+            $this->guard()->logout();
+
+            //$request->session()->invalidate();
+
+            return back()->with('status', '限制登陆');
+           // return back()->withErrors(['限制登陆'],'status');
+
+        }
+    }
 
     /**
      * Create a new controller instance.

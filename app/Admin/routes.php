@@ -17,6 +17,7 @@ Route::group([
 
     $router->resource('staff', 'StaffController');
 
+
     $router->resource('customers', 'CustomerController');
 
     $router->resource('departments', 'DepartmentController');
@@ -28,4 +29,14 @@ Route::group([
     $router->resource('companies', 'CompanyController');
 
     $router->resource('tasks', 'TaskController');
+
+    $router->resource('auditions', 'AuditionController');
+
+    $router->resource('patrons', 'PatronController');
+
+    $router->resource('notices', 'NoticeController');
+
+    $router->resource('calendar', 'CalendarController');
+    $router->put('/drop/{id}', 'CalendarController@drop');
+    $router->get('/event','CalendarController@event');
 });

@@ -17,7 +17,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['namespace' => 'Api'], function () {
+Route::group(['namespace' => 'Api','as'=>'api.'], function () {
 
     //会员性别统计
     Route::get('sex_count', 'VisualizationController@sex_count');
@@ -40,9 +40,7 @@ Route::group(['namespace' => 'Api'], function () {
 });
 
 
-
-Route::group(['middleware' => [],'namespace' => 'Wechat', 'prefix' => 'wechat', 'as' => 'wechat.'], function () {
-
+Route::group(['middleware' => [], 'namespace' => 'Wechat', 'prefix' => 'wechat', 'as' => 'wechat.'], function () {
 
 
 });

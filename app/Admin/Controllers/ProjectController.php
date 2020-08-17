@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\Project\Calendar;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Node;
@@ -106,7 +107,8 @@ class ProjectController extends AdminController
 
                 $html[] = '<span class="label" style="background-color: #00b7ee">' . $name . '</span><span class="label label-default">' . $node_name . $v["days"] . '天</span>';
             }
-            return '点击查看';implode('&nbsp;', $html);
+            return '点击查看';
+            implode('&nbsp;', $html);
         })->expand(function ($model) {
 
             $project_nodes = ProjectNode::where('project_id', $model->id)->get()->map(function ($model) {
@@ -223,6 +225,9 @@ class ProjectController extends AdminController
             });
         });
 
+        $grid->actions(function ($actions) {
+            $actions->add(new Calendar());
+        });
         return $grid;
     }
 
@@ -406,4 +411,5 @@ class ProjectController extends AdminController
 
         return $form;
     }
+
 }

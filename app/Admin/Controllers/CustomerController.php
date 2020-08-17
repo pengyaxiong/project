@@ -7,6 +7,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Widgets\Table;
 
 class CustomerController extends AdminController
 {
@@ -15,7 +16,7 @@ class CustomerController extends AdminController
      *
      * @var string
      */
-    protected $title = '客户管理';
+    protected $title = '商务管理';
 
     /**
      * Make a grid builder.
@@ -28,6 +29,32 @@ class CustomerController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))->editable();
+        $states = [
+            'on' => ['value' => 1, 'text' => '正常', 'color' => 'success'],
+            'off' => ['value' => 0, 'text' => '禁用', 'color' => 'danger'],
+        ];
+        $grid->column('status', __('Status'))->switch($states);
+        $grid->column('patrons', __('客户列表'))->display(function () {
+            return '点击查看';
+        })->expand(function ($model) {
+            $patrons = $model->patrons->map(function ($model) {
+                $from_arr=[0=>'线上',1=>'线下',2=>'其它'];
+                $need_arr=[0=>'APP',1=>'小程序',2=>'网站',3=>'系统软件',4=>'其它'];
+                $result = [
+                    'id' => $model->id,
+                    'from' => $from_arr[$model->from],
+                    'company_name' => $model->company_name,
+                    'name' => $model->name,
+                    'phone' => $model->phone,
+                    'job' => $model->job,
+                    'need' => $need_arr[$model->need],
+                    'money' => $model->money,
+                    'des' => '<a target="_blank" href="/admin/patrons/' . $model->id . '/edit">查看</a>',
+                ];
+                return $result;
+            });
+            return new Table(['ID', '信息来源', ' 公司名称','客户姓名', '客户电话', '客户职位', '需求', '预算','详情'], $patrons->toArray());
+        });
         $grid->column('openid', __('Openid'))->copyable();
         $grid->column('nickname', __('Nickname'))->copyable();
         $grid->column('headimgurl', __('Headimgurl'))->image();
@@ -70,6 +97,12 @@ class CustomerController extends AdminController
                 0 => '其它'
             ];
             $filter->equal('sex', __('Sex'))->select($status_text);
+
+            $status_text = [
+                1 => '正常',
+                0 => '禁用'
+            ];
+            $filter->equal('status', __('Status'))->select($status_text);
         });
 
 
@@ -77,14 +110,14 @@ class CustomerController extends AdminController
 
             $export->filename('客户列表');
 
-            $export->originalValue(['name', 'openid','nickname','headimgurl','tel','remark']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
+            $export->originalValue(['name', 'openid', 'nickname', 'headimgurl', 'tel', 'remark']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
 
-           // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
+            // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
 
-             $export->except(['sort_order', 'updated_at' ]); //用来指定哪些列不需要被导出
+            $export->except(['sort_order', 'updated_at']); //用来指定哪些列不需要被导出
 
             $export->column('sex', function ($value, $original) {
-                switch ($original){
+                switch ($original) {
                     case 1:
                         return '男';
                     case 2:
@@ -138,6 +171,11 @@ class CustomerController extends AdminController
         $form = new Form(new Customer());
 
         $form->text('name', __('Name'));
+        $states = [
+            'on' => ['value' => 1, 'text' => '正常', 'color' => 'success'],
+            'off' => ['value' => 0, 'text' => '禁用', 'color' => 'danger'],
+        ];
+        $form->switch('status', __('Status'))->states($states)->default(0);
         $form->text('openid', __('Openid'));
         $form->select('sex', __('Sex'))->options([1 => '男', 2 => '女', 0 => '保密']);
         $form->text('language', __('Language'));

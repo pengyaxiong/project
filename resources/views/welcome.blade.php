@@ -1,95 +1,53 @@
-<!doctype html>
-<html lang="{{ app()->getLocale() }}">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>{{ config('app.name') }}</title>
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-
-    <!-- Styles -->
+@extends('layouts.app')
+@section('css')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
     <style>
-        html, body {
-            background-color: #fff;
-            color: #636b6f;
-            font-family: 'Raleway', sans-serif;
-            font-weight: 100;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .full-height {
-            height: 100vh;
-        }
-
-        .flex-center {
-            align-items: center;
-            display: flex;
-            justify-content: center;
-        }
-
-        .position-ref {
-            position: relative;
-        }
-
-        .top-right {
-            position: absolute;
-            right: 10px;
-            top: 18px;
-        }
-
-        .content {
-            text-align: center;
-        }
-
-        .title {
-            font-size: 84px;
-        }
-
-        .links > a {
-            color: #636b6f;
-            padding: 0 25px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: .1rem;
-            text-decoration: none;
-            text-transform: uppercase;
-        }
-
-        .m-b-md {
-            margin-bottom: 30px;
+        .modal-dialog {
+            top: 31%;
         }
     </style>
-</head>
-<body>
-<div class="flex-center position-ref full-height">
-    @if (Route::has('login'))
-        <div class="top-right links">
-            @auth
-                <a href="{{ url('/home') }}">Home</a>
-            @else
-                <a href="{{ route('login') }}">Login</a>
-                <a href="{{ route('register') }}">Register</a>
-            @endauth
+@endsection
+@section('content')
+    <div class="page-header">
+        <h1 class="animate__animated  animate__backInDown">公告
+            <small>列表</small>
+        </h1>
+    </div>
+    @foreach($notices as $notice)
+        <div class="animate__animated animate__fadeInLeft panel panel-default" data-toggle="modal" data-target="#myModal" data-des="{{$notice->description}}" data-title="{{$notice->title}}">
+            <div class="panel-body">
+                {{$notice->title}}
+            </div>
         </div>
-    @endif
+    @endforeach
 
-    <div class="content">
-        <div class="title m-b-md">
-            {{ config('app.name') }}
-        </div>
+    <a class="btn btn-info" href="{{url('/home')}}" role="button"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> 个人中心</a>
 
-        <div class="links">
-            <a href="https://laravel.com/docs">Documentation</a>
-            <a href="https://laracasts.com">Laracasts</a>
-            <a href="https://laravel-news.com">News</a>
-            <a href="https://forge.laravel.com">Forge</a>
-            <a href="https://github.com/laravel/laravel">GitHub</a>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+            </div>
         </div>
     </div>
-</div>
-</body>
-</html>
+@endsection
+
+@section('js')
+    <script>
+        $(function () {
+            $(".panel").on('click', function () {
+                var des = $(this).data('des'),
+                    title = $(this).data('title');
+                $("#myModalLabel").html(title);
+                $(".modal-body").html(des);
+            })
+        })
+    </script>
+@endsection

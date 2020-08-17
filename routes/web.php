@@ -12,5 +12,19 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $notices=\App\Models\Notice::orderby('sort_order')->get();
+    return view('welcome',compact('notices'));
+//    return redirect('/home');
 });
+
+Auth::routes();
+
+Route::redirect('/register', '/404', 301);
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Route::group(['prefix' => 'patron'], function () {
+    Route::patch('is_something', 'PatronController@is_something')->name('is_something');
+    Route::post('follow', 'PatronController@follow')->name('follow');
+});
+Route::resource('patron', 'PatronController');
