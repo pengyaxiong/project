@@ -87,6 +87,7 @@ class StaffController extends AdminController
             return new Table(['项目ID', '项目名称', '项目状态', '节点名称', '节点状态', '负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
         });
 
+        $grid->column('admin.name', __('管理员'));
         $grid->column('company.name', __('所属公司'));
         $grid->column('department.name', __('所属部门'));
         $grid->column('mobile', __('Mobile'));
@@ -138,6 +139,7 @@ class StaffController extends AdminController
 
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
+        $show->field('admin.name', __('管理员'));
         $show->field('company.name', __('所属公司'));
         $show->field('department_id', __('所属部门'));
         $show->field('mobile', __('Mobile'));
@@ -162,6 +164,14 @@ class StaffController extends AdminController
 
         $form->text('name', __('Name'))->rules('required');
         $form->mobile('mobile', __('Mobile'));
+
+        $class = config('admin.database.users_model');
+        $admin=new $class();
+        $admins = $admin::all()->toArray();
+        $select_array = array_column($admins, 'name', 'id');
+        //创建select
+        $form->select('admin_id', '管理员')->options($select_array);
+
         $companies = Company::all()->toArray();
         $select_array = array_column($companies, 'name', 'id');
         //创建select

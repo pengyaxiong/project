@@ -18,6 +18,11 @@ class Staff extends Model
         );
     }
 
+    public function admin()
+    {
+        return $this->belongsTo(config('admin.database.users_model'));
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class);
