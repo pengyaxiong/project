@@ -71,4 +71,9 @@ class Project extends Model
     {
         return $this->belongsTo(Task::class);
     }
+
+    public function finances()
+    {
+        return $this->hasMany(Finance::class,'project_id');
+    }
 }

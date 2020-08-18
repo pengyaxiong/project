@@ -3,6 +3,9 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Actions\Project\Calendar;
+use App\Admin\Actions\Project\QdCheck;
+use App\Admin\Actions\Project\SjCheck;
+use App\Admin\Actions\Project\YsCheck;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Node;
@@ -29,6 +32,7 @@ class ProjectController extends AdminController
     protected $grade = [];
     protected $status = [];
     protected $node_status = [];
+    protected $check_status = [];
 
     public function __construct()
     {
@@ -36,6 +40,8 @@ class ProjectController extends AdminController
         $this->grade = [1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E'];
         $this->status = [1 => '已立项', 2 => '进行中', 3 => '已暂停', 4 => '已结项'];
         $this->node_status = [1 => '未开始', 2 => '进行中', 3 => '已完成'];
+
+        $this->check_status = [1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'];
     }
 
     /**
@@ -143,6 +149,33 @@ class ProjectController extends AdminController
             return new Table(['ID', '节点', '状态', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
         });
 
+        $grid->column('check_status', __('回款状态'))->using($this->check_status)->expand(function ($model){
+            $check_status=[1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'];
+            $apply_status=[1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
+            $finances = $model->finances->map(function ($model)use ($check_status,$apply_status) {
+                $nodes = [
+                    'id' => $model->id,
+                    'patron_name' => $model->patron->name,
+                    'money' => $model->money,
+                    'status' => $check_status[$model->status],
+                    'returned' => $model->project[$apply_status[$model->status]]*$model->money/100,
+                    'returned_money' => $model->returned_money,
+                    'rebate' => $model->rebate,
+                    'returned_bag' => $model->returned_bag,
+                    'debtors' => $model->debtors,
+                    'info' => '<a target="_blank" href="/admin/finances?project_id=' . $model->project_id . '">详情</a>',
+                ];
+                return $nodes;
+            });
+
+            return new Table(['ID', '客户名称', '合同金额', '状态', '预计回款金额','实际回款金额', '返渠道费', '回款账户', '未结余额', '详情'], $finances->toArray());
+        })->label([
+            1 => 'default',
+            2 => 'info',
+            3 => 'warning',
+            4 => 'danger',
+        ]);
+
 
         $grid->column('days', __('总天数'))->display(function ($days) {
             $result = ProjectNode::where('project_id', $this->id)->sum('days');
@@ -226,6 +259,9 @@ class ProjectController extends AdminController
         });
 
         $grid->actions(function ($actions) {
+            $actions->add(new SjCheck());
+            $actions->add(new QdCheck());
+            $actions->add(new YsCheck());
             $actions->add(new Calendar());
         });
         return $grid;

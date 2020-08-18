@@ -36,6 +36,8 @@ Route::group([
 
     $router->resource('notices', 'NoticeController');
 
+    $router->resource('finances', 'FinanceController');
+
     $router->resource('calendar', 'CalendarController');
     $router->put('/drop/{id}', 'CalendarController@drop');
     $router->get('/event','CalendarController@event');
