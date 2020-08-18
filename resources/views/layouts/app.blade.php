@@ -70,7 +70,11 @@
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 @csrf
                             </form>
-                            {{--<li role="separator" class="divider"></li>--}}
+                            <li role="separator" class="divider"></li>
+                            <li><a class="dropdown-item" href="{{ route('password') }}">
+                                    {{ __('修改密码') }}
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 @endguest

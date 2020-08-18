@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Patron;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class HomeController extends Controller
 {
@@ -38,6 +40,39 @@ class HomeController extends Controller
         });
 
         return view('home', compact('my_patrons', 'our_patrons'));
+    }
+
+    public function password()
+    {
+        return view('password');
+    }
+
+    public function retrieve(Request $request)
+    {
+        $customer=auth()->user();
+        $messages = [
+            'password.min' => '密码最少为6位!',
+        ];
+        $rules = [
+            'password' => 'confirmed|max:255|min:6',
+        ];
+        $validator = Validator::make($request->all(), $rules, $messages);
+        if ($validator->fails()) {
+            $error = $validator->errors()->first();
+            return back()->with('notice', $error);
+        }
+
+        if ($request->has('password') && $request->password != '') {
+            if (!\Hash::check($request->old_password, $customer->password)) {
+                return back()->with('notice', "原始密码错误");
+            }
+            $customer->password = bcrypt($request->password);
+        }
+        $customer->update([
+            'password' => bcrypt($request->password),
+        ]);
+
+        return back()->with('success', "修改密码成功~");
     }
 
 }

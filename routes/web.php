@@ -23,6 +23,9 @@ Route::redirect('/register', '/404', 301);
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+Route::get('/password', 'HomeController@password')->name('password');
+Route::post('/retrieve', 'HomeController@retrieve')->name('retrieve');
+
 Route::group(['prefix' => 'patron'], function () {
     Route::patch('is_something', 'PatronController@is_something')->name('is_something');
     Route::post('follow', 'PatronController@follow')->name('follow');

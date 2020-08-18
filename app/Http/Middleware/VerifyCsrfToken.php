@@ -17,5 +17,6 @@ class VerifyCsrfToken extends Middleware
         'api/*',
         'patron/is_something',
         'patron/follow',
+        'retrieve',
     ];
 }
