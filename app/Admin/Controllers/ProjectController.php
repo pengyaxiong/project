@@ -265,15 +265,31 @@ class ProjectController extends AdminController
                 }
             });
         });
+        if ($auth->id > 1) {
+            #禁用创建按钮
+            $grid->disableCreateButton();
+            #禁用导出数据按钮
+            $grid->disableExport();
+            #禁用行选择checkbox
+            $grid->disableRowSelector();
+        }
+        $grid->tools(function ($tools) use ($auth) {
+            if ($auth->id > 1) {
+                // 禁用批量删除按钮
+                $tools->batch(function ($batch) {
+                    $batch->disableDelete();
+                });
+            }
+        });
 
         $grid->actions(function ($actions) use ($auth) {
             if ($auth->id > 1) {
                 $actions->disableDelete();
-            }else{
+            } else {
                 $actions->add(new Calendar());
             }
-            $slug=$auth->roles->first()->slug;
-            if ($slug=='apply'){
+            $slug = $auth->roles->first()->slug;
+            if ($slug == 'apply') {
                 $actions->add(new SjCheck());
                 $actions->add(new QdCheck());
                 $actions->add(new YsCheck());
