@@ -53,11 +53,12 @@ class ProjectController extends AdminController
     {
         $grid = new Grid(new Project());
 
-        $authId=auth('admin')->user()->id;
-        if ($authId>1){
-            $staff_id=Staff::where('admin_id',$authId)->first()->id;
-            $project_ids=ProjectStaff::where('staff_id',$staff_id)->pluck('project_id');
-            $grid->model()->whereIn('id',$project_ids);
+        $auth = auth('admin')->user();
+
+        if ($auth->id > 1) {
+            $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
+            $project_ids = ProjectStaff::where('staff_id', $staff_id)->pluck('project_id');
+            $grid->model()->whereIn('id', $project_ids);
         }
 
         $grid->column('id', __('Id'));
@@ -156,16 +157,16 @@ class ProjectController extends AdminController
             return new Table(['ID', '节点', '状态', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
         });
 
-        $grid->column('check_status', __('回款状态'))->using($this->check_status)->expand(function ($model){
-            $check_status=[1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'];
-            $apply_status=[1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
-            $finances = $model->finances->map(function ($model)use ($check_status,$apply_status) {
+        $grid->column('check_status', __('回款状态'))->using($this->check_status)->expand(function ($model) {
+            $check_status = [1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'];
+            $apply_status = [1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
+            $finances = $model->finances->map(function ($model) use ($check_status, $apply_status) {
                 $nodes = [
                     'id' => $model->id,
                     'patron_name' => $model->patron->name,
                     'money' => $model->money,
                     'status' => $check_status[$model->status],
-                    'returned' => $model->project[$apply_status[$model->status]]*$model->money/100,
+                    'returned' => $model->project[$apply_status[$model->status]] * $model->money / 100,
                     'returned_money' => $model->returned_money,
                     'rebate' => $model->rebate,
                     'returned_bag' => $model->returned_bag,
@@ -175,7 +176,7 @@ class ProjectController extends AdminController
                 return $nodes;
             });
 
-            return new Table(['ID', '客户名称', '合同金额', '状态', '预计回款金额','实际回款金额', '返渠道费', '回款账户', '未结余额', '详情'], $finances->toArray());
+            return new Table(['ID', '客户名称', '合同金额', '状态', '预计回款金额', '实际回款金额', '返渠道费', '回款账户', '未结余额', '详情'], $finances->toArray());
         })->label([
             1 => 'default',
             2 => 'info',
@@ -265,17 +266,19 @@ class ProjectController extends AdminController
             });
         });
 
-        $grid->actions(function ($actions)use ($authId) {
-            if ($authId>1){
+        $grid->actions(function ($actions) use ($auth) {
+            if ($auth->id > 1) {
                 $actions->disableDelete();
+            }else{
+                $actions->add(new Calendar());
             }
-        });
+            $slug=$auth->roles->first()->slug;
+            if ($slug=='apply'){
+                $actions->add(new SjCheck());
+                $actions->add(new QdCheck());
+                $actions->add(new YsCheck());
+            }
 
-        $grid->actions(function ($actions) {
-            $actions->add(new SjCheck());
-            $actions->add(new QdCheck());
-            $actions->add(new YsCheck());
-            $actions->add(new Calendar());
         });
         return $grid;
     }
