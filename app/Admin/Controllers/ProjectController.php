@@ -53,6 +53,13 @@ class ProjectController extends AdminController
     {
         $grid = new Grid(new Project());
 
+        $authId=auth('admin')->user()->id;
+        if ($authId>1){
+            $staff_id=Staff::where('admin_id',$authId)->first()->id;
+            $project_ids=ProjectStaff::where('staff_id',$staff_id)->pluck('project_id');
+            $grid->model()->whereIn('id',$project_ids);
+        }
+
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))->display(function () {
             return '<a href="/admin/projects/' . $this->id . '/edit">' . $this->name . '</a>';
@@ -256,6 +263,12 @@ class ProjectController extends AdminController
                         return '否';
                 }
             });
+        });
+
+        $grid->actions(function ($actions)use ($authId) {
+            if ($authId>1){
+                $actions->disableDelete();
+            }
         });
 
         $grid->actions(function ($actions) {
