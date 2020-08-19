@@ -34,7 +34,16 @@ class LoginController extends Controller
      */
     public function username()
     {
-        return 'tel';
+        return 'account';
+    }
+
+    protected function attemptLogin(Request $request)
+    {
+        return collect(['name', 'nickname', 'tel'])->contains(function ($value) use ($request) {
+            $account = $request->get($this->username());
+            $password = $request->get('password');
+            return $this->guard()->attempt([$value => $account, 'password' => $password], $request->filled('remember'));
+        });
     }
 
     public function authenticated(Request $request, $user)

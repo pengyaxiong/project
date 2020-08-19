@@ -10,11 +10,11 @@
                 <strong>错误!</strong>{{ session('status') }}
             </div>
         @endif
-        @if ($errors->has('tel'))
+        @if ($errors->has('account'))
             <div class="alert alert-danger alert-dismissible" role="alert">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <strong>错误!</strong>{{ $errors->first('tel') }}
+                <strong>错误!</strong>{{ $errors->first('account') }}
             </div>
         @endif
 
@@ -30,8 +30,8 @@
             @csrf
             <h2 class="form-signin-heading">{{ __('Login') }}</h2>
             <label for="inputEmail" class="sr-only">{{ __('E-Mail Address') }}</label>
-            <input type="text" id="tel" class="form-control" placeholder="{{ __('E-Mail Address') }}" name="tel"
-                   value="{{ old('tel') }}" required="" autofocus="">
+            <input type="text" id="account" class="form-control" placeholder="{{ __('用户名/手机号') }}" name="account"
+                   value="{{ old('account') }}" required="" autofocus="">
             <br>
             <label for="inputPassword" class="sr-only">{{ __('Password') }}</label>
             <input type="password" id="password" class="form-control" placeholder="{{ __('Password') }}" name="password"
