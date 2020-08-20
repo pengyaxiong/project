@@ -54,8 +54,9 @@ class ProjectController extends AdminController
 
         $grid->model()->orderBy('sort_order')->orderBy('contract_time', 'desc');
         $auth = auth('admin')->user();
-        $slug = $auth->roles->first()->slug;
-        if ($auth->id > 1 && $slug != 'apply') {
+        $slug = $auth->roles->pluck('slug')->toarray();
+
+        if ($auth->id > 1 && !in_array('apply', $slug)) {
             $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
             $project_ids = ProjectStaff::where('staff_id', $staff_id)->pluck('project_id');
             $grid->model()->whereIn('id', $project_ids);
@@ -162,7 +163,7 @@ class ProjectController extends AdminController
             $finances = $model->finances->map(function ($model) use ($check_status, $apply_status) {
                 $nodes = [
                     'id' => $model->id,
-                    'patron_name' => $model->patron->name,
+                    'patron_name' => $model->patron ? $model->patron->name : '',
                     'money' => $model->money,
                     'status' => $check_status[$model->status],
                     'returned' => $model->project[$apply_status[$model->status]] * $model->money / 100,
@@ -282,12 +283,15 @@ class ProjectController extends AdminController
         $grid->actions(function ($actions) use ($auth) {
             if ($auth->id > 1) {
                 $actions->disableDelete();
-                $slug = $auth->roles->first()->slug;
-                if ($slug == 'apply') {
+
+                $slug = $auth->roles->pluck('slug')->toarray();
+
+                if (in_array('apply', $slug)) {
                     $actions->add(new SjCheck());
                     $actions->add(new QdCheck());
                     $actions->add(new YsCheck());
                 }
+
             } else {
                 $actions->add(new SjCheck());
                 $actions->add(new QdCheck());
