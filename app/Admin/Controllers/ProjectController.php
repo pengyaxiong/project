@@ -157,41 +157,46 @@ class ProjectController extends AdminController
             return new Table(['ID', '节点', '状态', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
         });
 
-        $grid->column('check_status', __('回款状态'))->using($this->check_status)->expand(function ($model) {
-            $check_status = [1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'];
-            $apply_status = [1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
-            $finances = $model->finances->map(function ($model) use ($check_status, $apply_status) {
-                $nodes = [
-                    'id' => $model->id,
-                    'patron_name' => $model->patron ? $model->patron->name : '',
-                    'money' => $model->money,
-                    'status' => $check_status[$model->status],
-                    'returned' => $model->project[$apply_status[$model->status]] * $model->money / 100,
-                    'returned_money' => $model->returned_money,
-                    'rebate' => $model->rebate,
-                    'returned_bag' => $model->returned_bag,
-                    'debtors' => $model->debtors,
-                    'info' => '<a target="_blank" href="/admin/finances?project_id=' . $model->project_id . '">详情</a>',
-                ];
-                return $nodes;
-            });
-
-            return new Table(['ID', '客户名称', '合同金额', '状态', '预计回款金额', '实际回款金额', '返渠道费', '回款账户', '未结余额', '详情'], $finances->toArray());
-        })->label([
-            1 => 'default',
-            2 => 'info',
-            3 => 'warning',
-            4 => 'danger',
-        ]);
-
-
         $grid->column('days', __('总天数'))->display(function ($days) {
             $result = ProjectNode::where('project_id', $this->id)->sum('days');
             return $result;
         });
 
-        $grid->column('remark', __('Remark'))->width(288)->editable('textarea');
-        $grid->column('money', __('Money'))->editable();
+        $auth = auth('admin')->user();
+        $slug = $auth->roles->pluck('slug')->toarray();
+
+        if ($auth->id == 1 || in_array('apply', $slug)) {
+            $grid->column('check_status', __('回款状态'))->using($this->check_status)->expand(function ($model) {
+                $check_status = [1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'];
+                $apply_status = [1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
+                $finances = $model->finances->map(function ($model) use ($check_status, $apply_status) {
+                    $nodes = [
+                        'id' => $model->id,
+                        'patron_name' => $model->patron ? $model->patron->name : '',
+                        'money' => $model->money,
+                        'status' => $check_status[$model->status],
+                        'returned' => $model->project[$apply_status[$model->status]] * $model->money / 100,
+                        'returned_money' => $model->returned_money,
+                        'rebate' => $model->rebate,
+                        'returned_bag' => $model->returned_bag,
+                        'debtors' => $model->debtors,
+                        'info' => '<a target="_blank" href="/admin/finances?project_id=' . $model->project_id . '">详情</a>',
+                    ];
+                    return $nodes;
+                });
+
+                return new Table(['ID', '客户名称', '合同金额', '状态', '预计回款金额', '实际回款金额', '返渠道费', '回款账户', '未结余额', '详情'], $finances->toArray());
+            })->label([
+                1 => 'default',
+                2 => 'info',
+                3 => 'warning',
+                4 => 'danger',
+            ]);
+
+            $grid->column('remark', __('Remark'))->width(288)->editable('textarea');
+            $grid->column('money', __('Money'))->editable();
+        }
+
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
         $states = [
             'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
@@ -283,6 +288,7 @@ class ProjectController extends AdminController
         $grid->actions(function ($actions) use ($auth) {
             if ($auth->id > 1) {
                 $actions->disableDelete();
+                $actions->disableView();
 
                 $slug = $auth->roles->pluck('slug')->toarray();
 
@@ -379,39 +385,43 @@ class ProjectController extends AdminController
     {
         $form = new Form(new Project());
 
-        $form->text('name', __('Name'))->rules('required');
+        $auth = auth('admin')->user();
+        $slug = $auth->roles->pluck('slug')->toarray();
+        if ($auth->id == 1 || in_array('apply', $slug)) {
+            $form->text('name', __('Name'))->rules('required');
 
-        $tasks = Task::all()->toArray();
-        $select_ = array_prepend($tasks, ['id' => 0, 'name' => '其它']);
-        $select_task = array_column($select_, 'name', 'id');
+            $tasks = Task::all()->toArray();
+            $select_ = array_prepend($tasks, ['id' => 0, 'name' => '其它']);
+            $select_task = array_column($select_, 'name', 'id');
 
-        //创建select
-        $form->select('task_id', '任务名称')->options($select_task);
+            //创建select
+            $form->select('task_id', '任务名称')->options($select_task);
 
-        $staffs = Staff::orderby('sort_order')->pluck('name', 'id')->toArray();
-        $customers = Customer::orderby('sort_order')->pluck('name', 'id')->toArray();
-        if ($form->isEditing()) {
-            $id = request()->route()->parameters()['project'];
-            $customer_ids = ProjectCustomer::where('project_id', $id)->pluck('customer_id')->toArray();
-            $staff_ids = ProjectStaff::where('project_id', $id)->pluck('staff_id')->toArray();
+            $staffs = Staff::orderby('sort_order')->pluck('name', 'id')->toArray();
+            $customers = Customer::orderby('sort_order')->pluck('name', 'id')->toArray();
+            if ($form->isEditing()) {
+                $id = request()->route()->parameters()['project'];
+                $customer_ids = ProjectCustomer::where('project_id', $id)->pluck('customer_id')->toArray();
+                $staff_ids = ProjectStaff::where('project_id', $id)->pluck('staff_id')->toArray();
 
-            $form->multipleSelect('customers', __('商务'))
-                ->options($customers)->default($customer_ids);
-            $form->multipleSelect('staffs', __('项目负责人'))
-                ->options($staffs)->default($staff_ids);
-        } else {
-            $form->multipleSelect('customers', __('商务'))
-                ->options($customers);
-            $form->multipleSelect('staffs', __('项目负责人'))
-                ->options($staffs);
+                $form->multipleSelect('customers', __('商务'))
+                    ->options($customers)->default($customer_ids);
+                $form->multipleSelect('staffs', __('项目负责人'))
+                    ->options($staffs)->default($staff_ids);
+            } else {
+                $form->multipleSelect('customers', __('商务'))
+                    ->options($customers);
+                $form->multipleSelect('staffs', __('项目负责人'))
+                    ->options($staffs);
+            }
+
+            $form->radio('grade', '优先级')->options($this->grade)->default(1);
+            $form->radio('status', __('Status'))->options($this->status)->default(1);
+
+
+            $form->textarea('remark', __('Remark'));
         }
-
-        $form->radio('grade', '优先级')->options($this->grade)->default(1);
-        $form->radio('status', __('Status'))->options($this->status)->default(1);
-
         $form->ueditor('content', __('Content'));
-        $form->textarea('remark', __('Remark'));
-
         $form->table('node', __('节点情况'), function ($table) {
             $staffs = Staff::all()->toArray();
             $select_staff = array_column($staffs, 'name', 'id');
@@ -428,18 +438,19 @@ class ProjectController extends AdminController
             $table->number('days', '耗时')->help('天');
             $table->textarea('content', '详情');
         });
+        if ($auth->id == 1 || in_array('apply', $slug)) {
+            $form->decimal('money', __('Money'))->default(0.00);
 
-        $form->decimal('money', __('Money'))->default(0.00);
-        $form->number('sort_order', __('Sort order'))->default(99);
-        $states = [
-            'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
-            'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
-        ];
-        $form->switch('is_check', __('是否交付'))->states($states)->default(0);
-        $form->datetime('contract_time', __('Contract time'));
-        $form->datetime('check_time', __('交付时间'));
-        $form->datetime('y_check_time', __('预计交付时间'));
-
+            $form->number('sort_order', __('Sort order'))->default(99);
+            $states = [
+                'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
+                'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+            ];
+            $form->switch('is_check', __('是否交付'))->states($states)->default(0);
+            $form->datetime('contract_time', __('Contract time'));
+            $form->datetime('check_time', __('交付时间'));
+            $form->datetime('y_check_time', __('预计交付时间'));
+        }
         //保存前回调
         $form->saving(function (Form $form) {
             $is_check = $form->model()->is_check;

@@ -31,6 +31,14 @@ class TaskController extends AdminController
     {
         $grid = new Grid(new Task());
 
+        $grid->model()->orderBy('sort_order')->orderBy('created_at', 'desc');
+        $auth = auth('admin')->user();
+        if ($auth->id > 1) {
+            $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
+            $task_ids = Task::where('principal_id', $staff_id)->pluck('id');
+            $grid->model()->whereIn('id', $task_ids);
+        }
+
         $grid->column('id', __('Id'));
         $grid->column('node.name', __('类型'));
         $grid->column('name', __('Name'));
@@ -68,12 +76,12 @@ class TaskController extends AdminController
         $grid->header(
             function ($query) {
 
-            return new Box('周期比列', view('admin.task_days'));
+                return new Box('周期比列', view('admin.task_days'));
 
-        });
+            });
 
         $grid->footer(function ($query) {
-            $days=$query->sum('days');
+            $days = $query->sum('days');
             return "<div style='padding: 5px;'>总时长 ： $days 天</div>";
         });
 
@@ -86,10 +94,10 @@ class TaskController extends AdminController
 
             // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
 
-            $export->except(['sort_order', 'updated_at' ]); //用来指定哪些列不需要被导出
+            $export->except(['sort_order', 'updated_at']); //用来指定哪些列不需要被导出
 
             $export->column('is_contract', function ($value, $original) {
-                switch ($original){
+                switch ($original) {
                     case 1:
                         return '是';
                     default:
@@ -98,6 +106,29 @@ class TaskController extends AdminController
             });
         });
 
+        if ($auth->id > 1) {
+            #禁用创建按钮
+            $grid->disableCreateButton();
+            #禁用导出数据按钮
+            $grid->disableExport();
+            #禁用行选择checkbox
+            $grid->disableRowSelector();
+        }
+        $grid->tools(function ($tools) use ($auth) {
+            if ($auth->id > 1) {
+                // 禁用批量删除按钮
+                $tools->batch(function ($batch) {
+                    $batch->disableDelete();
+                });
+            }
+        });
+
+        $grid->actions(function ($actions) use ($auth) {
+            if ($auth->id > 1) {
+                $actions->disableDelete();
+                $actions->disableView();
+            }
+        });
         return $grid;
     }
 
@@ -137,7 +168,7 @@ class TaskController extends AdminController
     {
         $form = new Form(new Task());
 
-        $nodes = Node::where('is_task',true)->get()->toArray();
+        $nodes = Node::where('is_task', true)->get()->toArray();
         $select_node = array_column($nodes, 'name', 'id');
         //创建select
         $form->select('node_id', '类型')->options($select_node);
@@ -164,9 +195,9 @@ class TaskController extends AdminController
         //保存后回调
         $form->saved(function (Form $form) {
             $id = $form->model()->id;
-            $task=Task::find($id);
-            if ($task->is_contract==1) {
-                $contract_time = $task->contract_time?$task->contract_time:date('Y-m-d H:i:s', time());
+            $task = Task::find($id);
+            if ($task->is_contract == 1) {
+                $contract_time = $task->contract_time ? $task->contract_time : date('Y-m-d H:i:s', time());
                 $project = Project::where('task_id', $id)->first();
                 if (!$project) {
                     Project::create([
