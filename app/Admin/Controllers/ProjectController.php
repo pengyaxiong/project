@@ -52,9 +52,10 @@ class ProjectController extends AdminController
     {
         $grid = new Grid(new Project());
 
+        $grid->model()->orderBy('sort_order')->orderBy('contract_time', 'desc');
         $auth = auth('admin')->user();
-
-        if ($auth->id > 1) {
+        $slug = $auth->roles->first()->slug;
+        if ($auth->id > 1 && $slug != 'apply') {
             $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
             $project_ids = ProjectStaff::where('staff_id', $staff_id)->pluck('project_id');
             $grid->model()->whereIn('id', $project_ids);
@@ -64,7 +65,7 @@ class ProjectController extends AdminController
         $grid->column('name', __('Name'))->display(function () {
             return '<a href="/admin/projects/' . $this->id . '/edit">' . $this->name . '</a>';
         });
-        $grid->column('task.name', __('任务名称'));
+        $grid->column('task.name', __('任务名称'))->hide();
         $grid->column('grade', __('优先级'))->using($this->grade)->label([
             1 => 'default',
             2 => 'info',
@@ -213,6 +214,8 @@ class ProjectController extends AdminController
                 0 => '未交付'
             ];
             $filter->equal('is_check', __('是否交付'))->select($status_text);
+
+            $filter->equal('check_status', __('回款状态'))->select([1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功']);
 
             $filter->equal('grade', __('优先级'))->select($this->grade);
             $filter->equal('status', __('Status'))->select($this->status);

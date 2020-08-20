@@ -30,6 +30,8 @@ class Project extends Model
             //这样可以拿到当前操作id
             $project_id=$model->id;
             ProjectNode::where('project_id',$project_id)->delete();
+            ProjectCustomer::where('project_id',$project_id)->delete();
+            ProjectStaff::where('project_id',$project_id)->delete();
         });
     }
 
@@ -71,4 +73,6 @@ class Project extends Model
     {
         return $this->hasMany(Finance::class,'project_id');
     }
+
+
 }
