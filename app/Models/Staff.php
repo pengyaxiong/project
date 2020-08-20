@@ -42,4 +42,9 @@ class Staff extends Model
     {
         return $this->hasMany(Task::class,'access_id');
     }
+
+    public function dailies()
+    {
+        return $this->hasMany(Daily::class,'daily_id');
+    }
 }

@@ -21,7 +21,6 @@ class HomeController extends Controller
             ->description('list...')
             //  ->row(Dashboard::title())
             ->row(function (Row $row) {
-
                 $row->column(12, function (Column $column) {
                     $column->append(new Box('项目状态统计', view('admin.project_status')));
                 });
