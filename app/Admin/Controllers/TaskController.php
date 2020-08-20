@@ -35,8 +35,7 @@ class TaskController extends AdminController
         $auth = auth('admin')->user();
         if ($auth->id > 1) {
             $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
-            $task_ids = Task::where('principal_id', $staff_id)->pluck('id');
-            $grid->model()->whereIn('id', $task_ids);
+            $grid->model()->where('principal_id', $staff_id);
         }
 
         $grid->column('id', __('Id'));

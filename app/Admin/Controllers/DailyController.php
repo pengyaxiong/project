@@ -10,6 +10,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Carbon\Carbon;
+
 class DailyController extends AdminController
 {
     /**
@@ -27,14 +28,19 @@ class DailyController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Daily());
+        $auth = auth('admin')->user();
 
         $grid->header(function ($query) {
-            $dailies = $query->wherebetween('created_at',[Carbon::today(),Carbon::tomorrow()])->get()->pluck('staff_id')->toArray();
-            $staffs=Staff::wherenotin('id',$dailies)->pluck('name')->toArray();
-            return '<span class="label" style="font-weight:unset; color: #fff; background-color: #d9534f">今日未完成人员:</span>&nbsp;'.implode('--',$staffs);
+            $dailies = $query->wherebetween('created_at', [Carbon::today(), Carbon::tomorrow()])->get()->pluck('staff_id')->toArray();
+            $staffs = Staff::wherenotin('id', $dailies)->pluck('name')->toArray();
+            return '<span class="label" style="font-weight:unset; color: #fff; background-color: #d9534f">今日未完成人员:</span>&nbsp;' . implode('--', $staffs);
         });
 
-        $auth = auth('admin')->user();
+        if ($auth->id > 1) {
+            $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
+            $grid->model()->where('staff_id', $staff_id);
+        }
+
         $grid->model()->with('staff.department');
 
         $grid->column('id', __('Id'));
