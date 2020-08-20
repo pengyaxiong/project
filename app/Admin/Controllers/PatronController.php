@@ -29,6 +29,8 @@ class PatronController extends AdminController
     {
         $grid = new Grid(new Patron());
 
+        $auth = auth('admin')->user();
+
         $grid->column('id', __('Id'));
         $grid->column('customer.name', __('所属商务'));
         $grid->column('from', __('From'))->using([
@@ -99,7 +101,29 @@ class PatronController extends AdminController
             $filter->equal('status', __('Status'))->select($status_text);
         });
 
-        $grid->actions(function ($actions) {
+        if ($auth->id > 1) {
+            #禁用创建按钮
+            $grid->disableCreateButton();
+            #禁用导出数据按钮
+            $grid->disableExport();
+            #禁用行选择checkbox
+            $grid->disableRowSelector();
+        }
+
+        $grid->tools(function ($tools) use ($auth) {
+            if ($auth->id > 1) {
+                // 禁用批量删除按钮
+                $tools->batch(function ($batch) {
+                    $batch->disableDelete();
+                });
+            }
+        });
+
+        $grid->actions(function ($actions) use ($auth) {
+            if ($auth->id > 1) {
+                $actions->disableDelete();
+                $actions->disableView();
+            }
             $actions->add(new PatronCheck());
         });
 

@@ -25,6 +25,7 @@ class FinanceController extends AdminController
     {
         $this->check_status = [1 => '签约审核收款', 2 => '设计审核收款', 3 => '前端审核收款', 4 => '验收审核收款'];
     }
+
     /**
      * Make a grid builder.
      *
@@ -33,6 +34,8 @@ class FinanceController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Finance());
+
+        $auth = auth('admin')->user();
 
         $grid->column('id', __('Id'));
         $grid->column('project.name', __('项目名称'));
@@ -74,21 +77,25 @@ class FinanceController extends AdminController
 
             $filter->between('created_at', __('Created at'))->date();
 
-            $status_text =[1 => '有', 0=> '无'];
+            $status_text = [1 => '有', 0 => '无'];
             $filter->equal('pact', __('合同（有/无）'))->select($status_text);
         });
 
-        $grid->actions(function ($actions) {
-            $actions->disableView();
-            //  $actions->disableEdit();
-            $actions->disableDelete();
+        $grid->actions(function ($actions) use ($auth) {
+            if ($auth->id > 1) {
+                $actions->disableView();
+                //  $actions->disableEdit();
+                $actions->disableDelete();
+            }
         });
 
-        $grid->tools(function ($tools) {
-            // 禁用批量删除按钮
-            $tools->batch(function ($batch) {
-                $batch->disableDelete();
-            });
+        $grid->tools(function ($tools) use ($auth) {
+            if ($auth->id > 1) {
+                // 禁用批量删除按钮
+                $tools->batch(function ($batch) {
+                    $batch->disableDelete();
+                });
+            }
         });
 
         return $grid;
@@ -147,7 +154,7 @@ class FinanceController extends AdminController
         $form->select('customer_id', '商务名称')->options($customer_array);
 
 
-        $form->radio('pact', __('合同（有/无）'))->options([1 => '有', 0=> '无'])->default(1);
+        $form->radio('pact', __('合同（有/无）'))->options([1 => '有', 0 => '无'])->default(1);
         $form->decimal('money', __('合同金额'))->default(1000.00);
         $form->decimal('returned_money', __('回款金额'))->default(0.00);
         $form->decimal('rebate', __('返渠道费'))->default(0.00);

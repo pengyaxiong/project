@@ -286,7 +286,7 @@ class ProjectController extends AdminController
             if ($auth->id > 1) {
                 $actions->disableDelete();
             } else {
-                $actions->add(new Calendar());
+//                $actions->add(new Calendar());
             }
             $slug = $auth->roles->first()->slug;
             if ($slug == 'apply') {
