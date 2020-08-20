@@ -10,12 +10,6 @@ class Task extends Model
     protected $guarded = [];
     protected $table = 'wechat_task';
 
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
-
     public function node()
     {
         return $this->belongsTo(Node::class);

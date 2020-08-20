@@ -6,7 +6,6 @@ use App\Admin\Actions\Project\Calendar;
 use App\Admin\Actions\Project\QdCheck;
 use App\Admin\Actions\Project\SjCheck;
 use App\Admin\Actions\Project\YsCheck;
-use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Node;
 use App\Models\Project;
@@ -65,7 +64,6 @@ class ProjectController extends AdminController
         $grid->column('name', __('Name'))->display(function () {
             return '<a href="/admin/projects/' . $this->id . '/edit">' . $this->name . '</a>';
         });
-        $grid->column('company.name', __('所属公司'));
         $grid->column('task.name', __('任务名称'));
         $grid->column('grade', __('优先级'))->using($this->grade)->label([
             1 => 'default',
@@ -216,10 +214,6 @@ class ProjectController extends AdminController
             ];
             $filter->equal('is_check', __('是否交付'))->select($status_text);
 
-            $companies = Company::all()->toArray();
-            $select_array = array_column($companies, 'name', 'id');
-            $filter->equal('company_id', __('所属公司'))->select($select_array);
-
             $filter->equal('grade', __('优先级'))->select($this->grade);
             $filter->equal('status', __('Status'))->select($this->status);
 
@@ -285,16 +279,18 @@ class ProjectController extends AdminController
         $grid->actions(function ($actions) use ($auth) {
             if ($auth->id > 1) {
                 $actions->disableDelete();
+                $slug = $auth->roles->first()->slug;
+                if ($slug == 'apply') {
+                    $actions->add(new SjCheck());
+                    $actions->add(new QdCheck());
+                    $actions->add(new YsCheck());
+                }
             } else {
-//                $actions->add(new Calendar());
-            }
-            $slug = $auth->roles->first()->slug;
-            if ($slug == 'apply') {
                 $actions->add(new SjCheck());
                 $actions->add(new QdCheck());
                 $actions->add(new YsCheck());
+//                $actions->add(new Calendar());
             }
-
         });
         return $grid;
     }
@@ -332,7 +328,6 @@ class ProjectController extends AdminController
 
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
-        $show->field('company.name', __('所属公司'));
         $show->field('task.name', __('任务名称'));
         $show->field('grade', __('优先级'))->using($this->grade);
         $show->field('status', __('Status'))->using($this->status);
@@ -378,11 +373,6 @@ class ProjectController extends AdminController
         $form = new Form(new Project());
 
         $form->text('name', __('Name'))->rules('required');
-
-        $companies = Company::all()->toArray();
-        $select_array = array_column($companies, 'name', 'id');
-        //创建select
-        $form->select('company_id', '所属公司')->options($select_array);
 
         $tasks = Task::all()->toArray();
         $select_ = array_prepend($tasks, ['id' => 0, 'name' => '其它']);

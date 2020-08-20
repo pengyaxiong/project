@@ -10,11 +10,6 @@ class Audition extends Model
 
     protected $table = 'wechat_audition';
 
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
-
     public function department()
     {
         return $this->belongsTo(Department::class);

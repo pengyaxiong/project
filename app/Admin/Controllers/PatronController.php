@@ -195,7 +195,7 @@ class PatronController extends AdminController
         $form->text('job', __('Job'));
         $form->select('need', __('Need'))->options([0=>'APP',1=>'小程序',2=>'网站',3=>'系统软件',4=>'其它']);
         $form->decimal('money', __('预算'))->default(1000.00);
-        $form->switch('status', __('Status'))->options([0=>'待签约',1=>'已签约',2=>'已审核']);
+        $form->select('status', __('Status'))->options([0=>'待签约',1=>'已签约',2=>'已审核']);
         $form->datetime('start_time', __('开始时间'))->default(date('Y-m-d H:i:s'));
         $form->textarea('relation', __('客户关系'));
         $form->table('follow', __('跟进记录'), function ($table) {

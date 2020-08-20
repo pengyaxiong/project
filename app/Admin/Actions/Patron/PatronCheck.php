@@ -22,14 +22,12 @@ class PatronCheck extends RowAction
         if ($model->status==2){
             return $this->response()->error('已审核.')->refresh();
         }
-        $company_id=$request->get('company_id');
         $name=$request->get('name');
         $customer_id=$model->customer_id;
         $remark=$request->get('remark');
         $money=$request->get('money');
 
         $project=Project::create([
-            'company_id'=>$company_id,
             'name'=>$name,
             'remark'=>$remark,
             'money'=>$money,
@@ -49,7 +47,6 @@ class PatronCheck extends RowAction
         $model->save();
 
         Finance::create([
-            'customer_id'=>$customer_id,
             'project_id'=>$project->id,
             'patron_id'=>$model->id,
             'status'=>$request->get('status'),
@@ -69,9 +66,6 @@ class PatronCheck extends RowAction
 
     public function form(Model $model)
     {
-        $companies = Company::all()->toArray();
-        $select_array = array_column($companies, 'name', 'id');
-        $this->radio('company_id', '所属公司')->options($select_array);
         $this->text('name','项目名称')->default($model->company_name.'-'.$model->name);
         $this->text('money','合同金额')->default($model->money);
 

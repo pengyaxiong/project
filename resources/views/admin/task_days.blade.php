@@ -29,7 +29,7 @@
                 legend: {
                     orient: 'vertical',
                     left: 'left',
-                    data: data.company
+                    data: data.node
                 },
                 series: [
                     {

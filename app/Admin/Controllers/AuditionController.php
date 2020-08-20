@@ -3,7 +3,6 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Audition;
-use App\Models\Company;
 use App\Models\Department;
 use App\Models\Staff;
 use Encore\Admin\Controllers\AdminController;
@@ -30,7 +29,6 @@ class AuditionController extends AdminController
         $grid = new Grid(new Audition());
 
         $grid->column('id', __('Id'));
-        $grid->column('company.name', __('所属公司'));
         $grid->column('department.name', __('所属部门'));
         $grid->column('staff.name', __('面试官'));
         $grid->column('name', __('Name'));
@@ -73,7 +71,6 @@ class AuditionController extends AdminController
         $show = new Show(Audition::findOrFail($id));
 
         $show->field('id', __('Id'));
-        $show->field('company_id', __('所属公司'));
         $show->field('department_id', __('所属部门'));
         $show->field('staff_id', __('面试官'));
         $show->field('name', __('Name'));
@@ -98,11 +95,6 @@ class AuditionController extends AdminController
     protected function form()
     {
         $form = new Form(new Audition());
-
-        $companies = Company::all()->toArray();
-        $company_array = array_column($companies, 'name', 'id');
-        //创建select
-        $form->select('company_id', '所属公司')->options($company_array);
 
         $departments=Department::all()->toArray();
         $department_array=array_column($departments, 'name', 'id');

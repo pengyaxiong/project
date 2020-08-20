@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Company;
 use App\Models\Department;
 use App\Models\Node;
 use App\Models\Project;
@@ -21,7 +20,7 @@ class StaffController extends AdminController
      *
      * @var string
      */
-    protected $title = '员工管理';
+    protected $title = '技术管理';
 
     /**
      * Make a grid builder.
@@ -88,7 +87,6 @@ class StaffController extends AdminController
         });
 
         $grid->column('admin.name', __('管理员'));
-        $grid->column('company.name', __('所属公司'));
         $grid->column('department.name', __('所属部门'));
         $grid->column('mobile', __('Mobile'));
         $grid->column('sex', __('Sex'))->using([
@@ -115,10 +113,6 @@ class StaffController extends AdminController
             ];
             $filter->equal('sex', __('Sex'))->select($status_text);
 
-            $companies = Company::all()->toArray();
-            $select_array = array_column($companies, 'name', 'id');
-            $filter->equal('company_id', __('所属公司'))->select($select_array);
-
             $departments = Department::all()->toArray();
             $select_array = array_column($departments, 'name', 'id');
             $filter->equal('department_id', __('所属部门'))->select($select_array);
@@ -140,7 +134,6 @@ class StaffController extends AdminController
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
         $show->field('admin.name', __('管理员'));
-        $show->field('company.name', __('所属公司'));
         $show->field('department_id', __('所属部门'));
         $show->field('mobile', __('Mobile'));
         $show->field('sex', __('Sex'));
@@ -171,11 +164,6 @@ class StaffController extends AdminController
         $select_array = array_column($admins, 'name', 'id');
         //创建select
         $form->select('admin_id', '管理员')->options($select_array);
-
-        $companies = Company::all()->toArray();
-        $select_array = array_column($companies, 'name', 'id');
-        //创建select
-        $form->select('company_id', '所属公司')->options($select_array);
 
         $departments = Department::all()->toArray();
         $select_array = array_column($departments, 'name', 'id');

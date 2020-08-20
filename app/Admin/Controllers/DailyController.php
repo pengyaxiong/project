@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Company;
 use App\Models\Daily;
 use App\Models\Department;
 use App\Models\Staff;
@@ -36,13 +35,10 @@ class DailyController extends AdminController
         });
 
         $auth = auth('admin')->user();
-        $grid->model()->with('staff.company', 'staff.department');
+        $grid->model()->with('staff.department');
 
         $grid->column('id', __('Id'));
         $grid->column('staff.name', __('Name'));
-        $grid->column('staff.company.name', __('所属公司'))->display(function ($model) {
-            return $model['name'];
-        });
         $grid->column('staff.department.name', __('所属部门'))->display(function ($model) {
             return $model['name'];
         });
@@ -71,10 +67,6 @@ class DailyController extends AdminController
                 0 => '保密'
             ];
             $filter->equal('staff.sex', __('Sex'))->select($status_text);
-
-            $companies = Company::all()->toArray();
-            $select_array = array_column($companies, 'name', 'id');
-            $filter->equal('staff.company.id', __('所属公司'))->select($select_array);
 
             $departments = Department::all()->toArray();
             $select_array = array_column($departments, 'name', 'id');

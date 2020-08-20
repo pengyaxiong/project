@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Company;
 use App\Models\Department;
 use App\Models\Node;
 use App\Models\Project;
@@ -305,13 +304,12 @@ class VisualizationController extends Controller
                 $query->where('start_time', '>=', $request->start);
             }
         };
-        // $day = Task::select(\DB::raw('sum(days) as count, company_id'))->groupBy('company_id')->get()->pluck('count','company.name')->toArray();
         $task = [];
-        $companies = Company::all();
-        foreach ($companies as $k => $company) {
-            $task['company'][$k] = $company->name;
-            $task['days'][$k]['value'] = Task::where($where)->where('company_id', $company->id)->sum('days');
-            $task['days'][$k]['name'] = $company->name;
+        $nodes = Node::where('is_task', true)->get();
+        foreach ($nodes as $k => $node) {
+            $task['node'][$k] = $node->name;
+            $task['days'][$k]['value'] = Task::where($where)->where('node_id', $node->id)->sum('days');
+            $task['days'][$k]['name'] = $node->name;
         }
         $task['all'] = Task::where($where)->sum('days');
         return $task;

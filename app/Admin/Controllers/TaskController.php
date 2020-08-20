@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Company;
 use App\Models\Node;
 use App\Models\Project;
 use App\Models\Staff;
@@ -33,7 +32,6 @@ class TaskController extends AdminController
         $grid = new Grid(new Task());
 
         $grid->column('id', __('Id'));
-        $grid->column('company.name', __('所属公司'));
         $grid->column('node.name', __('类型'));
         $grid->column('name', __('Name'));
         $grid->column('principal.name', __('负责人'));
@@ -65,9 +63,6 @@ class TaskController extends AdminController
             $filter->equal('principal_id', __('负责人'))->select($staffs_array);
             $filter->equal('access_id', __('对接人'))->select($staffs_array);
 
-            $companies = Company::all()->toArray();
-            $select_array = array_column($companies, 'name', 'id');
-            $filter->equal('company_id', __('所属公司'))->select($select_array);
         });
 
         $grid->header(
@@ -117,7 +112,6 @@ class TaskController extends AdminController
         $show = new Show(Task::findOrFail($id));
 
         $show->field('id', __('Id'));
-        $show->field('company_id', __('Company id'));
         $show->field('node.name', __('类型'));
         $show->field('name', __('Name'));
         $show->field('principal_id', __('Principal id'));
@@ -142,11 +136,6 @@ class TaskController extends AdminController
     protected function form()
     {
         $form = new Form(new Task());
-
-        $companies = Company::all()->toArray();
-        $select_array = array_column($companies, 'name', 'id');
-        //创建select
-        $form->select('company_id', '所属公司')->options($select_array);
 
         $nodes = Node::where('is_task',true)->get()->toArray();
         $select_node = array_column($nodes, 'name', 'id');
@@ -181,7 +170,6 @@ class TaskController extends AdminController
                 $project = Project::where('task_id', $id)->first();
                 if (!$project) {
                     Project::create([
-                        'company_id' => $form->model()->company_id,
                         'task_id' => $form->model()->id,
                         'name' => $form->model()->name,
                         'contract_time' => $contract_time

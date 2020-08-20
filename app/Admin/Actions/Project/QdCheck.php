@@ -46,8 +46,6 @@ class QdCheck extends RowAction
 
     public function form(Model $model)
     {
-        $company = Company::find($model->company_id);
-        $this->text('company', '所属公司')->default($company->name)->disable();
         $this->text('name', '项目名称')->default($model->name)->disable();
         $this->text('money', '合同金额')->default($model->money)->disable();
         $this->text('qy_rate', '签约付款比列')->help('占合同总额百分比(%)')->default($model->qy_rate)->disable();
