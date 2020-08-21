@@ -72,7 +72,16 @@ class PatronController extends AdminController
         });
         $grid->column('start_time', __('开始时间'));
         $grid->column('relation', __('客户关系'));
-        $grid->column('follow', __('跟进记录'));
+        $grid->column('follow', __('跟进记录'))->display(function ($follow) {
+            foreach ($follow as $k => $v) {
+                $follow[$k] = [
+                    'time' => $v['time'],
+                    'content' => isset($v['content']) ? $v['content'] : '',
+                ];
+            }
+
+            return new Table([], $follow);
+        });
         $grid->column('remark', __('Remark'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
@@ -165,7 +174,7 @@ class PatronController extends AdminController
             }
 
             return new Table(['时间', '详情'], $follow);
-        });
+        })->json();
         $show->field('remark', __('Remark'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));

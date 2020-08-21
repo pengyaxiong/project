@@ -28,28 +28,40 @@
                     <th>任务名</th>
                     <th>类型</th>
                     <th>时间周期</th>
+                    <th>是否完成</th>
                     <th>开始时间</th>
-                    <th>进度</th>
+                    <th>已耗时</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($tasks as $task)
                     <tr>
                         <th scope="row">{{$loop->index+1}}</th>
-                        <td>{{$task['name']}}</td>
-                        <td>{{$task['grade']}}</td>
+                        <td><a href="/admin/tasks">{{$task['name']}}</a></td>
+                        <td>{!! $task['grade'] !!}</td>
                         <td>{{$task['days']}}</td>
+                        <td>
+                            @if($task['is_finish'])
+                                <span class="label label-success">已完成</span>
+                            @else
+                                <span class="label label-info">进行中</span>
+                            @endif
+                        </td>
                         <td>{{$task['start_time']}}</td>
                         <td>
                             @if($task['is_empty'])
                                 <div class="progress">
-                                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{$task['now_date']}}"
-                                         aria-valuemin="{{$task['start_date']}}" aria-valuemax="{{$task['end_date']}}" style="width: {{$task['rate']}}%;">
+                                    <div class="progress-bar progress-bar-danger" role="progressbar"
+                                         aria-valuenow="{{$task['now_date']}}"
+                                         aria-valuemin="{{$task['start_date']}}" aria-valuemax="{{$task['end_date']}}"
+                                         style="width: {{$task['rate']}}%;">
                                         {{$task['rate']}}%
                                     </div>
                                 </div>
                             @else
-                                <span class="label label-danger">已超时!!</span>
+                                @if(!$task['is_finish'])
+                                    <span class="label label-danger">已超时!!</span>
+                                @endif
                             @endif
                         </td>
                     </tr>

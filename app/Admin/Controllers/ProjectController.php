@@ -19,6 +19,12 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Table;
+use Illuminate\Http\Request;
+use Encore\Admin\Layout\Column;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
+use Illuminate\Support\MessageBag;
 
 class ProjectController extends AdminController
 {
@@ -35,7 +41,6 @@ class ProjectController extends AdminController
 
     public function __construct()
     {
-
         $this->grade = [1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E'];
         $this->status = [1 => '已立项', 2 => '进行中', 3 => '已暂停', 4 => '已结项'];
         $this->node_status = [1 => '未开始', 2 => '进行中', 3 => '已完成'];
@@ -63,9 +68,14 @@ class ProjectController extends AdminController
         }
 
         $grid->column('id', __('Id'));
-        $grid->column('name', __('Name'))->display(function () {
-            return '<a href="/admin/projects/' . $this->id . '/edit">' . $this->name . '</a>';
-        });
+        if ($auth->id > 1) {
+            $grid->column('name', __('Name'));
+        } else {
+            $grid->column('name', __('Name'))->display(function () {
+                return '<a href="/admin/projects/' . $this->id . '/edit">' . $this->name . '</a>';
+            });
+        }
+
         $grid->column('task.name', __('任务名称'))->hide();
         $grid->column('grade', __('优先级'))->using($this->grade)->label([
             1 => 'default',
@@ -108,8 +118,9 @@ class ProjectController extends AdminController
         })->implode(',');
 
 
-        $grid->column('node', __('Node'))->display(function ($node) {
+        $grid->column('node', __('Node'))->display(function () {
             $html = [];
+            $node = ProjectNode::where('project_id', $this->id)->get()->toarray();
             foreach ($node as $k => $v) {
                 if (!isset($v["staff_id"]) || !isset($v["days"])) {
                     continue;
@@ -202,11 +213,17 @@ class ProjectController extends AdminController
             'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
         ];
-        $grid->column('is_check', __('是否交付'))->switch($states);
+        if ($auth->id > 1) {
+            $grid->column('is_check', __('是否交付'))->bool();
+            $grid->column('check_time', __('交付时间'));
+            $grid->column('y_check_time', __('预计交付时间'));
+        } else {
+            $grid->column('is_check', __('是否交付'))->switch($states);
+            $grid->column('contract_time', __('Contract time'))->editable('date');
+            $grid->column('check_time', __('交付时间'));
+            $grid->column('y_check_time', __('预计交付时间'))->editable('date');
+        }
 
-        $grid->column('contract_time', __('Contract time'))->editable('date');
-        $grid->column('check_time', __('交付时间'));
-        $grid->column('y_check_time', __('预计交付时间'))->editable('date');
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
@@ -289,6 +306,7 @@ class ProjectController extends AdminController
             if ($auth->id > 1) {
                 $actions->disableDelete();
                 $actions->disableView();
+                $actions->disableEdit();
 
                 $slug = $auth->roles->pluck('slug')->toarray();
 
@@ -344,7 +362,8 @@ class ProjectController extends AdminController
         $show->field('task.name', __('任务名称'));
         $show->field('grade', __('优先级'))->using($this->grade);
         $show->field('status', __('Status'))->using($this->status);
-        $show->field('node', __('Node'))->as(function ($nodes) {
+        $show->field('node', __('Node'))->as(function () {
+            $nodes = ProjectNode::where('project_id', $this->id)->get()->toarray();
             foreach ($nodes as $k => $v) {
                 $staff = Staff::find($v['staff_id']);
                 $node = Node::find($v['node_id']);
@@ -361,7 +380,7 @@ class ProjectController extends AdminController
             }
 
             return new Table(['节点', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $nodes);
-        });
+        })->json();
         $show->field('content', __('Content'));
         $show->field('remark', __('Remark'));
         $show->field('money', __('Money'));
@@ -431,12 +450,8 @@ class ProjectController extends AdminController
             $select_node = array_column($nodes, 'name', 'id');
             $table->select('node_id', '节点')->options($select_node);
 
-            $table->select('status', '状态')->options($this->node_status);
-
             $table->datetime('start_time', '开始时间')->default(date('Y-m-d', time()));
             $table->datetime('end_time', '结束时间')->default(date('Y-m-d', time()));
-            $table->number('days', '耗时')->help('天');
-            $table->textarea('content', '详情');
         });
         if ($auth->id == 1 || in_array('apply', $slug)) {
             $form->decimal('money', __('Money'))->default(0.00);
@@ -470,22 +485,151 @@ class ProjectController extends AdminController
             if (!empty($node)) {
                 ProjectNode::where('project_id', $id)->delete();
                 foreach ($node as $value) {
-                    ProjectNode::create([
-                        'staff_id' => $value['staff_id'],
-                        'node_id' => $value['node_id'],
-                        'status' => $value['status'],
-                        'project_id' => $id,
-                        'start_time' => $value['start_time'],
-                        'end_time' => $value['end_time'],
-                        'days' => $value['days'],
-                        'content' => $value['content'],
-                    ]);
+                    $project_node = ProjectNode::where('project_id', $id)->where('node_id', $value['node_id'])->where('staff_id', $value['staff_id'])->exists();
+                    if (!$project_node) {
+                        ProjectNode::create([
+                            'staff_id' => $value['staff_id'],
+                            'node_id' => $value['node_id'],
+//                        'status' => $value['status'],
+                            'project_id' => $id,
+                            'start_time' => $value['start_time'],
+                            'end_time' => $value['end_time'],
+                            'days' => $this->get_weekend_days($value['start_time'], $value['end_time']),
+//                        'content' => $value['content'],
+                        ]);
+                    }
                 }
-
             }
         });
 
         return $form;
     }
 
+
+    /**
+     * | @param char|int $start_date 一个有效的日期格式，例如：20091016，2009-10-16
+     * | @param char|int $end_date 同上
+     * | @param int $weekend_days 一周休息天数
+     * | @return array
+     * | array[total_days]  给定日期之间的总天数
+     * | array[total_relax] 给定日期之间的周末天数
+     */
+    function get_weekend_days($start_date, $end_date, $weekend_days = 2)
+    {
+
+        $data = array();
+        if (strtotime($start_date) > strtotime($end_date)) list($start_date, $end_date) = array($end_date, $start_date);
+
+        $start_reduce = $end_add = 0;
+        $start_N = date('N', strtotime($start_date));
+        $start_reduce = ($start_N == 7) ? 1 : 0;
+
+        $end_N = date('N', strtotime($end_date));
+
+        // 进行单、双休判断，默认按单休计算
+        $weekend_days = intval($weekend_days);
+        switch ($weekend_days) {
+            case 2:
+                in_array($end_N, array(6, 7)) && $end_add = ($end_N == 7) ? 2 : 1;
+                break;
+            case 1:
+            default:
+                $end_add = ($end_N == 7) ? 1 : 0;
+                break;
+        }
+
+        $days = round(abs(strtotime($end_date) - strtotime($start_date)) / 86400) + 1;
+        $data['total_days'] = $days;
+        $data['total_relax'] = floor(($days + $start_N - 1 - $end_N) / 7) * $weekend_days - $start_reduce + $end_add;
+        $data['total_work'] = $days - (floor(($days + $start_N - 1 - $end_N) / 7) * $weekend_days - $start_reduce + $end_add);
+
+        return $data['total_work'];
+    }
+
+    public function project_node(Content $content, $id)
+    {
+        $project = Project::find($id);
+        return $content
+            ->title($project->name)
+            ->description('Doing')
+            ->row(function (Row $row) use ($project) {
+                $row->column(6, function (Column $column) use ($project) {
+
+                    $project_nodes = ProjectNode::where('project_id', $project->id)->get()->map(function ($model) {
+                        $staff = Staff::find($model->staff_id);
+                        $node = Node::find($model->node_id);
+                        $staff_name = isset($staff) ? $staff->name : '';
+                        $node_name = isset($node) ? $node->name : '';
+                        $node_status = $model->status;
+                        $status = '';
+                        if ($node_status == 2) {
+                            $status = '<span class="label" style="font-weight:unset; color: #444; background-color: #DFFA99"><i class="fa fa-clock-o"></i>&nbsp;进行中</span>';
+                        } else if ($node_status == 3) {
+                            $status = '<span class="label" style="font-weight:unset; color: #444; background-color: #87FAC1"><i class="fa fa-check-circle-o"></i>&nbsp;已完成</span>';
+                        } else {
+                            $status = '<span class="label" style="font-weight:unset; color: #444; background-color: #FAC0D6"><i class="fa fa-frown-o"></i>&nbsp;未开始</span>';
+                        }
+
+                        $nodes = [
+                            'id' => $model->id,
+                            'node_name' => $node_name,
+                            'node_status' => $status,
+                            'staff_name' => $staff_name,
+                            'start_time' => $model->start_time,
+                            'end_time' => $model->end_time,
+                            'days' => $model->days,
+                            'content' => $model->content,
+                        ];
+                        return $nodes;
+                    });
+
+                    $table = new Table(['ID', '节点', '状态', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
+
+                    $column->append(new Box('任务情况', $table->render()));
+                });
+
+                $row->column(6, function (Column $column) use ($project) {
+
+                    $form = new \Encore\Admin\Widgets\Form();
+                    $form->action('/admin/projects/work');
+
+                    $auth = auth('admin')->user();
+                    $staff = Staff::where(['admin_id' => $auth->id])->get()->toarray();
+                    $select_staff = array_column($staff, 'name', 'id');
+
+                    $node_ids = ProjectNode::where(['project_id' => $project->id, 'staff_id' => $staff[0]['id']])->pluck('node_id');
+                    $nodes = Node::wherein('id', $node_ids)->get()->toArray();
+                    $select_node = array_column($nodes, 'name', 'id');
+
+                    $id=ProjectNode::where(['project_id' => $project->id, 'staff_id' => $staff[0]['id']])->first()->id;
+                    $form->hidden('id')->default($id);
+
+                    $form->select('staff_id', '项目负责人')->options($select_staff)->default(key($select_staff))->rules('required');
+
+                    $form->select('node_id', '节点')->options($select_node)->default(key($select_node))->rules('required');
+
+                    $form->select('status', __('Status'))->options($this->node_status)->default(key($this->node_status));
+
+                    $project_node = ProjectNode::where(['project_id' => $project->id, 'staff_id' => $staff[0]['id']])->first();
+                    $form->textarea('content', '详情')->default($project_node->content);
+
+                    $column->append(new Box('更新工作...', $form->render()));
+                });
+            });
+    }
+
+    public function project_work(Request $request)
+    {
+        ProjectNode::where(['id' => $request->id])->update([
+            'content' => $request->input('content'),
+            'status' => $request->input('status'),
+        ]);
+
+        $success = new MessageBag([
+            'title' => 'Success',
+            'message' => '提交成功....',
+        ]);
+        return back()->with(compact('success'));
+
+    }
 }

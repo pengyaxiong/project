@@ -143,9 +143,9 @@ class DailyController extends AdminController
             $staffs = Staff::where('admin_id', $auth->id)->pluck('name', 'id')->toArray();
         }
         //创建select
-        $form->select('staff_id', __('Name'))->options($staffs);
+        $form->select('staff_id', __('Name'))->options($staffs)->rules('required');
 
-        $form->textarea('work', __('今日工作内容'));
+        $form->textarea('work', __('今日工作内容'))->rules('required');
         $form->textarea('problem', __('待处理问题'));
         $form->textarea('done', __('完成情况'));
 

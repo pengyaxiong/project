@@ -30,24 +30,26 @@
                     <th>优先级</th>
                     <th>状态</th>
                     <th>预计交付时间</th>
-                    <th>进度</th>
+                    <th>剩余时间</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($projects as $project)
                     <tr>
                         <th scope="row">{{$loop->index+1}}</th>
-                        <td>{{$project['name']}}</td>
+                        <td><a href="/admin/projects">{{$project['name']}}</a></td>
                         <td>{{$project['grade']}}</td>
-                        <td>{{$project['status']}}</td>
+                        <td>{!! $project['status'] !!}</td>
                         <td>{{$project['y_check_time']}}</td>
                         <td>
                             @if($project['is_empty'])
-                                倒计时：<span id="wait">{{$project['end_date']-$project['now_date']}}</span><span>秒</span>
+                                倒计时：<span id="djs"></span><span id="wait" style="display: none">{{$project['end_date']-$project['now_date']}}</span>
                             @else
                                 <span class="label label-danger">已超时!!</span>
                             @endif
                         </td>
+                        <td><a href="/admin/projects/node/{{$project['id']}}" type="button" class="btn btn-xs btn-info">工作</a></td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -62,10 +64,26 @@
         var wait = document.getElementById('wait');
         var interval = setInterval(function () {
             var time = --wait.innerHTML;
+            var d = parseInt(time / (24 * 60 * 60))
+            var h = parseInt(time / (60 * 60) % 24);
+            var m = parseInt(time / 60 % 60);
+            var s = parseInt(time % 60);
+            d = checkTime(d);
+            h = checkTime(h);
+            m = checkTime(m);
+            s = checkTime(s);
+            document.getElementById('djs').innerHTML = d + '天' + h + '时' + m + '分' + s + '秒';
             if (time <= 0) {
                 clearInterval(interval);
             };
         }, 1000);
     })();
+
+    function checkTime(i) { //将0-9的数字前面加上0，例1变为01
+        if (i < 10) {
+            i = "0" + i;
+        }
+        return i;
+    }
 </script>
 </html>

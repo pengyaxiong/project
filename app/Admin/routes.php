@@ -26,6 +26,9 @@ Route::group([
 
     $router->resource('projects', 'ProjectController');
 
+    $router->get('projects/node/{project_id}', 'ProjectController@project_node');
+    $router->post('projects/work', 'ProjectController@project_work');
+
     $router->resource('companies', 'CompanyController');
 
     $router->resource('tasks', 'TaskController');

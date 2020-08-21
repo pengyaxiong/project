@@ -72,9 +72,11 @@ class HomeController extends Controller
                         $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
                         $tasks = Task::where('principal_id', $staff_id)->get()->map(function ($model) {
                             $result = [
+                                'id' => $model->id,
                                 'name' => $model->name,
                                 'grade' => $model->node->name,
                                 'days' => $model->days . '(天)',
+                                'is_finish' => $model->is_finish,
                                 'start_time' => $model->start_time,
 
                                 'start_date' => strtotime($model->start_time),
@@ -103,9 +105,21 @@ class HomeController extends Controller
                         $project_ids = ProjectStaff::where('staff_id', $staff_id)->pluck('project_id');
                         $projects = Project::whereIn('id', $project_ids)->orderby('grade')->get()->map(function ($model) {
 
-                            $grade = [1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E'];
-                            $status = [1 => '已立项', 2 => '进行中', 3 => '已暂停', 4 => '已结项'];
+                            $grade = [
+                                1 => 'A',
+                                2 => 'B',
+                                3 => 'C',
+                                4 => 'D',
+                                5 => 'E'
+                            ];
+                            $status = [
+                                1 => '<span class="label label-info">已立项</span>',
+                                2 => '<span class="label label-primary">进行中</span>',
+                                3 => '<span class="label label-warning">已暂停</span>',
+                                4 => '<span class="label label-default">已结项</span>'
+                            ];
                             $result = [
+                                'id' => $model->id,
                                 'name' => $model->name,
                                 'grade' => $grade[$model->grade],
                                 'status' => $status[$model->status],

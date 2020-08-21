@@ -50,7 +50,12 @@ class TaskController extends AdminController
             'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
         ];
-        $grid->column('is_contract', __('是否签约'))->switch($states);
+        if ($auth->id > 1) {
+            $grid->column('is_contract', __('是否签约'))->bool();
+        } else {
+            $grid->column('is_contract', __('是否签约'))->switch($states);
+        }
+        $grid->column('is_finish', __('是否完成'))->switch($states);
         $grid->column('start_time', __('开始时间'));
         $grid->column('contract_time', __('Contract time'));
         $grid->column('created_at', __('Created at'))->hide();
@@ -103,6 +108,14 @@ class TaskController extends AdminController
                         return '否';
                 }
             });
+            $export->column('is_finish', function ($value, $original) {
+                switch ($original) {
+                    case 1:
+                        return '是';
+                    default:
+                        return '否';
+                }
+            });
         });
 
         if ($auth->id > 1) {
@@ -126,6 +139,7 @@ class TaskController extends AdminController
             if ($auth->id > 1) {
                 $actions->disableDelete();
                 $actions->disableView();
+                $actions->disableEdit();
             }
         });
         return $grid;
@@ -150,6 +164,7 @@ class TaskController extends AdminController
         $show->field('days', __('Days'));
         $show->field('sort_order', __('Sort order'));
         $show->field('is_contract', __('Is contract'));
+        $show->field('is_finish', __('Is finish'));
         $show->field('start_time', __('Start time'));
         $show->field('contract_time', __('Contract time'));
         $show->field('created_at', __('Created at'));
@@ -187,6 +202,7 @@ class TaskController extends AdminController
             'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
         ];
         $form->switch('is_contract', __('是否签约'))->states($states)->default(0);
+        $form->switch('is_finish', __('是否完成'))->states($states)->default(0);
         $form->datetime('start_time', __('开始时间'))->default(date('Y-m-d H:i:s'));
         $form->datetime('contract_time', __('Contract time'))->default(null);
         $form->number('sort_order', __('Sort order'))->default(99);
@@ -209,4 +225,7 @@ class TaskController extends AdminController
         });
         return $form;
     }
+
+
+
 }
