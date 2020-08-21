@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Node;
 use App\Models\Project;
+use App\Models\ProjectNode;
 use App\Models\ProjectStaff;
 use App\Models\Staff;
 use App\Models\Task;
@@ -102,7 +103,7 @@ class HomeController extends Controller
                     $row->column(12, function (Column $column) use ($auth) {
 
                         $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
-                        $project_ids = ProjectStaff::where('staff_id', $staff_id)->pluck('project_id');
+                        $project_ids=ProjectNode::where('staff_id',$staff_id)->pluck('project_id');
                         $projects = Project::whereIn('id', $project_ids)->orderby('grade')->get()->map(function ($model) {
 
                             $grade = [

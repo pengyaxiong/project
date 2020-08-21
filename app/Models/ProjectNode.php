@@ -21,4 +21,9 @@ class ProjectNode extends Model
     {
         return $this->hasMany(Node::class,'node_id');
     }
+
+    public function nodes_info()
+    {
+        return $this->hasMany(ProjectNodeInfo::class,'project_node_id');
+    }
 }

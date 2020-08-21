@@ -28,6 +28,8 @@ Route::group([
 
     $router->get('projects/node/{project_id}', 'ProjectController@project_node');
     $router->post('projects/work', 'ProjectController@project_work');
+    $router->post('projects/status', 'ProjectController@project_status');
+    $router->get('projects/info/{id}', 'ProjectController@project_info');
 
     $router->resource('companies', 'CompanyController');
 

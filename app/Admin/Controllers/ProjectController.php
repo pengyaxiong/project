@@ -11,9 +11,11 @@ use App\Models\Node;
 use App\Models\Project;
 use App\Models\ProjectCustomer;
 use App\Models\ProjectNode;
+use App\Models\ProjectNodeInfo;
 use App\Models\ProjectStaff;
 use App\Models\Staff;
 use App\Models\Task;
+use Encore\Admin\Admin;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -63,7 +65,7 @@ class ProjectController extends AdminController
 
         if ($auth->id > 1 && !in_array('apply', $slug)) {
             $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
-            $project_ids = ProjectStaff::where('staff_id', $staff_id)->pluck('project_id');
+            $project_ids = ProjectNode::where('staff_id', $staff_id)->pluck('project_id');
             $grid->model()->whereIn('id', $project_ids);
         }
 
@@ -553,7 +555,7 @@ class ProjectController extends AdminController
             ->title($project->name)
             ->description('Doing')
             ->row(function (Row $row) use ($project) {
-                $row->column(6, function (Column $column) use ($project) {
+                $row->column(12, function (Column $column) use ($project) {
 
                     $project_nodes = ProjectNode::where('project_id', $project->id)->get()->map(function ($model) {
                         $staff = Staff::find($model->staff_id);
@@ -578,50 +580,123 @@ class ProjectController extends AdminController
                             'start_time' => $model->start_time,
                             'end_time' => $model->end_time,
                             'days' => $model->days,
-                            'content' => $model->content,
+                            'content' => "<a class='btn btn-xs action-btn btn-danger grid-row-refuse' data-id='{$model->id}'><i class='fa fa-eye' title='详情'>详情</i></a>"
                         ];
                         return $nodes;
                     });
 
-                    $table = new Table(['ID', '节点', '状态', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
+                    $table = new Table(['ID', '节点', '状态', '项目负责人', '开始时间', '结束时间', '耗时(天)', '操作'], $project_nodes->toArray());
 
                     $column->append(new Box('任务情况', $table->render()));
-                });
 
-                $row->column(6, function (Column $column) use ($project) {
+                    /**
+                     * 创建模态框
+                     */
+                    $this->script = <<<EOT
+                    $('.grid-row-refuse').unbind('click').click(function() {
+                        var id = $(this).data('id');
+                        swal({
+                            title: "确认拒绝该用户的退款申请吗？",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "确认",
+                            showLoaderOnConfirm: true,
+                            cancelButtonText: "取消",
+                            preConfirm: function() {
+                                $.ajax({
+                                    method: 'get',
+                                    url: '/admin/projects/info/' + id,
+                                    success: function (data) {
+                                        console.log(data);
+                                        $.pjax.reload('#pjax-container');
+                                        if(data.code){
+                                            swal(data.msg, '', 'success');
+                                        }else{
+                                            swal(data.msg, '', 'error');
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+EOT;
+                    Admin::script($this->script);
 
-                    $form = new \Encore\Admin\Widgets\Form();
-                    $form->action('/admin/projects/work');
+                    $column->row(function (Row $row) use ($project) {
+                        $row->column(6, function (Column $column) use ($project) {
 
-                    $auth = auth('admin')->user();
-                    $staff = Staff::where(['admin_id' => $auth->id])->get()->toarray();
-                    $select_staff = array_column($staff, 'name', 'id');
+                            $form = new \Encore\Admin\Widgets\Form();
+                            $form->action('/admin/projects/work');
 
-                    $node_ids = ProjectNode::where(['project_id' => $project->id, 'staff_id' => $staff[0]['id']])->pluck('node_id');
-                    $nodes = Node::wherein('id', $node_ids)->get()->toArray();
-                    $select_node = array_column($nodes, 'name', 'id');
+                            $auth = auth('admin')->user();
+                            $staff = Staff::where(['admin_id' => $auth->id])->first();
 
-                    $id=ProjectNode::where(['project_id' => $project->id, 'staff_id' => $staff[0]['id']])->first()->id;
-                    $form->hidden('id')->default($id);
+                            $id = ProjectNode::where(['project_id' => $project->id, 'staff_id' => $staff->id])->first()->id;
+                            $form->hidden('id')->default($id);
 
-                    $form->select('staff_id', '项目负责人')->options($select_staff)->default(key($select_staff))->rules('required');
+                            $form->textarea('content', '详情');
+                            $form->textarea('remark', '备注');
 
-                    $form->select('node_id', '节点')->options($select_node)->default(key($select_node))->rules('required');
+                            $column->append(new Box('更新工作...', $form->render()));
+                        });
 
-                    $form->select('status', __('Status'))->options($this->node_status)->default(key($this->node_status));
+                        $row->column(6, function (Column $column) use ($project) {
 
-                    $project_node = ProjectNode::where(['project_id' => $project->id, 'staff_id' => $staff[0]['id']])->first();
-                    $form->textarea('content', '详情')->default($project_node->content);
+                            $form = new \Encore\Admin\Widgets\Form();
+                            $form->action('/admin/projects/status');
 
-                    $column->append(new Box('更新工作...', $form->render()));
+                            $auth = auth('admin')->user();
+                            $staff = Staff::where(['admin_id' => $auth->id])->get()->toarray();
+                            $select_staff = array_column($staff, 'name', 'id');
+
+                            $node_ids = ProjectNode::where(['project_id' => $project->id, 'staff_id' => $staff[0]['id']])->pluck('node_id');
+                            $nodes = Node::wherein('id', $node_ids)->get()->toArray();
+                            $select_node = array_column($nodes, 'name', 'id');
+
+                            $id = ProjectNode::where(['project_id' => $project->id, 'staff_id' => $staff[0]['id']])->first()->id;
+                            $form->hidden('id')->default($id);
+
+                            $form->select('staff_id', '项目负责人')->options($select_staff)->default(key($select_staff))->rules('required');
+
+                            $form->select('node_id', '节点')->options($select_node)->default(key($select_node))->rules('required');
+
+                            $form->select('status', __('Status'))->options($this->node_status)->default(key($this->node_status));
+
+                            $column->append(new Box('更新状态...', $form->render()));
+                        });
+                    });
                 });
             });
     }
 
+    public function project_info($id)
+    {
+        $list = ProjectNodeInfo::where('project_node_id', $id)->get();
+
+        return $list;
+    }
+
     public function project_work(Request $request)
     {
-        ProjectNode::where(['id' => $request->id])->update([
+        ProjectNodeInfo::create([
+            'project_node_id' => $request->id,
             'content' => $request->input('content'),
+            'remark' => $request->remark,
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        $success = new MessageBag([
+            'title' => 'Success',
+            'message' => '提交成功....',
+        ]);
+        return back()->with(compact('success'));
+
+    }
+
+    public function project_status(Request $request)
+    {
+        ProjectNode::where(['id' => $request->id])->update([
             'status' => $request->input('status'),
         ]);
 
@@ -632,4 +707,6 @@ class ProjectController extends AdminController
         return back()->with(compact('success'));
 
     }
+
+
 }

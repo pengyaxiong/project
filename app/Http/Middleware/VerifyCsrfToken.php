@@ -18,5 +18,6 @@ class VerifyCsrfToken extends Middleware
         'patron/is_something',
         'patron/follow',
         'retrieve',
+        'admin/projects/project_info',
     ];
 }
