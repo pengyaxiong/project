@@ -59,6 +59,24 @@ class ProjectController extends AdminController
     {
         $grid = new Grid(new Project());
 
+        $projects=Project::all();
+        foreach ($projects as $project){
+            $result=ProjectNode::where('project_id',$project->id)->get()->map(function ($model){
+                $nodes = [
+                    'node_id' => $model->node_id,
+                    'staff_id' => $model->staff_id,
+                    'start_time' => $model->start_time,
+                    'end_time' => $model->end_time,
+                    'content' => $model->content
+                ];
+              return $nodes;
+
+            });
+            Project::where('id',$project->id)->update([
+                'node'=>json_encode(array_values($result->toarray()))
+            ]);
+        }
+
         $grid->model()->orderBy('sort_order')->orderBy('contract_time', 'desc');
         $auth = auth('admin')->user();
         $slug = $auth->roles->pluck('slug')->toarray();
@@ -170,12 +188,13 @@ class ProjectController extends AdminController
                     'start_time' => $model->start_time,
                     'end_time' => $model->end_time,
                     'days' => $model->days,
-                    'content' => $nodes_info
+                    'content' => $model->content,
+                    'info' => $nodes_info
                 ];
                 return $nodes;
             });
 
-            return new Table(['ID', '节点', '状态', '节点负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
+            return new Table(['ID', '节点', '状态', '节点负责人', '开始时间', '结束时间', '耗时(天)', '备注', '详情'], $project_nodes->toArray());
         });
 
 
@@ -463,6 +482,7 @@ class ProjectController extends AdminController
 
             $table->datetime('start_time', '开始时间')->default(date('Y-m-d', time()));
             $table->datetime('end_time', '结束时间')->default(date('Y-m-d', time()));
+            $table->textarea('content', '备注');
         });
         if ($auth->id == 1 || in_array('apply', $slug)) {
             $form->decimal('money', __('Money'))->default(0.00);
@@ -508,7 +528,7 @@ class ProjectController extends AdminController
                             'start_time' => $value['start_time'],
                             'end_time' => $value['end_time'],
                             'days' => $this->get_weekend_days($value['start_time'], $value['end_time']),
-//                        'content' => $value['content'],
+                            'content' => $value['content'],
                         ]);
                     }
                 }
