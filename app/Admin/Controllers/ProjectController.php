@@ -59,23 +59,23 @@ class ProjectController extends AdminController
     {
         $grid = new Grid(new Project());
 
-        $projects=Project::all();
-        foreach ($projects as $project){
-            $result=ProjectNode::where('project_id',$project->id)->get()->map(function ($model){
-                $nodes = [
-                    'node_id' => $model->node_id,
-                    'staff_id' => $model->staff_id,
-                    'start_time' => $model->start_time,
-                    'end_time' => $model->end_time,
-                    'content' => $model->content
-                ];
-              return $nodes;
-
-            });
-            Project::where('id',$project->id)->update([
-                'node'=>json_encode(array_values($result->toarray()))
-            ]);
-        }
+//        $projects=Project::all();
+//        foreach ($projects as $project){
+//            $result=ProjectNode::where('project_id',$project->id)->get()->map(function ($model){
+//                $nodes = [
+//                    'node_id' => $model->node_id,
+//                    'staff_id' => $model->staff_id,
+//                    'start_time' => $model->start_time,
+//                    'end_time' => $model->end_time,
+//                    'content' => $model->content
+//                ];
+//              return $nodes;
+//
+//            });
+//            Project::where('id',$project->id)->update([
+//                'node'=>json_encode(array_values($result->toarray()))
+//            ]);
+//        }
 
         $grid->model()->orderBy('sort_order')->orderBy('contract_time', 'desc');
         $auth = auth('admin')->user();
