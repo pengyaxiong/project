@@ -25,6 +25,11 @@ class PatronCheck extends RowAction
         }
         $name = $request->get('name');
         $customer_id = $model->customer_id;
+
+        if ($model->customer_id == 0) {
+            return $this->response()->error('请选择签约商务.')->refresh();
+        }
+
         $remark = $request->get('remark');
         $money = $request->get('money');
 

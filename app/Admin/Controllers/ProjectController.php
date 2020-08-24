@@ -122,7 +122,7 @@ class ProjectController extends AdminController
 
         $grid->column('node', __('Node'))->display(function () {
             $html = [];
-            $node = ProjectNode::where('project_id', $this->id)->get()->toarray();
+            $node = ProjectNode::with('nodes_info')->where('project_id', $this->id)->get()->toarray();
             foreach ($node as $k => $v) {
                 if (!isset($v["staff_id"]) || !isset($v["days"])) {
                     continue;
@@ -137,7 +137,6 @@ class ProjectController extends AdminController
             return '点击查看';
             implode('&nbsp;', $html);
         })->expand(function ($model) {
-
             $project_nodes = ProjectNode::where('project_id', $model->id)->get()->map(function ($model) {
                 $staff = Staff::find($model->staff_id);
                 $node = Node::find($model->node_id);
@@ -154,6 +153,15 @@ class ProjectController extends AdminController
                     $status = '<span class="label" style="font-weight:unset; color: #444; background-color: #FAC0D6"><i class="fa fa-frown-o"></i>&nbsp;未开始</span>';
                 }
 
+                $nodes_info=ProjectNodeInfo::where('project_node_id', $model->id)->get()->map(function ($model) {
+                    $nodes_info_list=[
+                        'created_at' => $model->created_at,
+                        'content' =>  $model->content,
+                        'remark' =>  $model->remark,
+                    ];
+                    return $nodes_info_list;
+                });
+                $nodes_info=new Table(['时间', '详情', '备注'],$nodes_info->toArray());
                 $nodes = [
                     'id' => $model->id,
                     'node_name' => $node_name,
@@ -162,13 +170,14 @@ class ProjectController extends AdminController
                     'start_time' => $model->start_time,
                     'end_time' => $model->end_time,
                     'days' => $model->days,
-                    'content' => $model->content,
+                    'content' => $nodes_info
                 ];
                 return $nodes;
             });
 
-            return new Table(['ID', '节点', '状态', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
+            return new Table(['ID', '节点', '状态', '节点负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
         });
+
 
         $grid->column('days', __('总天数'))->display(function ($days) {
             $result = ProjectNode::where('project_id', $this->id)->sum('days');
@@ -470,19 +479,21 @@ class ProjectController extends AdminController
         }
         //保存前回调
         $form->saving(function (Form $form) {
-            $is_check = $form->model()->is_check;
-            if (!$is_check) {
+
+            $is_check = \Request('is_check');
+            if ($is_check=='on') {
                 $form->check_time = date('Y-m-d H:i:s', time());
             } else {
                 $form->check_time = null;
             }
+
         });
 
         //保存后回调
         $form->saved(function (Form $form) {
             $id = $form->model()->id;
             $node = array_filter(\Request('node'));
-//           dump($node);
+//           dump($is_check);
 //           exit();
             if (!empty($node)) {
                 ProjectNode::where('project_id', $id)->delete();
@@ -595,33 +606,45 @@ class ProjectController extends AdminController
                     $this->script = <<<EOT
                     $('.grid-row-refuse').unbind('click').click(function() {
                         var id = $(this).data('id');
-                        swal({
-                            title: "确认拒绝该用户的退款申请吗？",
-                            type: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#DD6B55",
-                            confirmButtonText: "确认",
-                            showLoaderOnConfirm: true,
-                            cancelButtonText: "取消",
-                            preConfirm: function() {
-                                $.ajax({
-                                    method: 'get',
-                                    url: '/admin/projects/info/' + id,
-                                    success: function (data) {
-                                        console.log(data);
-                                        $.pjax.reload('#pjax-container');
-                                        if(data.code){
-                                            swal(data.msg, '', 'success');
-                                        }else{
-                                            swal(data.msg, '', 'error');
+                        $.ajax({
+                            method: 'get',
+                            url: '/admin/projects/info/' + id,
+                            success: function (data) {
+                                console.log(data);
+                                var content = "无记录";
+                                if (data.length>0) {
+                                    var html1="<table class='table'>"
+                                        + "<thead><tr>"
+                                        + "     <th> 详情</th> <th>备注</th> <th>时间</th>"
+                                        + "</tr></thead><tbody>";
+                                       
+                                     var html2="</tbody></table>"
+                                     var html='';
+                                     for (var i=0;i<data.length;i++)
+                                        { 
+                                           html+='<tr><td>'+data[i]['content']+'</td><td>'+data[i]['remark']+'</td><td>'+data[i]['updated_at']+'</td></tr>';
                                         }
-                                    }
-                                });
+                                     content  = html1+html+html2;
+                                }
+
+                                swal.fire({
+                                    title: '<strong>记录</strong>',
+                                 //   type: 'info',
+                                    html: content, // HTML
+                                    focusConfirm: true, //聚焦到确定按钮
+                                    showCloseButton: true,//右上角关闭
+                                    customClass: "Alerttable",
+                                })
                             }
                         });
                     });
 EOT;
+                    $this->style = <<<EOT
+               .Alerttable{width: 90%; font-size: 14px;}
+               .Alerttable th{text-align: center;}
+EOT;
                     Admin::script($this->script);
+                    Admin::style($this->style);
 
                     $column->row(function (Row $row) use ($project) {
                         $row->column(6, function (Column $column) use ($project) {
