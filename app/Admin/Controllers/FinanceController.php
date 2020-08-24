@@ -45,6 +45,13 @@ class FinanceController extends AdminController
             3 => 'primary',
             4 => 'success',
         ]);
+        $grid->column('staff.name', __('审核者'))->display(function (){
+            if ($this->staff_id==1){
+                return '超级管理员';
+            }else{
+                return $this->staff->name;
+            }
+        });
         $grid->column('patron.name', __('客户名称'));
         $grid->column('customer.name', __('商务名称'));
         $grid->column('pact', __('合同（有/无）'))->bool();

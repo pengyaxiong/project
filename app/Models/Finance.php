@@ -10,6 +10,11 @@ class Finance extends Model
 
     protected $table = 'wechat_finance';
 
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class);
+    }
+
     public function project()
     {
         return $this->belongsTo(Project::class);

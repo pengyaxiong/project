@@ -53,6 +53,7 @@ class PatronCheck extends RowAction
         $model->save();
 
         Finance::create([
+            'staff_id' => auth('admin')->user()->id,
             'customer_id' => $customer_id,
             'project_id' => $project->id,
             'patron_id' => $model->id,

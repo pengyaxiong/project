@@ -22,6 +22,7 @@ class SjCheck extends RowAction
 
         $patron=Patron::where('project_id',$model->id)->first();
         Finance::create([
+            'staff_id' => auth('admin')->user()->id,
             'customer_id'=>$patron->customer_id,
             'project_id'=>$model->id,
             'patron_id'=>$patron->id,
