@@ -59,23 +59,24 @@ class ProjectController extends AdminController
     {
         $grid = new Grid(new Project());
 
-//        $projects=Project::all();
-//        foreach ($projects as $project){
-//            $result=ProjectNode::where('project_id',$project->id)->get()->map(function ($model){
-//                $nodes = [
-//                    'node_id' => $model->node_id,
-//                    'staff_id' => $model->staff_id,
-//                    'start_time' => $model->start_time,
-//                    'end_time' => $model->end_time,
-//                    'content' => $model->content
-//                ];
-//              return $nodes;
-//
-//            });
-//            Project::where('id',$project->id)->update([
-//                'node'=>json_encode(array_values($result->toarray()))
-//            ]);
-//        }
+        $projects=Project::all();
+        foreach ($projects as $project){
+            $result=ProjectNode::where('project_id',$project->id)->get()->map(function ($model){
+                $nodes = [
+                    'node_id' => $model->node_id,
+                    'staff_id' => $model->staff_id,
+                    'status' => $model->status,
+                    'start_time' => $model->start_time,
+                    'end_time' => $model->end_time,
+                    'content' => $model->content
+                ];
+              return $nodes;
+
+            });
+            Project::where('id',$project->id)->update([
+                'node'=>json_encode(array_values($result->toarray()))
+            ]);
+        }
 
         $grid->model()->orderBy('sort_order')->orderBy('contract_time', 'desc');
         $auth = auth('admin')->user();
@@ -480,6 +481,8 @@ class ProjectController extends AdminController
             $select_node = array_column($nodes, 'name', 'id');
             $table->select('node_id', '节点')->options($select_node);
 
+            $table->select('status', __('Status'))->options($this->node_status);
+
             $table->datetime('start_time', '开始时间')->default(date('Y-m-d', time()));
             $table->datetime('end_time', '结束时间')->default(date('Y-m-d', time()));
             $table->textarea('content', '备注');
@@ -523,7 +526,7 @@ class ProjectController extends AdminController
                         ProjectNode::create([
                             'staff_id' => $value['staff_id'],
                             'node_id' => $value['node_id'],
-//                        'status' => $value['status'],
+                             'status' => $value['status'],
                             'project_id' => $id,
                             'start_time' => $value['start_time'],
                             'end_time' => $value['end_time'],
