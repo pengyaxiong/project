@@ -135,7 +135,7 @@
                 initialPreview: html,
                 language: 'zh', //设置语言
                 uploadUrl: uploadUrl, //上传的地址
-                allowedFileExtensions: ['jpg','jepg', 'png', 'gif'],//接收的文件后缀
+                allowedFileExtensions: ['jpg','jpeg', 'png', 'gif'],//接收的文件后缀
                 overwriteInitial: false,
                 showCaption: false,
                 maxFileSize: 3000,
