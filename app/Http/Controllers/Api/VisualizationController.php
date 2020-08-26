@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Node;
+use App\Models\Patron;
 use App\Models\Project;
 use App\Models\ProjectNode;
 use App\Models\Staff;
@@ -397,9 +398,49 @@ class VisualizationController extends Controller
         $status_4 = Project::where('status', 4)->count();
         $status_5 = Project::where('is_check', 1)->count();
 
-        $data = [$status_1,$status_2,$status_3,$status_4,$status_5];
+        $data = [$status_1, $status_2, $status_3, $status_4, $status_5];
 
         return $data;
+    }
 
+    public function upload_image(Request $request)
+    {
+        if ($request->id and $request->hasFile('file') and $request->file('file')->isValid()) {
+
+            //文件大小判断$filePath
+            $max_size = 1024 * 1024 * 3;
+            $size = $request->file('file')->getClientSize();
+            if ($size > $max_size) {
+                return $this->error(500, '文件大小不能超过3M！');
+            }
+
+            $path = $request->file->store('upload', 'public');
+
+            $patron = Patron::find($request->id)->toarray();
+            array_push($patron['images'], '/' . $path);;
+            Patron::where('id', $request->id)->update([
+                'images' => json_encode(array_values($patron['images']))
+            ]);
+
+            return $this->null();
+        }
+    }
+
+    public function delete_image(Request $request)
+    {
+        $patron_id=$request->id;
+        $index=$request->index;
+        $patron = Patron::find($patron_id);
+        $images=$patron->images;
+        foreach ($images as $key=>$image){
+            if ($index==$key){
+                unset($images[$key]);
+            }
+        }
+        Patron::where('id', $patron_id)->update([
+            'images' => json_encode(array_values($images))
+        ]);
+
+        return $this->null();
     }
 }

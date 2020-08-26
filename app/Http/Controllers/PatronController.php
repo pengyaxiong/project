@@ -102,7 +102,7 @@ class PatronController extends Controller
 
         $arr=[[
             'time'=>date('Y-m-d H:i:s'),
-            'content'=>$request->content
+            'content'=>$request->input('content')
         ]];
         $patron->follow=array_merge($patron->follow,$arr);
 

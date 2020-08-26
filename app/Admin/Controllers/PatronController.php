@@ -82,6 +82,7 @@ class PatronController extends AdminController
 
             return new Table([], $follow);
         });
+        $grid->column('images', __('Images'))->carousel();
         $grid->column('remark', __('Remark'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
@@ -175,6 +176,7 @@ class PatronController extends AdminController
 
             return new Table(['时间', '详情'], $follow);
         })->json();
+        $show->field('images', __('Images'));
         $show->field('remark', __('Remark'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
@@ -211,6 +213,7 @@ class PatronController extends AdminController
             $table->datetime('time', '时间')->default(date('Y-m-d', time()));
             $table->textarea('content', '跟进内容');
         });
+        $form->multipleImage('images', __('Images'))->removable()->sortable()->help(' ');
         $form->textarea('remark', __('Remark'));
 
         return $form;

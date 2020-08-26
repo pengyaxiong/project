@@ -37,6 +37,10 @@ Route::group(['namespace' => 'Api','as'=>'api.'], function () {
     //项目状态统计
     Route::get('project_status', 'VisualizationController@project_status');
 
+    //上传图片
+    Route::post('upload_image', 'VisualizationController@upload_image');
+    Route::post('delete_image', 'VisualizationController@delete_image');
+
 });
 
 

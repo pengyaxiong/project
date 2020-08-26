@@ -1,7 +1,7 @@
 @extends('layouts.app')
-<style>
-
-</style>
+@section('css')
+    <link href="/vendor/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet">
+@endsection
 @section('content')
     @if(!empty($patron->follow) && $patron->customer_id==auth()->user()->id)
         <div class="panel panel-default">
@@ -104,14 +104,53 @@
                     <textarea class="form-control" rows="3" name="remark">{{$patron->remark}}</textarea>
                 </div>
 
-                {{--<div class="form-group">--}}
-                {{--<label for="exampleInputFile">附件</label>--}}
-                {{--<input type="file" id="exampleInputFile">--}}
-                {{--<p class="help-block">选择上传.</p>--}}
-                {{--</div>--}}
+                <div class="form-group">
+                    <label for="images">附件</label>
+                    <input type="file" id="images" name="file" data-overwrite-initial="false">
+                </div>
 
                 <button type="submit" class="btn btn-default">修改</button>
             </form>
         </div>
     </div>
+@endsection
+@section('js')
+    <script src="/vendor/bootstrap-fileinput/js/fileinput.min.js"></script>
+    <script src="/vendor/bootstrap-fileinput/js/fileinput_locale_zh.js"></script>
+    <script>
+        var images = '{{ implode(',',$patron->images) }}';
+        var data = images.split(',');
+        var html = [];
+        data.forEach(function (element, index) {
+            //初始化fileinput控件（第一次初始化）
+            html[index] = "<img src=/storage/" + element + " class='file-preview-image'><i class='glyphicon glyphicon-trash text-danger delete_image' data-id='{{$patron->id}}' data-index='" + index + "'></i>"
+        });
+        console.log(html);
+        initFileInput("images", "/api/upload_image?id={{$patron->id}}", html);
+
+        //初始化fileinput控件（第一次初始化）
+        function initFileInput(ctrlName, uploadUrl, html) {
+            var control = $('#' + ctrlName);
+            control.fileinput({
+                initialPreview: html,
+                language: 'zh', //设置语言
+                uploadUrl: uploadUrl, //上传的地址
+                allowedFileExtensions: ['jpg', 'png', 'gif'],//接收的文件后缀
+                overwriteInitial: false,
+                showCaption: false,
+                maxFileSize: 3000,
+                browseClass: "btn btn-default", //按钮样式
+            });
+        }
+
+        $(".delete_image").on('click', function () {
+            var index = $(this).data('index');
+            var id = $(this).data('id');
+            $.post('/api/delete_image', {id: id, index: index}, function (data) {
+                if (data.code == 200) {
+                    location.href = location.href;
+                }
+            })
+        })
+    </script>
 @endsection
