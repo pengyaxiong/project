@@ -29,6 +29,7 @@ class DepartmentController extends AdminController
 
         $grid->model()->orderby('sort_order');
 
+
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))->editable();
         $grid->column('', __('部门节点'))->display(function (){
@@ -40,6 +41,10 @@ class DepartmentController extends AdminController
             return new Table(['ID', '名称'], $nodes->toArray());
         });
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
+
+
+        #禁用行选择checkbox
+        $grid->disableRowSelector();
 
         return $grid;
     }

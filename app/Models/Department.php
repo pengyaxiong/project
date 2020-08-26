@@ -12,6 +12,11 @@ class Department extends Model
 
     public $timestamps = false;
 
+    public function notices()
+    {
+        return $this->hasMany(Notice::class,'department_id');
+    }
+
     public function staffs()
     {
         return $this->hasMany(Staff::class,'department_id');

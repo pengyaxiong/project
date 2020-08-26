@@ -4,11 +4,13 @@ namespace App\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Node;
+use App\Models\Notice;
 use App\Models\Project;
 use App\Models\ProjectNode;
 use App\Models\ProjectStaff;
 use App\Models\Staff;
 use App\Models\Task;
+use Encore\Admin\Admin;
 use Encore\Admin\Controllers\Dashboard;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
@@ -17,6 +19,7 @@ use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Widgets\Form;
+use Encore\Admin\Widgets\Collapse;
 
 class HomeController extends Controller
 {
@@ -89,6 +92,26 @@ class HomeController extends Controller
                     });
                 } else {
                     $row->column(12, function (Column $column) {
+                        $column->append($this->my_notices());
+                        /**
+                         * 创建模态框
+                         */
+                        $this->script = <<<EOT
+                        $('.grid-row-refuse').unbind('click').click(function() {
+                            var des=$(this).data('des');
+                            var title=$(this).data('title');
+                            swal.fire({
+                                        title: '<strong>'+title+'</strong>',
+                                        html: des, // HTML
+                                        focusConfirm: true, //聚焦到确定按钮
+                                        showCloseButton: true,//右上角关闭
+                             })
+                          });
+EOT;
+                        Admin::script($this->script);
+                    });
+
+                    $row->column(12, function (Column $column) {
                         $column->append($this->my_tasks());
                     });
 
@@ -100,6 +123,31 @@ class HomeController extends Controller
             });
     }
 
+    public function my_notices()
+    {
+        $auth = auth('admin')->user();
+        $staff = Staff::where('admin_id', $auth->id)->first();
+        $notices = Notice::where('department_id', $staff->department_id)->orwhere('department_id', 0)->orderBy('sort_order')->get()->map(function ($model) {
+            $result = [
+                'content' => "<a class='btn  grid-row-refuse'  data-title='{$model->title}' data-des='{$model->description}'>{$model->title}</a>"
+            ];
+            return $result;
+        });
+
+        if (!empty($notices)) {
+            $table = implode(' ',array_pluck($notices->toarray(),'content'));
+        } else {
+            $table ='暂无~';
+        }
+        $Box = new Box('公告', $table);
+        $Box->collapsable();
+        $Box->style('info');
+        $Box->solid();
+        $Box->scrollable();
+
+
+        return $Box->render();
+    }
 
     public function info_1()
     {
@@ -170,6 +218,12 @@ class HomeController extends Controller
 //
 //                        $column->append(new Box('我的任务', $table->render()));
         $Box = new Box('我的任务', view('admin.my_tasks', compact('tasks')));
+
+        $Box->collapsable();
+        $Box->style('info');
+        $Box->solid();
+        $Box->scrollable();
+
         return $Box->render();
     }
 
@@ -214,6 +268,11 @@ class HomeController extends Controller
 //                        $column->append(new Box('我的项目', $table->render()));
 
         $Box = new Box('我的项目', view('admin.my_projects', compact('projects')));
+
+        $Box->collapsable();
+        $Box->style('info');
+        $Box->solid();
+        $Box->scrollable();
 
         return $Box->render();
     }
