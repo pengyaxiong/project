@@ -42,4 +42,9 @@ class Staff extends Model
     {
         return $this->hasMany(Daily::class,'daily_id');
     }
+
+    public function project_nodes()
+    {
+        return $this->hasMany(ProjectNode::class);
+    }
 }

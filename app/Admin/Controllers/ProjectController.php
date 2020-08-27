@@ -50,7 +50,7 @@ class ProjectController extends AdminController
         $this->status = [1 => '已立项', 2 => '进行中', 3 => '已暂停', 4 => '已结项'];
         $this->node_status = [1 => '未开始', 2 => '进行中', 3 => '已完成'];
 
-        $this->check_status = [1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'];
+        $this->check_status = [1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功', 5 => '设计评审成功', 6 => '前端评审成功'];
     }
 
     /**
@@ -141,29 +141,14 @@ class ProjectController extends AdminController
             return $staff_name;
         })->implode(',');
 
-
-        $grid->column('node', __('Node'))->display(function () {
-            $html = [];
-            $node = ProjectNode::with('nodes_info')->where('project_id', $this->id)->get()->toarray();
-            foreach ($node as $k => $v) {
-                if (!isset($v["staff_id"]) || !isset($v["days"])) {
-                    continue;
-                }
-                $staff = Staff::find($v["staff_id"]);
-                $node_ = Node::find($v["node_id"]);
-                $name = isset($staff) ? $staff->name : '';
-                $node_name = isset($node_) ? $node_->name : '';
-
-                $html[] = '<span class="label" style="background-color: #00b7ee">' . $name . '</span><span class="label label-default">' . $node_name . $v["days"] . '天</span>';
-            }
+        $grid->column('project_nodes', __('节点情况'))->display(function () {
             return '查看';
             implode('&nbsp;', $html);
         })->expand(function ($model) {
-            $project_nodes = ProjectNode::where('project_id', $model->id)->get()->map(function ($model) {
-                $staff = Staff::find($model->staff_id);
-                $node = Node::find($model->node_id);
-                $staff_name = isset($staff) ? $staff->name : '';
-                $node_name = isset($node) ? $node->name : '';
+
+            $project_nodes =$this->project_nodes->map(function ($model) {
+                $staff_name = $model->staff?$model->staff->name:'';
+                $node_name = $model->node?$model->node->name:'';
 
                 $node_status = $model->status;
                 $status = '';
@@ -249,8 +234,8 @@ class ProjectController extends AdminController
         })->expand(function ($model) {
 
             $project_demands = Demand::where('project_id', $model->id)->get()->map(function ($model) {
-                $pact = $model->pact?'<i class="fa fa-check text-green"></i>':'<i class="fa fa-close text-red"></i>';
-                $status = $model->status?'<span class="label label-success">已审核</span>':'<span class="label label-danger">未审核</span>';
+                $pact = $model->pact ? '<i class="fa fa-check text-green"></i>' : '<i class="fa fa-close text-red"></i>';
+                $status = $model->status ? '<span class="label label-success">已审核</span>' : '<span class="label label-danger">未审核</span>';
                 $nodes = [
                     'pact' => $pact,
                     'status' => $status,
@@ -295,7 +280,7 @@ class ProjectController extends AdminController
             ];
             $filter->equal('is_check', __('是否交付'))->select($status_text);
 
-            $filter->equal('check_status', __('回款状态'))->select([1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功']);
+            $filter->equal('check_status', __('回款状态'))->select([1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功', 5 => '设计评审成功', 6 => '前端评审成功']);
 
             $filter->equal('grade', __('优先级'))->select($this->grade);
             $filter->equal('status', __('Status'))->select($this->status);
@@ -421,13 +406,11 @@ class ProjectController extends AdminController
         $show->field('task.name', __('任务名称'));
         $show->field('grade', __('优先级'))->using($this->grade);
         $show->field('status', __('Status'))->using($this->status);
-        $show->field('node', __('Node'))->as(function () {
-            $nodes = ProjectNode::where('project_id', $this->id)->get()->toarray();
+        $show->field('project_nodes', __('节点情况'))->as(function () {
+            $nodes = $this->project_nodes;
             foreach ($nodes as $k => $v) {
-                $staff = Staff::find($v['staff_id']);
-                $node = Node::find($v['node_id']);
-                $staff_name = isset($staff) ? $staff->name : '';
-                $node_name = isset($node) ? $node->name : '';
+                $staff_name = $v->staff?$v->staff->name:'';
+                $node_name = $v->node?$v->node->name:'';
                 $nodes[$k] = [
                     'node_name' => $node_name,
                     'staff_name' => $staff_name,
@@ -438,7 +421,7 @@ class ProjectController extends AdminController
                 ];
             }
 
-            return new Table(['节点', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $nodes);
+            return new Table(['节点', '项目负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $nodes->toarray());
         })->json();
         $show->field('content', __('Content'));
         $show->field('remark', __('Remark'));
@@ -500,21 +483,52 @@ class ProjectController extends AdminController
             $form->textarea('remark', __('Remark'));
         }
         $form->ueditor('content', __('Content'));
-        $form->table('node', __('节点情况'), function ($table) {
+
+        $form->hasMany('project_nodes', __('节点情况'), function (Form\NestedForm $form) {
             $staffs = Staff::all()->toArray();
             $select_staff = array_column($staffs, 'name', 'id');
-            $table->select('staff_id', '项目负责人')->options($select_staff);
+            $form->select('staff_id', '项目负责人')->options($select_staff);
 
             $nodes = Node::where('is_project', true)->get()->toArray();
             $select_node = array_column($nodes, 'name', 'id');
-            $table->select('node_id', '节点')->options($select_node);
+            $form->select('node_id', '节点')->options($select_node);
 
-            $table->select('status', __('Status'))->options($this->node_status);
+            $form->select('status', __('Status'))->options($this->node_status);
 
-            $table->datetime('start_time', '开始时间')->default(date('Y-m-d', time()));
-            $table->datetime('end_time', '结束时间')->default(date('Y-m-d', time()));
-            $table->textarea('content', '备注');
+            $form->datetime('start_time', '开始时间')->default(date('Y-m-d', time()));
+            $form->datetime('end_time', '结束时间')->default(date('Y-m-d', time()));
+            $form->textarea('content', '备注');
         });
+
+
+        // 子表字段
+        $form->hasMany('design_checks', __('设计审核人员'), function (Form\NestedForm $form) {
+            $staffs = Staff::all()->toArray();
+            $select_staff = array_column($staffs, 'name', 'id');
+            $form->select('staff_id', '审核人')->options($select_staff);
+            $states = [
+                'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
+                'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+            ];
+            $form->switch('status', __('Status'))->states($states)->default(0);
+            $form->textarea('description', __('Description'));
+            $form->textarea('remark', __('Remark'));
+        });
+
+        // 子表字段
+        $form->hasMany('html_checks', __('前端审核人员'), function (Form\NestedForm $form) {
+            $staffs = Staff::all()->toArray();
+            $select_staff = array_column($staffs, 'name', 'id');
+            $form->select('staff_id', '审核人')->options($select_staff);
+            $states = [
+                'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
+                'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+            ];
+            $form->switch('status', __('Status'))->states($states)->default(0);
+            $form->textarea('description', __('Description'));
+            $form->textarea('remark', __('Remark'));
+        });
+
         if ($auth->id == 1 || in_array('apply', $slug)) {
             $form->decimal('money', __('Money'))->default(0.00);
 
@@ -543,25 +557,14 @@ class ProjectController extends AdminController
         //保存后回调
         $form->saved(function (Form $form) {
             $id = $form->model()->id;
-            $node = array_filter(\Request('node'));
+            $project_nodes = array_filter(\Request('project_nodes'));
 //           dump($is_check);
 //           exit();
-            if (!empty($node)) {
-                ProjectNode::where('project_id', $id)->delete();
-                foreach ($node as $value) {
-                    $project_node = ProjectNode::where('project_id', $id)->where('node_id', $value['node_id'])->where('staff_id', $value['staff_id'])->exists();
-                    if (!$project_node) {
-                        ProjectNode::create([
-                            'staff_id' => $value['staff_id'],
-                            'node_id' => $value['node_id'],
-                            'status' => $value['status'],
-                            'project_id' => $id,
-                            'start_time' => $value['start_time'],
-                            'end_time' => $value['end_time'],
-                            'days' => $this->get_weekend_days($value['start_time'], $value['end_time']),
-                            'content' => $value['content'],
-                        ]);
-                    }
+            if (!empty($project_nodes)) {
+                foreach ($project_nodes as $value) {
+                    ProjectNode::where('project_id', $id)->where('node_id', $value['node_id'])->where('staff_id', $value['staff_id'])->update([
+                        'days' => $this->get_weekend_days($value['start_time'], $value['end_time']),
+                    ]);
                 }
             }
         });

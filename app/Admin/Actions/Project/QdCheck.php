@@ -15,10 +15,12 @@ class QdCheck extends RowAction
     public function handle(Model $model, Request $request)
     {
         // $model ...
-        if ($model->check_status != 2) {
-            return $this->response()->error('审核状态错误')->refresh();
+//        if ($model->check_status != 2) {
+//            return $this->response()->error('审核状态错误')->refresh();
+//        }
+        if ($model->check_status != 6) {
+            return $this->response()->error('前端评审未完成')->refresh();
         }
-
 
         $patron = Patron::where('project_id', $model->id)->first();
         Finance::create([

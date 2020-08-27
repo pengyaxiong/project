@@ -12,14 +12,19 @@ class ProjectNode extends Model
 
     public $timestamps = false;
 
-    public function projects()
+    public function project()
     {
-        return $this->hasMany(Project::class,'project_id');
+        return $this->belongsTo(Project::class,'project_id');
     }
 
-    public function nodes()
+    public function node()
     {
-        return $this->hasMany(Node::class,'node_id');
+        return $this->belongsTo(Node::class,'node_id');
+    }
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class,'staff_id');
     }
 
     public function nodes_info()

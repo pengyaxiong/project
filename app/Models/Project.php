@@ -51,17 +51,9 @@ class Project extends Model
         );
     }
 
-    public function nodes()
+    public function project_nodes()
     {
-        return $this->belongsToMany(Node::class,'wechat_project_node','project_id','node_id')->withPivot(
-            'node_id',
-            'staff_id',
-            'start_time',
-            'end_time',
-            'days',
-            'content',
-            'project_id'
-        );
+        return $this->hasMany(ProjectNode::class);
     }
 
     public function task()
@@ -80,4 +72,13 @@ class Project extends Model
         return $this->hasMany(Demand::class,'project_id');
     }
 
+    public function design_checks()
+    {
+        return $this->hasMany(DesignCheck::class,'project_id');
+    }
+
+    public function html_checks()
+    {
+        return $this->hasMany(HtmlCheck::class,'project_id');
+    }
 }
