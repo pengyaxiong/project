@@ -54,6 +54,17 @@ class AuditionController extends AdminController
 
 
         $grid->filter(function ($filter) {
+
+            $departments=Department::all()->toArray();
+            $department_array=array_column($departments, 'name', 'id');
+
+            $filter->equal('department_id', __('所属部门'))->select($department_array);
+
+            $staffs=Staff::all()->toArray();
+            $staff_array=array_column($staffs, 'name', 'id');
+
+            $filter->equal('staff_id', __('面试官'))->select($staff_array);
+
             $filter->like('name', __('Name'));
             $filter->like('phone', __('Phone'));
             $filter->between('start_time', __('面试时间'))->date();

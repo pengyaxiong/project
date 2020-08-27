@@ -2,11 +2,14 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\Project\AddDemand;
 use App\Admin\Actions\Project\Calendar;
 use App\Admin\Actions\Project\QdCheck;
 use App\Admin\Actions\Project\SjCheck;
 use App\Admin\Actions\Project\YsCheck;
 use App\Models\Customer;
+use App\Models\Demand;
+use App\Models\Finance;
 use App\Models\Node;
 use App\Models\Project;
 use App\Models\ProjectCustomer;
@@ -153,7 +156,7 @@ class ProjectController extends AdminController
 
                 $html[] = '<span class="label" style="background-color: #00b7ee">' . $name . '</span><span class="label label-default">' . $node_name . $v["days"] . '天</span>';
             }
-            return '点击查看';
+            return '查看';
             implode('&nbsp;', $html);
         })->expand(function ($model) {
             $project_nodes = ProjectNode::where('project_id', $model->id)->get()->map(function ($model) {
@@ -172,15 +175,15 @@ class ProjectController extends AdminController
                     $status = '<span class="label" style="font-weight:unset; color: #444; background-color: #FAC0D6"><i class="fa fa-frown-o"></i>&nbsp;未开始</span>';
                 }
 
-                $nodes_info=ProjectNodeInfo::where('project_node_id', $model->id)->get()->map(function ($model) {
-                    $nodes_info_list=[
+                $nodes_info = ProjectNodeInfo::where('project_node_id', $model->id)->get()->map(function ($model) {
+                    $nodes_info_list = [
                         'created_at' => $model->created_at,
-                        'content' =>  $model->content,
-                        'remark' =>  $model->remark,
+                        'content' => $model->content,
+                        'remark' => $model->remark,
                     ];
                     return $nodes_info_list;
                 });
-                $nodes_info=new Table(['时间', '详情', '备注'],$nodes_info->toArray());
+                $nodes_info = new Table(['时间', '详情', '备注'], $nodes_info->toArray());
                 $nodes = [
                     'id' => $model->id,
                     'node_name' => $node_name,
@@ -208,9 +211,16 @@ class ProjectController extends AdminController
         $slug = $auth->roles->pluck('slug')->toarray();
 
         if ($auth->id == 1 || in_array('apply', $slug)) {
-            $grid->column('check_status', __('回款状态'))->using($this->check_status)->expand(function ($model) {
+            $grid->column('check_status', __('回款状态'))->using($this->check_status)->label([
+                1 => 'default',
+                2 => 'info',
+                3 => 'warning',
+                4 => 'danger',
+            ])->expand(function ($model) {
                 $check_status = [1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'];
                 $apply_status = [1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
+
+
                 $finances = $model->finances->map(function ($model) use ($check_status, $apply_status) {
                     $nodes = [
                         'id' => $model->id,
@@ -227,17 +237,32 @@ class ProjectController extends AdminController
                     return $nodes;
                 });
 
-                return new Table(['ID', '客户名称', '合同金额', '状态', '预计回款金额', '实际回款金额', '返渠道费', '回款账户', '未结余额', '详情'], $finances->toArray());
-            })->label([
-                1 => 'default',
-                2 => 'info',
-                3 => 'warning',
-                4 => 'danger',
-            ]);
+                return new Table(['ID', '客户名称', '合同金额', '状态', '预计回款金额', '实际回款金额', '返渠道费', '回款账户', '未结余额', '详情'], $finances->toarray());
+            });
 
             $grid->column('remark', __('Remark'))->width(288)->editable('textarea');
             $grid->column('money', __('Money'))->editable();
         }
+
+        $grid->column('demands', __('新增需求'))->display(function ($model) {
+            return empty($model) ? false : '查看';
+        })->expand(function ($model) {
+
+            $project_demands = Demand::where('project_id', $model->id)->get()->map(function ($model) {
+                $pact = $model->pact?'<i class="fa fa-check text-green"></i>':'<i class="fa fa-close text-red"></i>';
+                $status = $model->status?'<span class="label label-success">已审核</span>':'<span class="label label-danger">未审核</span>';
+                $nodes = [
+                    'pact' => $pact,
+                    'status' => $status,
+                    'money' => $model->money,
+                    'description' => $model->description,
+                    'remark' => $model->remark,
+                ];
+                return $nodes;
+            });
+
+            return new Table(['合同', '状态', '金额', '详情', '备注'], $project_demands->toArray());
+        });
 
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
         $states = [
@@ -250,15 +275,16 @@ class ProjectController extends AdminController
             $grid->column('y_check_time', __('预计交付时间'));
         } else {
             $grid->column('is_check', __('是否交付'))->switch($states);
-            $grid->column('contract_time', __('Contract time'))->editable('date');
-            $grid->column('check_time', __('交付时间'));
-            $grid->column('y_check_time', __('预计交付时间'))->editable('date');
+            $grid->column('contract_time', __('Contract time'))->date('Y-m-d')->editable('combodate');
+            $grid->column('check_time', __('交付时间'))->date('Y-m-d');
+            $grid->column('y_check_time', __('预计交付时间'))->date('Y-m-d')->editable('combodate');
         }
 
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
-        // $grid->fixColumns(3, -1);
+        $grid->fixColumns(3, -1);
+
         $grid->filter(function ($filter) {
 
             $filter->like('name', __('Name'));
@@ -347,7 +373,9 @@ class ProjectController extends AdminController
                     $actions->add(new YsCheck());
                 }
 
+                $actions->add(new AddDemand());
             } else {
+                $actions->add(new AddDemand());
                 $actions->add(new SjCheck());
                 $actions->add(new QdCheck());
                 $actions->add(new YsCheck());
@@ -504,7 +532,7 @@ class ProjectController extends AdminController
         $form->saving(function (Form $form) {
 
             $is_check = \Request('is_check');
-            if ($is_check=='on') {
+            if ($is_check == 'on') {
                 $form->check_time = date('Y-m-d H:i:s', time());
             } else {
                 $form->check_time = null;
@@ -526,7 +554,7 @@ class ProjectController extends AdminController
                         ProjectNode::create([
                             'staff_id' => $value['staff_id'],
                             'node_id' => $value['node_id'],
-                             'status' => $value['status'],
+                            'status' => $value['status'],
                             'project_id' => $id,
                             'start_time' => $value['start_time'],
                             'end_time' => $value['end_time'],

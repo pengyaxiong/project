@@ -75,4 +75,9 @@ class Project extends Model
     }
 
 
+    public function demands()
+    {
+        return $this->hasMany(Demand::class,'project_id');
+    }
+
 }
