@@ -18,7 +18,12 @@ class AuditionController extends AdminController
      * @var string
      */
     protected $title = '面试邀约';
+    protected $status = [];
 
+    public function __construct()
+    {
+        $this->status = [0 => '拒绝', 1 => '通过', 2 => '保留'];
+    }
     /**
      * Make a grid builder.
      *
@@ -36,11 +41,12 @@ class AuditionController extends AdminController
         $grid->column('point', __('分数'));
         $grid->column('phone', __('Phone'));
         $grid->column('money', __('期望薪资'))->sortable()->editable();
-        $states = [
-            'on' => ['value' => 1, 'text' => '通过', 'color' => 'success'],
-            'off' => ['value' => 0, 'text' => '拒绝', 'color' => 'danger'],
-        ];
-        $grid->column('status', __('Status'))->switch($states);
+        $grid->column('status', __('Status'))->editable('select', $this->status)->dot([
+            0 => 'danger',
+            1 => 'success',
+            2 => 'info',
+        ]);
+        $grid->column('images', __('Images'))->carousel();
         $grid->column('remark', __('Remark'));
         $grid->column('start_time', __('面试时间'));
         $grid->column('created_at', __('Created at'))->hide();
@@ -51,11 +57,8 @@ class AuditionController extends AdminController
             $filter->like('name', __('Name'));
             $filter->like('phone', __('Phone'));
             $filter->between('start_time', __('面试时间'))->date();
-            $status_text = [
-                1 => '通过',
-                0 => '拒绝'
-            ];
-            $filter->equal('status', __('Status'))->select($status_text);
+            $filter->between('point', __('分数'));
+            $filter->equal('status', __('Status'))->radio($this->status);
         });
         return $grid;
     }
@@ -79,6 +82,7 @@ class AuditionController extends AdminController
         $show->field('phone', __('Phone'));
         $show->field('money', __('期望薪资'));
         $show->field('status', __('Status'));
+        $show->field('images', __('Images'));
         $show->field('remark', __('Remark'));
         $show->field('start_time', __('面试时间'));
         $show->field('created_at', __('Created at'));
@@ -111,11 +115,8 @@ class AuditionController extends AdminController
         $form->number('point', __('分数'))->default(100);
         $form->text('phone', __('Phone'));
         $form->decimal('money', __('期望薪资'))->default(1000.00);
-        $states = [
-            'on' => ['value' => 1, 'text' => '通过', 'color' => 'success'],
-            'off' => ['value' => 0, 'text' => '拒绝', 'color' => 'danger'],
-        ];
-        $form->switch('status', __('Status'))->states($states)->default(0);
+        $form->radio('status', __('Status'))->options($this->status)->default(0);
+        $form->multipleImage('images', __('Images'))->removable()->sortable()->help('简历、作品展示');
         $form->textarea('remark', __('Remark'));
         $form->datetime('start_time', __('面试时间'))->default(date('Y-m-d H:i:s'));
 
