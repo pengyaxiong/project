@@ -15,14 +15,14 @@ class Task extends Model
         return $this->belongsTo(Node::class);
     }
 
-    public function principal()
+    public function staff()
     {
         return $this->belongsTo(Staff::class);
     }
 
-    public function access()
+    public function customer()
     {
-        return $this->belongsTo(Staff::class);
+        return $this->belongsTo(Customer::class);
     }
 
     public function project()

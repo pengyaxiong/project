@@ -28,14 +28,9 @@ class Staff extends Model
         return $this->belongsTo(Department::class);
     }
 
-    public function principal_tasks()
+    public function tasks()
     {
-        return $this->hasMany(Task::class,'principal_id');
-    }
-
-    public function access_tasks()
-    {
-        return $this->hasMany(Task::class,'access_id');
+        return $this->hasMany(Task::class);
     }
 
     public function dailies()

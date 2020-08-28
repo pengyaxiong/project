@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Customer;
 use App\Models\Node;
 use App\Models\Project;
 use App\Models\Staff;
@@ -35,14 +36,14 @@ class TaskController extends AdminController
         $auth = auth('admin')->user();
         if ($auth->id > 1) {
             $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
-            $grid->model()->where('principal_id', $staff_id);
+            $grid->model()->where('staff_id', $staff_id);
         }
 
         $grid->column('id', __('Id'));
         $grid->column('node.name', __('类型'));
         $grid->column('name', __('Name'));
-        $grid->column('principal.name', __('负责人'));
-        $grid->column('access.name', __('对接人'));
+        $grid->column('staff.name', __('负责人'));
+        $grid->column('customer.name', __('对接人'));
         $grid->column('remark', __('Remark'));
         $grid->column('days', __('时间周期(天)'));
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
@@ -72,8 +73,8 @@ class TaskController extends AdminController
 
             $staffs = Staff::all()->toArray();
             $staffs_array = array_column($staffs, 'name', 'id');
-            $filter->equal('principal_id', __('负责人'))->select($staffs_array);
-            $filter->equal('access_id', __('对接人'))->select($staffs_array);
+            $filter->equal('staff_id', __('负责人'))->select($staffs_array);
+            $filter->equal('customer_id', __('对接人'))->select($staffs_array);
 
         });
 
@@ -158,8 +159,8 @@ class TaskController extends AdminController
         $show->field('id', __('Id'));
         $show->field('node.name', __('类型'));
         $show->field('name', __('Name'));
-        $show->field('principal_id', __('Principal id'));
-        $show->field('access_id', __('Access id'));
+        $show->field('staff_id', __('Principal id'));
+        $show->field('customer_id', __('Access id'));
         $show->field('remark', __('Remark'));
         $show->field('days', __('Days'));
         $show->field('sort_order', __('Sort order'));
@@ -191,9 +192,12 @@ class TaskController extends AdminController
         $staffs = Staff::all()->toArray();
         $staffs_array = array_column($staffs, 'name', 'id');
 
+        $customers = Customer::all()->toArray();
+        $customers_array = array_column($customers, 'name', 'id');
+
         $form->text('name', __('Name'));
-        $form->select('principal_id', __('负责人'))->options($staffs_array);
-        $form->select('access_id', __('对接人'))->options($staffs_array);
+        $form->select('staff_id', __('负责人'))->options($staffs_array);
+        $form->select('customer_id', __('对接人'))->options($customers_array);
         $form->textarea('remark', __('Remark'));
         $form->decimal('days', __('周期'))->default(0.00)->help('单位（天）');
 

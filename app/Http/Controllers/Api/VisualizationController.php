@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\Department;
 use App\Models\Node;
 use App\Models\Patron;
@@ -109,10 +110,10 @@ class VisualizationController extends Controller
             $task = Task::whereBetween('created_at', [$start, $end])->pluck('id');
 
             //对应热门商品,前10名. 语句较复杂,请自己return sql出来看
-            $tasks = Task::with('principal')
-                ->select('principal_id', \DB::raw('sum(days) as sum_num'))
+            $tasks = Task::has('staff')->with('staff')
+                ->select('staff_id', \DB::raw('sum(days) as sum_num'))
                 ->whereIn('id', $task)
-                ->groupBy('principal_id')
+                ->groupBy('staff_id')
                 ->orderBy(\DB::raw('sum(days)'), 'desc')
                 //   ->take(5)
                 ->get();
@@ -202,24 +203,24 @@ class VisualizationController extends Controller
     {
         //负责人
         $principal = [];
-        $principals = Task::where('is_contract', true)->select('principal_id')->distinct()->get();
+        $principals = Task::where('is_contract', true)->select('staff_id')->distinct()->get();
         foreach ($principals as $k => $v) {
-            $principal[$k]['name'] = Staff::find($v->principal_id)->name;
-            $principal[$k]['value'] = Task::where('principal_id', $v->principal_id)->count();
+            $principal[$k]['name'] = Staff::find($v->staff_id)->name;
+            $principal[$k]['value'] = Task::where('staff_id', $v->staff_id)->count();
         }
         //对接人
         $access = [];
-        $accesses = Task::where('node_id', 1)->select('access_id')->distinct()->get();
+        $accesses = Task::where('node_id', 1)->select('customer_id')->distinct()->get();
         foreach ($accesses as $k => $v) {
-            $all = Task::where('access_id', $v->access_id)->where('node_id', 1)->count();
-            $done = Task::where('access_id', $v->access_id)->where('node_id', 1)->where('is_contract', true)->count();
+            $all = Task::where('customer_id', $v->customer_id)->where('node_id', 1)->count();
+            $done = Task::where('customer_id', $v->customer_id)->where('node_id', 1)->where('is_contract', true)->count();
             if ($all == 0) {
                 $rate = 0;
             } else {
                 $rate = $done / $all;
             }
-            $access[$k]['name'] = Staff::find($v->access_id)->name . '(签约率:' . round($rate, 2) . ')';
-            $access[$k]['value'] = Task::where('access_id', $v->access_id)->where('node_id', 1)->count();
+            $access[$k]['name'] = Customer::find($v->customer_id)->name . '(签约率:' . round($rate, 2) . ')';
+            $access[$k]['value'] = Task::where('customer_id', $v->customer_id)->where('node_id', 1)->count();
         }
 
         $legend = array_pluck($access, 'name');
@@ -227,8 +228,8 @@ class VisualizationController extends Controller
         //签约数量
         $contract = [];
         foreach ($accesses as $k => $v) {
-            $contract[$k]['name'] = Staff::find($v->access_id)->name;
-            $contract[$k]['value'] = Task::where('access_id', $v->access_id)->where('node_id', 1)->where('is_contract', true)->count();
+            $contract[$k]['name'] = Customer::find($v->customer_id)->name;
+            $contract[$k]['value'] = Task::where('customer_id', $v->customer_id)->where('node_id', 1)->where('is_contract', true)->count();
         }
 
         $data = [
@@ -246,12 +247,12 @@ class VisualizationController extends Controller
     {
         //对接人
         $access = [];
-        $accesses = Task::has('access')->where('node_id', 1)->select('access_id')->distinct()->get();
+        $accesses = Task::has('customer')->where('node_id', 1)->select('customer_id')->distinct()->get();
         foreach ($accesses as $k => $v) {
-            $task = Task::where('access_id', $v->access_id)->count();
-            $contract = Task::where('access_id', $v->access_id)->where('is_contract', true)->count();
+            $task = Task::where('customer_id', $v->customer_id)->count();
+            $contract = Task::where('customer_id', $v->customer_id)->where('is_contract', true)->count();
 
-            $access['name'][$k] = Staff::find($v->access_id)->name;
+            $access['name'][$k] = Customer::find($v->customer_id)->name;
             $access['task'][$k] = $task;
             $access['contract'][$k] = $contract;
             $access['rate'][$k] = $task ? $contract / $task : 0;
@@ -264,12 +265,12 @@ class VisualizationController extends Controller
     {
         //负责人                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
         $principal = [];
-        $principals = Task::where('node_id', 1)->select('principal_id')->distinct()->get();
+        $principals = Task::has('staff')->where('node_id', 1)->select('staff_id')->distinct()->get();
         foreach ($principals as $k => $v) {
-            $task = Task::where('principal_id', $v->principal_id)->count();
-            $contract = Task::where('principal_id', $v->principal_id)->where('is_contract', true)->count();
+            $task = Task::where('staff_id', $v->staff_id)->count();
+            $contract = Task::where('staff_id', $v->staff_id)->where('is_contract', true)->count();
 
-            $principal['name'][$k] = Staff::find($v->principal_id)->name;
+            $principal['name'][$k] = Staff::find($v->staff_id)->name;
             $principal['task'][$k] = $task;
             $principal['contract'][$k] = $contract;
             $principal['rate'][$k] = $task ? $contract / $task : 0;
@@ -287,11 +288,11 @@ class VisualizationController extends Controller
             if ($request->has('name') && $request->name != null) {
                 $query->where('name', 'like', '%' . $request->name . '%');
             }
-            if ($request->has('principal_id') && $request->principal_id != null) {
-                $query->where('principal_id', $request->principal_id);
+            if ($request->has('staff_id') && $request->staff_id != null) {
+                $query->where('staff_id', $request->staff_id);
             }
-            if ($request->has('access_id') && $request->access_id != null) {
-                $query->where('access_id', $request->access_id);
+            if ($request->has('customer_id') && $request->customer_id != null) {
+                $query->where('customer_id', $request->customer_id);
             }
             if ($request->has('is_contract') && $request->is_contract != null) {
                 $query->where('is_contract', $request->is_contract);

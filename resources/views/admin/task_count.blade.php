@@ -10,8 +10,8 @@
             var sell = [];      //数据
 
             $.each(data.tasks, function (k, v) {
-                type.push(v.principal.name);
-                sell.push({value: v.sum_num, name: v.principal.name})
+                type.push(v.staff.name);
+                sell.push({value: v.sum_num, name: v.staff.name})
             })
 
             var myChart = echarts.init(document.getElementById('task_count'), 'macarons');

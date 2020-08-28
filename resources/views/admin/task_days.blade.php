@@ -9,10 +9,10 @@
              start="{{\Request::input('start_time.start')}}",
              end="{{\Request::input('start_time.end')}}",
              is_contract="{{\Request::input('is_contract')}}",
-             principal_id="{{Request::input('principal_id')}}",
-             access_id="{{\Request::input('access_id')}}";
+             staff_id="{{Request::input('staff_id')}}",
+             customer_id="{{\Request::input('customer_id')}}";
              console.log(start+'---'+end);
-        $.get('/api/task_days?id='+id+'&name='+name+'&start='+start+'&end='+end+'&is_contract='+is_contract+'&principal_id='+principal_id+'&access_id='+access_id).done(function (data) {
+        $.get('/api/task_days?id='+id+'&name='+name+'&start='+start+'&end='+end+'&is_contract='+is_contract+'&staff_id='+staff_id+'&customer_id='+customer_id).done(function (data) {
               console.log(data);
             var myChart = echarts.init(document.getElementById('task_days'), 'macarons');
 

@@ -218,7 +218,7 @@ class HomeController extends Controller
     {
         $auth = auth('admin')->user();
         $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
-        $tasks = Task::where('principal_id', $staff_id)->get()->map(function ($model) {
+        $tasks = Task::where('staff_id', $staff_id)->get()->map(function ($model) {
             $result = [
                 'id' => $model->id,
                 'name' => $model->name,
@@ -322,7 +322,7 @@ class HomeController extends Controller
 
         $table = new Table($headers, $checks->toarray());
 
-        $Box = new Box('设计审核', $table->render());
+        $Box = new Box('设计评审', $table->render());
 
         $Box->collapsable();
         $Box->style('info');
@@ -350,7 +350,7 @@ class HomeController extends Controller
 
         $table = new Table($headers, $checks->toarray());
 
-        $Box = new Box('前端审核', $table->render());
+        $Box = new Box('前端评审', $table->render());
 
         $Box->collapsable();
         $Box->style('info');
