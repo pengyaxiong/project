@@ -117,6 +117,15 @@ class DemandController extends AdminController
         $form->textarea('description', __('Description'));
         $form->textarea('remark', __('Remark'));
 
+
+        //保存后回调
+        $form->saved(function (Form $form) {
+            activity()->inLog(7)
+                ->performedOn($form->model())
+                ->causedBy(auth('admin')->user())
+                ->withProperties(['description'=>$form->model()->description,'remark'=>$form->model()->remark])
+                ->log('更新状态为：'.$this->status[$form->model()->status]);
+        });
         return $form;
     }
 }

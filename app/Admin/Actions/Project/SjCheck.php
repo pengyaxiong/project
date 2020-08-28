@@ -5,12 +5,13 @@ namespace App\Admin\Actions\Project;
 use App\Models\Company;
 use App\Models\Finance;
 use App\Models\Patron;
+use App\Models\Project;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 class SjCheck extends RowAction
 {
-    public $name = '设计审核';
+    public $name = '设计验收';
 
     public function handle(Model $model,Request $request)
     {
@@ -25,9 +26,9 @@ class SjCheck extends RowAction
         $patron=Patron::where('project_id',$model->id)->first();
         Finance::create([
             'staff_id' => auth('admin')->user()->id,
-            'customer_id'=>$patron->customer_id,
+            'customer_id'=>$patron?$patron->customer_id:0,
             'project_id'=>$model->id,
-            'patron_id'=>$patron->id,
+            'patron_id'=>$patron?$patron->id:0,
             'status'=>2,
             'pact'=>$request->get('pact'),
             'money'=>$model->money,
@@ -43,7 +44,14 @@ class SjCheck extends RowAction
         $model->check_status=2;
         $model->save();
 
-        return $this->response()->success('设计审核成功.')->refresh();
+        $project=Project::find($model->id);
+        activity()->inLog(4)
+            ->performedOn($project)
+            ->causedBy(auth('admin')->user())
+            ->withProperties([])
+            ->log('更新'.$project->name.'状态为：设计验收成功');
+
+        return $this->response()->success('设计验收成功.')->refresh();
 
     }
 

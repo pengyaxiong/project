@@ -52,7 +52,7 @@ class ProjectController extends AdminController
         $this->status = [1 => '已立项', 2 => '进行中', 3 => '已暂停', 4 => '已结项'];
         $this->node_status = [1 => '未开始', 2 => '进行中', 3 => '已完成'];
 
-        $this->check_status = [1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功', 5 => '设计评审成功', 6 => '前端评审成功'];
+        $this->check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功', 5 => '设计评审成功', 6 => '前端评审成功'];
     }
 
     /**
@@ -204,7 +204,7 @@ class ProjectController extends AdminController
                 3 => 'warning',
                 4 => 'danger',
             ])->expand(function ($model) {
-                $check_status = [1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'];
+                $check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功'];
                 $apply_status = [1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
 
 
@@ -282,7 +282,7 @@ class ProjectController extends AdminController
             ];
             $filter->equal('is_check', __('是否交付'))->select($status_text);
 
-            $filter->equal('check_status', __('回款状态'))->select([1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功', 5 => '设计评审成功', 6 => '前端评审成功']);
+            $filter->equal('check_status', __('回款状态'))->select([1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功', 5 => '设计评审成功', 6 => '前端评审成功']);
 
             $filter->equal('grade', __('优先级'))->select($this->grade);
             $filter->equal('status', __('Status'))->select($this->status);
@@ -873,13 +873,20 @@ EOT;
         $design_check->status = $request->status;
         $design_check->save();
 
-        $result=DesignCheck::where('project_id',$design_check->project_id)->where('status',1)->exists();
+        $result=DesignCheck::where('project_id',$design_check->project_id)->where('status',0)->exists();
         if (!$result){
             $project->check_status = 5;
         }else{
             $project->check_status = 1;
         }
         $project->save();
+
+        $stause=$request->status?'设计评审成功':'设计评审失败';
+        activity()->inLog(3)
+            ->performedOn($project)
+            ->causedBy(auth('admin')->user())
+            ->withProperties(['description'=>$request->description,'remark'=>$request->remark])
+            ->log('更新'.$project->name.'状态为：'.$stause);
 
         $success = new MessageBag([
             'title' => 'Success',
@@ -949,13 +956,21 @@ EOT;
         $html_check->status = $request->status;
         $html_check->save();
 
-        $result=HtmlCheck::where('project_id',$html_check->project_id)->where('status',1)->exists();
+        $result=HtmlCheck::where('project_id',$html_check->project_id)->where('status',0)->exists();
         if (!$result){
             $project->check_status = 6;
         }else{
             $project->check_status = 2;
         }
         $project->save();
+
+        $stause=$request->status?'前端评审成功':'前端评审失败';
+        activity()->inLog(5)
+            ->performedOn($project)
+            ->causedBy(auth('admin')->user())
+            ->withProperties(['description'=>$request->description,'remark'=>$request->remark])
+            ->log('更新'.$project->name.'状态为：'.$stause);
+
 
         $success = new MessageBag([
             'title' => 'Success',

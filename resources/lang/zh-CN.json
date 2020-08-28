@@ -118,5 +118,11 @@
   "Company name": "公司名称",
   "Need": "需求",
   "Tel": "电话",
-  "Phone": "手机号"
+  "Phone": "手机号",
+  "Log name": "标识",
+  "Subject id": "对象",
+  "Subject type": "对象模型",
+  "Causer id": "操作者",
+  "Causer type": "操作模型",
+  "Properties": "内容"
 }

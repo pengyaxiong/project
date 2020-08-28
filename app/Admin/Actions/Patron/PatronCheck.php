@@ -68,6 +68,12 @@ class PatronCheck extends RowAction
             'remark' => $request->get('remark'),
         ]);
 
+        activity()->inLog(2)
+            ->performedOn($project)
+            ->causedBy(auth('admin')->user())
+            ->withProperties([])
+            ->log('更新'.$name.'状态为：签约审核成功');
+
         return $this->response()->success('签约审核成功.')->redirect('/admin/projects');
         return $this->response()->success('签约审核成功.')->refresh();
     }

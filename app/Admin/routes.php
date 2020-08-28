@@ -53,6 +53,9 @@ Route::group([
     //新增需求
     $router->resource('demands', 'DemandController');
 
+    //操作日志
+    $router->resource('activities', 'ActivityController');
+
     $router->resource('calendar', 'CalendarController');
     $router->put('/drop/{id}', 'CalendarController@drop');
     $router->get('/event','CalendarController@event');

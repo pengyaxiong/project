@@ -24,6 +24,7 @@ class AuditionController extends AdminController
     {
         $this->status = [0 => '拒绝', 1 => '通过', 2 => '保留'];
     }
+
     /**
      * Make a grid builder.
      *
@@ -55,13 +56,13 @@ class AuditionController extends AdminController
 
         $grid->filter(function ($filter) {
 
-            $departments=Department::all()->toArray();
-            $department_array=array_column($departments, 'name', 'id');
+            $departments = Department::all()->toArray();
+            $department_array = array_column($departments, 'name', 'id');
 
             $filter->equal('department_id', __('所属部门'))->select($department_array);
 
-            $staffs=Staff::all()->toArray();
-            $staff_array=array_column($staffs, 'name', 'id');
+            $staffs = Staff::all()->toArray();
+            $staff_array = array_column($staffs, 'name', 'id');
 
             $filter->equal('staff_id', __('面试官'))->select($staff_array);
 
@@ -111,13 +112,13 @@ class AuditionController extends AdminController
     {
         $form = new Form(new Audition());
 
-        $departments=Department::all()->toArray();
-        $department_array=array_column($departments, 'name', 'id');
+        $departments = Department::all()->toArray();
+        $department_array = array_column($departments, 'name', 'id');
 
         $form->select('department_id', __('所属部门'))->options($department_array);
 
-        $staffs=Staff::all()->toArray();
-        $staff_array=array_column($staffs, 'name', 'id');
+        $staffs = Staff::all()->toArray();
+        $staff_array = array_column($staffs, 'name', 'id');
 
         $form->select('staff_id', __('面试官'))->options($staff_array);
 
@@ -130,6 +131,15 @@ class AuditionController extends AdminController
         $form->multipleImage('images', __('Images'))->removable()->sortable()->help('简历、作品展示');
         $form->textarea('remark', __('Remark'));
         $form->datetime('start_time', __('面试时间'))->default(date('Y-m-d H:i:s'));
+
+        //保存后回调
+        $form->saved(function (Form $form) {
+            activity()->inLog(1)
+                ->performedOn($form->model())
+                ->causedBy(auth('admin')->user())
+                ->withProperties([])
+                ->log('更新状态为：'.$this->status[$form->model()->status]);
+        });
 
         return $form;
     }

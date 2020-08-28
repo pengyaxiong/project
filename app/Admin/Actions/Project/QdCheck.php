@@ -2,6 +2,7 @@
 
 namespace App\Admin\Actions\Project;
 
+use App\Models\Project;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -10,7 +11,7 @@ use App\Models\Patron;
 
 class QdCheck extends RowAction
 {
-    public $name = '前端审核';
+    public $name = '前端验收';
 
     public function handle(Model $model, Request $request)
     {
@@ -25,9 +26,9 @@ class QdCheck extends RowAction
         $patron = Patron::where('project_id', $model->id)->first();
         Finance::create([
             'staff_id' => auth('admin')->user()->id,
-            'customer_id' => $patron->customer_id,
-            'project_id' => $model->id,
-            'patron_id' => $patron->id,
+            'customer_id'=>$patron?$patron->customer_id:0,
+            'project_id'=>$model->id,
+            'patron_id'=>$patron?$patron->id:0,
             'status' => 3,
             'pact' => $request->get('pact'),
             'money' => $model->money,
@@ -43,7 +44,14 @@ class QdCheck extends RowAction
         $model->check_status = 3;
         $model->save();
 
-        return $this->response()->success('前端审核成功.')->refresh();
+        $project=Project::find($model->id);
+        activity()->inLog(6)
+            ->performedOn($project)
+            ->causedBy(auth('admin')->user())
+            ->withProperties([])
+            ->log('更新'.$project->name.'状态为：前端验收成功');
+
+        return $this->response()->success('前端验收成功.')->refresh();
     }
 
     public function form(Model $model)
