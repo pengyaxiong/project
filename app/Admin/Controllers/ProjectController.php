@@ -9,7 +9,9 @@ use App\Admin\Actions\Project\SjCheck;
 use App\Admin\Actions\Project\YsCheck;
 use App\Models\Customer;
 use App\Models\Demand;
+use App\Models\DesignCheck;
 use App\Models\Finance;
+use App\Models\HtmlCheck;
 use App\Models\Node;
 use App\Models\Project;
 use App\Models\ProjectCustomer;
@@ -146,9 +148,9 @@ class ProjectController extends AdminController
             implode('&nbsp;', $html);
         })->expand(function ($model) {
 
-            $project_nodes =$this->project_nodes->map(function ($model) {
-                $staff_name = $model->staff?$model->staff->name:'';
-                $node_name = $model->node?$model->node->name:'';
+            $project_nodes = $this->project_nodes->map(function ($model) {
+                $staff_name = $model->staff ? $model->staff->name : '';
+                $node_name = $model->node ? $model->node->name : '';
 
                 $node_status = $model->status;
                 $status = '';
@@ -247,7 +249,7 @@ class ProjectController extends AdminController
             });
 
             return new Table(['合同', '状态', '金额', '详情', '备注'], $project_demands->toArray());
-        });
+        })->hide();
 
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
         $states = [
@@ -409,8 +411,8 @@ class ProjectController extends AdminController
         $show->field('project_nodes', __('节点情况'))->as(function () {
             $nodes = $this->project_nodes;
             foreach ($nodes as $k => $v) {
-                $staff_name = $v->staff?$v->staff->name:'';
-                $node_name = $v->node?$v->node->name:'';
+                $staff_name = $v->staff ? $v->staff->name : '';
+                $node_name = $v->node ? $v->node->name : '';
                 $nodes[$k] = [
                     'node_name' => $node_name,
                     'staff_name' => $staff_name,
@@ -507,8 +509,8 @@ class ProjectController extends AdminController
             $select_staff = array_column($staffs, 'name', 'id');
             $form->select('staff_id', '审核人')->options($select_staff);
             $states = [
-                'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
-                'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+                'on' => ['value' => 1, 'text' => '已审核', 'color' => 'success'],
+                'off' => ['value' => 0, 'text' => '待审核', 'color' => 'danger'],
             ];
             $form->switch('status', __('Status'))->states($states)->default(0);
             $form->textarea('description', __('Description'));
@@ -521,13 +523,17 @@ class ProjectController extends AdminController
             $select_staff = array_column($staffs, 'name', 'id');
             $form->select('staff_id', '审核人')->options($select_staff);
             $states = [
-                'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
-                'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+                'on' => ['value' => 1, 'text' => '已审核', 'color' => 'success'],
+                'off' => ['value' => 0, 'text' => '待审核', 'color' => 'danger'],
             ];
             $form->switch('status', __('Status'))->states($states)->default(0);
             $form->textarea('description', __('Description'));
             $form->textarea('remark', __('Remark'));
         });
+
+        if ($auth->id == 1) {
+            $form->select('check_status', '回款状态')->options($this->check_status);
+        }
 
         if ($auth->id == 1 || in_array('apply', $slug)) {
             $form->decimal('money', __('Money'))->default(0.00);
@@ -615,18 +621,17 @@ class ProjectController extends AdminController
 
     public function project_node(Content $content, $id)
     {
-        $project = Project::find($id);
+        $project = Project::with('project_nodes')->find($id);
         return $content
             ->title($project->name)
             ->description('Doing')
             ->row(function (Row $row) use ($project) {
                 $row->column(12, function (Column $column) use ($project) {
 
-                    $project_nodes = ProjectNode::where('project_id', $project->id)->get()->map(function ($model) {
-                        $staff = Staff::find($model->staff_id);
-                        $node = Node::find($model->node_id);
-                        $staff_name = isset($staff) ? $staff->name : '';
-                        $node_name = isset($node) ? $node->name : '';
+                    $project_nodes = $project->project_nodes->map(function ($model) {
+                        $staff_name = $model->staff ? $model->staff->name : '';
+                        $node_name = $model->node ? $model->node->name : '';
+
                         $node_status = $model->status;
                         $status = '';
                         if ($node_status == 2) {
@@ -653,6 +658,26 @@ class ProjectController extends AdminController
                     $table = new Table(['ID', '节点', '状态', '项目负责人', '开始时间', '结束时间', '耗时(天)', '操作'], $project_nodes->toArray());
 
                     $column->append(new Box('任务情况', $table->render()));
+
+                    //新增需求
+                    if ($project->is_add) {
+                        $project_demands = Demand::where('project_id', $project->id)->get()->map(function ($model) {
+                            $pact = $model->pact ? '<i class="fa fa-check text-green"></i>' : '<i class="fa fa-close text-red"></i>';
+                            $status = $model->status ? '<span class="label label-success">已审核</span>' : '<span class="label label-danger">未审核</span>';
+                            $nodes = [
+                                'pact' => $pact,
+                                'status' => $status,
+                                'money' => $model->money,
+                                'description' => $model->description,
+                                'remark' => $model->remark,
+                            ];
+                            return $nodes;
+                        });
+
+                        $demands = new Table(['合同', '状态', '金额', '详情', '备注'], $project_demands->toArray());
+
+                        $column->append(new Box('新增需求', $demands->render()));
+                    }
 
                     /**
                      * 创建模态框
@@ -785,5 +810,158 @@ EOT;
 
     }
 
+
+    public function design(Content $content, $id)
+    {
+        $design_check = DesignCheck::with('project','staff')->find($id);
+        return $content
+            ->title($design_check->project->name)
+            ->description($design_check->staff->name)
+            ->row(function (Row $row) use ($design_check) {
+                $row->column(6, function (Column $column) use ($design_check) {
+
+                    $checks = DesignCheck::with('staff')->where('project_id', $design_check->project->id)->get()->map(function ($model) {
+                        $result = [
+                            'name' => $model->staff->name,
+                            'status' => $model->status?'<span class="label label-success">已审核</span>':'<span class="label label-danger">待审核</span>',
+                            'description' => $model->remark,
+                        ];
+                        return $result;
+                    });
+
+                    $headers = ['姓名', '状态', '备注'];
+
+                    $table = new Table($headers, $checks->toarray());
+
+                    $column->append(new Box('评审人员', $table->render()));
+                });
+
+                $row->column(6, function (Column $column) use ($design_check) {
+
+                    $form = new \Encore\Admin\Widgets\Form();
+                    $form->action('/admin/projects/design_check');
+
+                    $form->hidden('id')->default($design_check->id);
+
+                    $form->select('status', __('Status'))->options([1 => '已审核', 0 => '待审核'])->default($design_check->status);
+
+                    $form->textarea('description', '简介')->default($design_check->description)->rules('required');
+
+                    $form->textarea('remark', '备注')->default($design_check->remark)->rules('required');
+
+
+                    $column->append(new Box('设计评审', $form->render()));
+                });
+            });
+    }
+
+    public function design_check(Request $request)
+    {
+        $design_check = DesignCheck::find($request->id);
+
+        $project=Project::find($design_check->project_id);
+        if ($project->check_status != 1){
+            $error = new MessageBag([
+                'title' => 'Error',
+                'message' => '提交失败,请先完成签约审核....',
+            ]);
+            return back()->with(compact('error'));
+        }
+
+        $design_check->description = $request->description;
+        $design_check->remark = $request->remark;
+        $design_check->status = $request->status;
+        $design_check->save();
+
+        $result=DesignCheck::where('project_id',$design_check->project_id)->where('status',1)->exists();
+        if (!$result){
+            $project->check_status = 5;
+        }else{
+            $project->check_status = 1;
+        }
+        $project->save();
+
+        $success = new MessageBag([
+            'title' => 'Success',
+            'message' => '提交成功....',
+        ]);
+        return back()->with(compact('success'));
+    }
+
+    public function html(Content $content,$id)
+    {
+        $html_check = HtmlCheck::with('project','staff')->find($id);
+        return $content
+            ->title($html_check->project->name)
+            ->description($html_check->staff->name)
+            ->row(function (Row $row) use ($html_check) {
+                $row->column(6, function (Column $column) use ($html_check) {
+
+                    $checks = HtmlCheck::with('staff')->where('project_id', $html_check->project->id)->get()->map(function ($model) {
+                        $result = [
+                            'name' => $model->staff->name,
+                            'status' => $model->status?'<span class="label label-success">已审核</span>':'<span class="label label-danger">待审核</span>',
+                            'description' => $model->remark,
+                        ];
+                        return $result;
+                    });
+
+                    $headers = ['姓名', '状态', '备注'];
+
+                    $table = new Table($headers, $checks->toarray());
+
+                    $column->append(new Box('评审人员', $table->render()));
+                });
+
+                $row->column(6, function (Column $column) use ($html_check) {
+                    $form = new \Encore\Admin\Widgets\Form();
+                    $form->action('/admin/projects/html_check');
+
+                    $form->hidden('id')->default($html_check->id);
+
+                    $form->select('status', __('Status'))->options([1 => '已审核', 0 => '待审核'])->default($html_check->status);
+
+                    $form->textarea('description', '简介')->default($html_check->description)->rules('required');
+
+                    $form->textarea('remark', '备注')->default($html_check->remark)->rules('required');
+
+
+                    $column->append(new Box('前端评审', $form->render()));
+                });
+            });
+    }
+
+    public function html_check(Request $request)
+    {
+        $html_check = HtmlCheck::find($request->id);
+
+        $project=Project::find($html_check->project_id);
+        if ($project->check_status != 2){
+            $error = new MessageBag([
+                'title' => 'Error',
+                'message' => '提交失败,请先完成设计审核....',
+            ]);
+            return back()->with(compact('error'));
+        }
+
+        $html_check->description = $request->description;
+        $html_check->remark = $request->remark;
+        $html_check->status = $request->status;
+        $html_check->save();
+
+        $result=HtmlCheck::where('project_id',$html_check->project_id)->where('status',1)->exists();
+        if (!$result){
+            $project->check_status = 6;
+        }else{
+            $project->check_status = 2;
+        }
+        $project->save();
+
+        $success = new MessageBag([
+            'title' => 'Success',
+            'message' => '提交成功....',
+        ]);
+        return back()->with(compact('success'));
+    }
 
 }

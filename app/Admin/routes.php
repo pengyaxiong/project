@@ -31,6 +31,11 @@ Route::group([
     $router->post('projects/status', 'ProjectController@project_status');
     $router->get('projects/info/{id}', 'ProjectController@project_info');
 
+    $router->get('projects/design/{id}', 'ProjectController@design');
+    $router->post('projects/design_check', 'ProjectController@design_check');
+    $router->get('projects/html/{id}', 'ProjectController@html');
+    $router->post('projects/html_check', 'ProjectController@html_check');
+
     $router->resource('companies', 'CompanyController');
 
     $router->resource('tasks', 'TaskController');

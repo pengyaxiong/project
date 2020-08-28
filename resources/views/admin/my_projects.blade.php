@@ -31,6 +31,7 @@
                     <th>状态</th>
                     <th>预计交付时间</th>
                     <th>剩余时间</th>
+                    <th>新增需求</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -44,12 +45,19 @@
                         <td>{{$project['y_check_time']}}</td>
                         <td>
                             @if($project['is_empty'])
-                                倒计时：<span id="djs"></span><span id="wait" style="display: none">{{$project['end_date']-$project['now_date']}}</span>
+                                倒计时：<span id="djs"></span><span id="wait"
+                                                                style="display: none">{{$project['end_date']-$project['now_date']}}</span>
                             @else
                                 <span class="label label-danger">已超时!!</span>
                             @endif
                         </td>
-                        <td><a href="/admin/projects/node/{{$project['id']}}" type="button" class="btn btn-xs btn-info">工作</a></td>
+                        <td>
+                            @if($project['is_add']) <span class="badge label-primary">{{count($project['demands'])}}</span>
+                            @else <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
+                            @endif
+                        </td>
+                        <td><a href="/admin/projects/node/{{$project['id']}}" type="button" class="btn btn-xs btn-info">工作</a>
+                        </td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -75,7 +83,8 @@
             document.getElementById('djs').innerHTML = d + '天' + h + '时' + m + '分' + s + '秒';
             if (time <= 0) {
                 clearInterval(interval);
-            };
+            }
+            ;
         }, 1000);
     })();
 

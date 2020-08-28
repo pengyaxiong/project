@@ -3,6 +3,8 @@
 namespace App\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\DesignCheck;
+use App\Models\HtmlCheck;
 use App\Models\Node;
 use App\Models\Notice;
 use App\Models\Project;
@@ -20,6 +22,7 @@ use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Widgets\Form;
 use Encore\Admin\Widgets\Collapse;
+use Encore\Admin\Widgets\Tab;
 
 class HomeController extends Controller
 {
@@ -92,23 +95,25 @@ class HomeController extends Controller
                     });
                 } else {
                     $row->column(12, function (Column $column) {
+//                        /**
+//                         * 创建模态框
+//                         */
+//                        $this->script = <<<EOT
+//                        $('.grid-row-refuse').unbind('click').click(function() {
+//                            var des=$(this).data('des');
+//                            var title=$(this).data('title');
+//                            swal.fire({
+//                                        title: '<strong>'+title+'</strong>',
+//                                        html: des, // HTML
+//                                        focusConfirm: true, //聚焦到确定按钮
+//                                        showCloseButton: true,//右上角关闭
+//                             })
+//                          });
+//EOT;
+//                        Admin::script($this->script);
+
                         $column->append($this->my_notices());
-                        /**
-                         * 创建模态框
-                         */
-                        $this->script = <<<EOT
-                        $('.grid-row-refuse').unbind('click').click(function() {
-                            var des=$(this).data('des');
-                            var title=$(this).data('title');
-                            swal.fire({
-                                        title: '<strong>'+title+'</strong>',
-                                        html: des, // HTML
-                                        focusConfirm: true, //聚焦到确定按钮
-                                        showCloseButton: true,//右上角关闭
-                             })
-                          });
-EOT;
-                        Admin::script($this->script);
+
                     });
 
                     $row->column(12, function (Column $column) {
@@ -117,6 +122,18 @@ EOT;
 
                     $row->column(12, function (Column $column) {
                         $column->append($this->my_projects());
+                    });
+
+
+                    $row->column(12, function (Column $column) {
+                        $column->row(function (Row $row) {
+                            $row->column(6, function (Column $column) {
+                                $column->append($this->design_check());
+                            });
+                            $row->column(6, function (Column $column) {
+                                $column->append($this->html_check());
+                            });
+                        });
                     });
 
                 }
@@ -129,23 +146,31 @@ EOT;
         $staff = Staff::where('admin_id', $auth->id)->first();
         $notices = Notice::where('department_id', $staff->department_id)->orwhere('department_id', 0)->orderBy('sort_order')->get()->map(function ($model) {
             $result = [
-                'content' => "<a class='btn  grid-row-refuse'  data-title='{$model->title}' data-des='{$model->description}'>{$model->title}</a>"
+                'title' => $model->title,
+                'content' => $model->description
             ];
             return $result;
         });
 
-        if (!empty($notices)) {
-            $table = implode(' ',array_pluck($notices->toarray(),'content'));
-        } else {
-            $table ='暂无~';
+        $tab = new Tab();
+        foreach ($notices as $notice) {
+            $tab->add($notice['title'], $notice['content']);
         }
-        $Box = new Box('公告', $table);
+
+        $Box = new Box('系统公告', $tab->render());
         $Box->collapsable();
         $Box->style('info');
         $Box->solid();
         $Box->scrollable();
 
+        return $Box->render();
 
+        $notices = Notice::where('department_id', $staff->department_id)->orwhere('department_id', 0)->orderBy('sort_order')->get()->map(function ($model) {
+            $result = [
+                'content' => "<a class='btn  grid-row-refuse'  data-title='{$model->title}' data-des='{$model->description}'>{$model->title}</a>"
+            ];
+            return $result;
+        });
         return $Box->render();
     }
 
@@ -232,7 +257,7 @@ EOT;
         $auth = auth('admin')->user();
         $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
         $project_ids = ProjectNode::where('staff_id', $staff_id)->pluck('project_id');
-        $projects = Project::whereIn('id', $project_ids)->orderby('grade')->get()->map(function ($model) {
+        $projects = Project::with('demands')->whereIn('id', $project_ids)->orderby('grade')->get()->map(function ($model) {
 
             $grade = [
                 1 => 'A',
@@ -253,6 +278,8 @@ EOT;
                 'grade' => $grade[$model->grade],
                 'status' => $status[$model->status],
                 'y_check_time' => $model->y_check_time,
+                'is_add' => $model->is_add,
+                'demands' => $model->demands,
 
                 'end_date' => strtotime($model->y_check_time),
                 'now_date' => time(),
@@ -268,6 +295,62 @@ EOT;
 //                        $column->append(new Box('我的项目', $table->render()));
 
         $Box = new Box('我的项目', view('admin.my_projects', compact('projects')));
+
+        $Box->collapsable();
+        $Box->style('info');
+        $Box->solid();
+        $Box->scrollable();
+
+        return $Box->render();
+    }
+
+    public function design_check()
+    {
+        $auth = auth('admin')->user();
+        $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
+        $checks = DesignCheck::with('project')->where('staff_id', $staff_id)->get()->map(function ($model) {
+            $result = [
+                'name' => $model->project->name,
+                'status' => $model->status?'<span class="label label-success">已审核</span>':'<span class="label label-danger">待审核</span>',
+                'description' => $model->description,
+                'see' => "<a class='btn btn-xs tn-danger' href='/admin/projects/design/{$model->id}'><i class='fa fa-eye' title='详情'>详情</i></a>",
+            ];
+            return $result;
+        });
+
+        $headers = ['项目名', '状态', '简介', '查看'];
+
+        $table = new Table($headers, $checks->toarray());
+
+        $Box = new Box('设计审核', $table->render());
+
+        $Box->collapsable();
+        $Box->style('info');
+        $Box->solid();
+        $Box->scrollable();
+
+        return $Box->render();
+    }
+
+    public function html_check()
+    {
+        $auth = auth('admin')->user();
+        $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
+        $checks = HtmlCheck::with('project')->where('staff_id', $staff_id)->get()->map(function ($model) {
+            $result = [
+                'name' => $model->project->name,
+                'status' => $model->status?'<span class="label label-success">已审核</span>':'<span class="label label-danger">待审核</span>',
+                'description' => $model->description,
+                'see' => "<a class='btn btn-xs tn-danger' href='/admin/projects/html/{$model->id}'><i class='fa fa-eye' title='详情'>详情</i></a>",
+            ];
+            return $result;
+        });
+
+        $headers = ['项目名', '状态', '简介', '查看'];
+
+        $table = new Table($headers, $checks->toarray());
+
+        $Box = new Box('前端审核', $table->render());
 
         $Box->collapsable();
         $Box->style('info');
