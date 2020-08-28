@@ -74,7 +74,10 @@ class TaskController extends AdminController
             $staffs = Staff::all()->toArray();
             $staffs_array = array_column($staffs, 'name', 'id');
             $filter->equal('staff_id', __('负责人'))->select($staffs_array);
-            $filter->equal('customer_id', __('对接人'))->select($staffs_array);
+
+            $customers = Customer::all()->toArray();
+            $customers_array = array_column($customers, 'name', 'id');
+            $filter->equal('customer_id', __('对接人'))->select($customers_array);
 
         });
 
