@@ -17,7 +17,7 @@ class AddDemand extends RowAction
             'project_id' => $model->id,
             'status' => 0,
             'pact' => $request->get('pact'),
-            'money' => $model->money,
+            'money' =>$request->get('money'),
             'description' => $request->get('description'),
             'remark' => $request->get('remark'),
         ]);
@@ -28,18 +28,26 @@ class AddDemand extends RowAction
         return $this->response()->success('新增需求成功,等待审核.')->refresh();
     }
 
-    public function form(Model $model)
+    /**
+     * @return string
+     */
+    public function href()
     {
-        $this->text('name', '项目名称')->default($model->name)->disable();
-        //新增需求
-        $this->radio('pact', __('合同（有/无）'))->options([1 => '有', 0 => '无'])->default(1);
-        $this->text('money', '金额');
-        $this->textarea('description', '需求情况');
-        $this->textarea('remark', '备注');
-
-
-        $this->confirm('确认新增需求？', '确定？', []);
-
-        $this->modalLarge();
+        return "/admin/projects/demand/".$this->getKey();
     }
+
+//    public function form(Model $model)
+//    {
+//        $this->text('name', '项目名称')->default($model->name)->disable();
+//        //新增需求
+//        $this->radio('pact', __('合同（有/无）'))->options([1 => '有', 0 => '无'])->default(1);
+//        $this->text('money', '金额');
+//        $this->textarea('description', '需求情况');
+//        $this->textarea('remark', '备注');
+//
+//
+//        $this->confirm('确认新增需求？', '确定？', []);
+//
+//        $this->modalLarge();
+//    }
 }

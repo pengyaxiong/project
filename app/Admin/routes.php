@@ -36,6 +36,19 @@ Route::group([
     $router->get('projects/html/{id}', 'ProjectController@html');
     $router->post('projects/html_check', 'ProjectController@html_check');
 
+    //新增需求
+    $router->get('projects/demand/{id}', 'ProjectController@demand');
+    $router->post('projects/add_demand', 'ProjectController@add_demand');
+    //设计验收
+    $router->get('projects/sj/{id}', 'ProjectController@sj');
+    $router->post('projects/sj_check', 'ProjectController@sj_check');
+    //前端验收
+    $router->get('projects/qd/{id}', 'ProjectController@qd');
+    $router->post('projects/qd_check', 'ProjectController@qd_check');
+    //整体验收
+    $router->get('projects/ys/{id}', 'ProjectController@ys');
+    $router->post('projects/ys_check', 'ProjectController@ys_check');
+
     $router->resource('companies', 'CompanyController');
 
     $router->resource('tasks', 'TaskController');

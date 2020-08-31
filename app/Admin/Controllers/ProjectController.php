@@ -47,6 +47,7 @@ class ProjectController extends AdminController
     protected $node_status = [];
     protected $check_status = [];
     protected $finance_status = [];
+
     public function __construct()
     {
         $this->grade = [1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E'];
@@ -66,71 +67,6 @@ class ProjectController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Project());
-
-//        $projects=Project::with('customers')->get()->map(function ($model){
-//            Finance::create([
-//                'staff_id' => 1,
-//                'customer_id' => $model->customers->first()->id,
-//                'project_id' => $model->id,
-//                'patron_id' => 6,
-//                'status' => 1,
-//                'pact' => 1,
-//                'money' => $model->money,
-//                'returned_money' => $model->money*0.4,
-//                'rebate' => 100,
-//                'returned_bag' => '对公账户',
-//                'debtors' => $model->money*0.6,
-//                'description' => '详情',
-//                'remark' => '备注',
-//            ]);
-//            Finance::create([
-//                'staff_id' => 1,
-//                'customer_id' =>  $model->customers->first()->id,
-//                'project_id' => $model->id,
-//                'patron_id' => 6,
-//                'status' => 2,
-//                'pact' => 1,
-//                'money' => $model->money,
-//                'returned_money' => $model->money*0.3,
-//                'rebate' => 100,
-//                'returned_bag' => '对公账户',
-//                'debtors' => $model->money*0.3,
-//                'description' => '详情',
-//                'remark' => '备注',
-//            ]);
-//            Finance::create([
-//                'staff_id' => 1,
-//                'customer_id' =>  $model->customers->first()->id,
-//                'project_id' => $model->id,
-//                'patron_id' => 6,
-//                'status' => 3,
-//                'pact' => 1,
-//                'money' => $model->money,
-//                'returned_money' => $model->money*0.2,
-//                'rebate' => 100,
-//                'returned_bag' => '对公账户',
-//                'debtors' => $model->money*0.1,
-//                'description' => '详情',
-//                'remark' => '备注',
-//            ]);
-//            Finance::create([
-//                'staff_id' => 1,
-//                'customer_id' =>  $model->customers->first()->id,
-//                'project_id' => $model->id,
-//                'patron_id' => 6,
-//                'status' => 4,
-//                'pact' => 1,
-//                'money' => $model->money,
-//                'returned_money' => $model->money*0.1,
-//                'rebate' => 100,
-//                'returned_bag' => '对公账户',
-//                'debtors' => 0,
-//                'description' => '详情',
-//                'remark' => '备注',
-//            ]);
-//
-//        });
-
 
         $grid->model()->orderBy('sort_order')->orderBy('contract_time', 'desc');
         $auth = auth('admin')->user();
@@ -499,141 +435,161 @@ class ProjectController extends AdminController
 
         $auth = auth('admin')->user();
         $slug = $auth->roles->pluck('slug')->toarray();
+
         if ($auth->id == 1 || in_array('apply', $slug)) {
-            $form->text('name', __('Name'))->rules('required');
 
-            $tasks = Task::all()->toArray();
-            $select_ = array_prepend($tasks, ['id' => 0, 'name' => '其它']);
-            $select_task = array_column($select_, 'name', 'id');
+            $form->tab('基础信息', function ($form) {
 
-            //创建select
-            $form->select('task_id', '任务名称')->options($select_task);
+                $form->text('name', __('Name'))->rules('required');
 
-            $staffs = Staff::orderby('sort_order')->pluck('name', 'id')->toArray();
-            $customers = Customer::orderby('sort_order')->pluck('name', 'id')->toArray();
-            if ($form->isEditing()) {
-                $id = request()->route()->parameters()['project'];
-                $customer_ids = ProjectCustomer::where('project_id', $id)->pluck('customer_id')->toArray();
-                $staff_ids = ProjectStaff::where('project_id', $id)->pluck('staff_id')->toArray();
+                $tasks = Task::all()->toArray();
+                $select_ = array_prepend($tasks, ['id' => 0, 'name' => '其它']);
+                $select_task = array_column($select_, 'name', 'id');
 
-                $form->multipleSelect('customers', __('商务'))
-                    ->options($customers)->default($customer_ids);
-                $form->multipleSelect('staffs', __('项目负责人'))
-                    ->options($staffs)->default($staff_ids);
-            } else {
-                $form->multipleSelect('customers', __('商务'))
-                    ->options($customers);
-                $form->multipleSelect('staffs', __('项目负责人'))
-                    ->options($staffs);
-            }
-
-            $form->radio('grade', '优先级')->options($this->grade)->default(1);
-            $form->radio('status', __('Status'))->options($this->status)->default(1);
-
-
-            $form->textarea('remark', __('Remark'));
-
-            $form->rate('qy_rate', '签约付款比列')->help('占合同总额百分比')->default(40);
-            $form->rate('sj_rate', '设计付款比列')->help('占合同总额百分比')->default(30);
-            $form->rate('qd_rate', '前端付款比列')->help('占合同总额百分比')->default(20);
-            $form->rate('ys_rate', '验收付款比列')->help('占合同总额百分比')->default(10);
-
-            // 子表字段
-            $form->hasMany('finances', __('回款记录'), function (Form\NestedForm $form) {
-                $staffs = Staff::all()->toArray();
-                $select_ = array_prepend($staffs, ['id' => 1, 'name' => '超级管理员']);
-                $select_staff = array_column($select_, 'name', 'id');
-                $form->select('staff_id', '审核人')->options($select_staff)->default(1);
-
-                $patrons = Patron::all()->toArray();
-                $patron_array = array_column($patrons, 'name', 'id');
                 //创建select
-                $form->select('patron_id', '客户名称')->options($patron_array);
+                $form->select('task_id', '任务名称')->options($select_task);
 
-                $customers = Customer::all()->toArray();
-                $customer_array = array_column($customers, 'name', 'id');
-                //创建select
-                $form->select('customer_id', '商务名称')->options($customer_array);
+                $staffs = Staff::orderby('sort_order')->pluck('name', 'id')->toArray();
+                $customers = Customer::orderby('sort_order')->pluck('name', 'id')->toArray();
+                if ($form->isEditing()) {
+                    $id = request()->route()->parameters()['project'];
+                    $customer_ids = ProjectCustomer::where('project_id', $id)->pluck('customer_id')->toArray();
+                    $staff_ids = ProjectStaff::where('project_id', $id)->pluck('staff_id')->toArray();
 
-                $form->select('status', __('Status'))->options($this->finance_status);
+                    $form->multipleSelect('customers', __('商务'))
+                        ->options($customers)->default($customer_ids);
+                    $form->multipleSelect('staffs', __('项目负责人'))
+                        ->options($staffs)->default($staff_ids);
+                } else {
+                    $form->multipleSelect('customers', __('商务'))
+                        ->options($customers);
+                    $form->multipleSelect('staffs', __('项目负责人'))
+                        ->options($staffs);
+                }
 
+                $form->radio('grade', '优先级')->options($this->grade)->default(1);
+                $form->radio('status', __('Status'))->options($this->status)->default(1);
+
+
+                $form->textarea('remark', __('Remark'));
+
+                $form->ueditor('content', __('Content'));
+
+                $form->decimal('money', __('Money'))->default(0.00);
+
+                $form->number('sort_order', __('Sort order'))->default(99);
                 $states = [
-                    'on' => ['value' => 1, 'text' => '有', 'color' => 'success'],
-                    'off' => ['value' => 0, 'text' => '无', 'color' => 'danger'],
+                    'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
+                    'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
                 ];
-                $form->switch('pact', __('合同（有/无）'))->states($states)->default(0);
-                $form->text('returned_money', '回款金额');
-                $form->text('rebate', '返渠道费');
-                $form->text('returned_bag', '回款账户');
-                $form->text('debtors', '未结余额');
-                $form->textarea('description', '开票情况');
-                $form->textarea('remark', '项目备注');
+                $form->switch('is_check', __('是否交付'))->states($states)->default(0);
+                $form->datetime('contract_time', __('Contract time'));
+                $form->datetime('check_time', __('交付时间'));
+                $form->datetime('y_check_time', __('预计交付时间'));
+
+
+            }, true);
+
+            $form->tab('回款情况', function ($form) {
+                $form->rate('qy_rate', '签约付款比列')->help('占合同总额百分比')->default(40);
+                $form->rate('sj_rate', '设计付款比列')->help('占合同总额百分比')->default(30);
+                $form->rate('qd_rate', '前端付款比列')->help('占合同总额百分比')->default(20);
+                $form->rate('ys_rate', '验收付款比列')->help('占合同总额百分比')->default(10);
+
+                $form->select('check_status', '回款状态')->options($this->check_status);
+
+                // 子表字段
+                $form->hasMany('finances', __('回款记录'), function (Form\NestedForm $form) {
+                    $staffs = Staff::all()->toArray();
+                    $select_ = array_prepend($staffs, ['id' => 1, 'name' => '超级管理员']);
+                    $select_staff = array_column($select_, 'name', 'id');
+                    $form->select('staff_id', '审核人')->options($select_staff)->default(1);
+
+                    $patrons = Patron::all()->toArray();
+                    $patron_array = array_column($patrons, 'name', 'id');
+                    //创建select
+                    $form->select('patron_id', '客户名称')->options($patron_array);
+
+                    $customers = Customer::all()->toArray();
+                    $customer_array = array_column($customers, 'name', 'id');
+                    //创建select
+                    $form->select('customer_id', '商务名称')->options($customer_array);
+
+                    $form->select('status', __('Status'))->options($this->finance_status);
+
+                    $states = [
+                        'on' => ['value' => 1, 'text' => '有', 'color' => 'success'],
+                        'off' => ['value' => 0, 'text' => '无', 'color' => 'danger'],
+                    ];
+                    $form->switch('pact', __('合同（有/无）'))->states($states)->default(0);
+                    $form->text('returned_money', '回款金额');
+                    $form->text('rebate', '返渠道费');
+                    $form->text('returned_bag', '回款账户');
+                    $form->text('debtors', '未结余额');
+                    $form->textarea('description', '开票情况');
+                    $form->textarea('remark', '项目备注');
+                });
             });
-        }
-        $form->ueditor('content', __('Content'));
 
-        $form->hasMany('project_nodes', __('节点情况'), function (Form\NestedForm $form) {
-            $staffs = Staff::all()->toArray();
-            $select_staff = array_column($staffs, 'name', 'id');
-            $form->select('staff_id', '项目负责人')->options($select_staff);
-
-            $nodes = Node::where('is_project', true)->get()->toArray();
-            $select_node = array_column($nodes, 'name', 'id');
-            $form->select('node_id', '节点')->options($select_node);
-
-            $form->select('status', __('Status'))->options($this->node_status);
-
-            $form->datetime('start_time', '开始时间')->default(date('Y-m-d', time()));
-            $form->datetime('end_time', '结束时间')->default(date('Y-m-d', time()));
-            $form->textarea('content', '备注');
-        });
-
-
-        // 子表字段
-        $form->hasMany('design_checks', __('设计评审人员'), function (Form\NestedForm $form) {
-            $staffs = Staff::all()->toArray();
-            $select_staff = array_column($staffs, 'name', 'id');
-            $form->select('staff_id', '审核人')->options($select_staff);
-            $states = [
-                'on' => ['value' => 1, 'text' => '已审核', 'color' => 'success'],
-                'off' => ['value' => 0, 'text' => '待审核', 'color' => 'danger'],
-            ];
-            $form->switch('status', __('Status'))->states($states)->default(0);
-            $form->textarea('description', __('Description'));
-            $form->textarea('remark', __('Remark'));
-        });
-
-        // 子表字段
-        $form->hasMany('html_checks', __('前端评审人员'), function (Form\NestedForm $form) {
-            $staffs = Staff::all()->toArray();
-            $select_staff = array_column($staffs, 'name', 'id');
-            $form->select('staff_id', '审核人')->options($select_staff);
-            $states = [
-                'on' => ['value' => 1, 'text' => '已审核', 'color' => 'success'],
-                'off' => ['value' => 0, 'text' => '待审核', 'color' => 'danger'],
-            ];
-            $form->switch('status', __('Status'))->states($states)->default(0);
-            $form->textarea('description', __('Description'));
-            $form->textarea('remark', __('Remark'));
-        });
-
-        if ($auth->id == 1) {
-            $form->select('check_status', '回款状态')->options($this->check_status);
         }
 
-        if ($auth->id == 1 || in_array('apply', $slug)) {
-            $form->decimal('money', __('Money'))->default(0.00);
+        $form->tab('节点情况', function ($form) {
+            $form->hasMany('project_nodes', __('节点情况'), function (Form\NestedForm $form) {
+                $staffs = Staff::all()->toArray();
+                $select_staff = array_column($staffs, 'name', 'id');
+                $form->select('staff_id', '项目负责人')->options($select_staff);
 
-            $form->number('sort_order', __('Sort order'))->default(99);
-            $states = [
-                'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
-                'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
-            ];
-            $form->switch('is_check', __('是否交付'))->states($states)->default(0);
-            $form->datetime('contract_time', __('Contract time'));
-            $form->datetime('check_time', __('交付时间'));
-            $form->datetime('y_check_time', __('预计交付时间'));
-        }
+                $nodes = Node::where('is_project', true)->get()->toArray();
+                $select_node = array_column($nodes, 'name', 'id');
+                $form->select('node_id', '节点')->options($select_node);
+
+                $form->select('status', __('Status'))->options($this->node_status);
+
+                $form->datetime('start_time', '开始时间')->default(date('Y-m-d', time()));
+                $form->datetime('end_time', '结束时间')->default(date('Y-m-d', time()));
+                $form->textarea('content', '备注');
+            });
+        });
+
+        $form->tab('设计评审人员', function ($form) {
+            // 子表字段
+            $form->hasMany('design_checks', __('设计评审人员'), function (Form\NestedForm $form) {
+                $staffs = Staff::all()->toArray();
+                $select_staff = array_column($staffs, 'name', 'id');
+                $form->select('staff_id', '审核人')->options($select_staff);
+                $states = [
+                    'on' => ['value' => 1, 'text' => '已审核', 'color' => 'success'],
+                    'off' => ['value' => 0, 'text' => '待审核', 'color' => 'danger'],
+                ];
+                $form->switch('status', __('Status'))->states($states)->default(0);
+                $form->textarea('description', __('Description'));
+                $form->textarea('remark', __('Remark'));
+            });
+        });
+
+        $form->tab('前端评审人员', function ($form) {
+            // 子表字段
+            $form->hasMany('html_checks', __('前端评审人员'), function (Form\NestedForm $form) {
+                $staffs = Staff::all()->toArray();
+                $select_staff = array_column($staffs, 'name', 'id');
+                $form->select('staff_id', '审核人')->options($select_staff);
+                $states = [
+                    'on' => ['value' => 1, 'text' => '已审核', 'color' => 'success'],
+                    'off' => ['value' => 0, 'text' => '待审核', 'color' => 'danger'],
+                ];
+                $form->switch('status', __('Status'))->states($states)->default(0);
+                $form->textarea('description', __('Description'));
+                $form->textarea('remark', __('Remark'));
+            });
+        });
+
+        $this->style = <<<EOT
+               h4{background-color: cornflowerblue;
+    padding: 9px;
+    border-radius: 24%;};
+EOT;
+        Admin::style($this->style);
+
         //保存前回调
         $form->saving(function (Form $form) {
 
@@ -899,7 +855,7 @@ EOT;
 
     public function design(Content $content, $id)
     {
-        $design_check = DesignCheck::with('project','staff')->find($id);
+        $design_check = DesignCheck::with('project', 'staff')->find($id);
         return $content
             ->title($design_check->project->name)
             ->description($design_check->staff->name)
@@ -909,7 +865,7 @@ EOT;
                     $checks = DesignCheck::with('staff')->where('project_id', $design_check->project->id)->get()->map(function ($model) {
                         $result = [
                             'name' => $model->staff->name,
-                            'status' => $model->status?'<span class="label label-success">已审核</span>':'<span class="label label-danger">待审核</span>',
+                            'status' => $model->status ? '<span class="label label-success">已审核</span>' : '<span class="label label-danger">待审核</span>',
                             'description' => $model->remark,
                         ];
                         return $result;
@@ -945,8 +901,8 @@ EOT;
     {
         $design_check = DesignCheck::find($request->id);
 
-        $project=Project::find($design_check->project_id);
-        if ($project->check_status != 1){
+        $project = Project::find($design_check->project_id);
+        if ($project->check_status != 1) {
             $error = new MessageBag([
                 'title' => 'Error',
                 'message' => '提交失败,请先完成签约审核....',
@@ -959,20 +915,20 @@ EOT;
         $design_check->status = $request->status;
         $design_check->save();
 
-        $result=DesignCheck::where('project_id',$design_check->project_id)->where('status',0)->exists();
-        if (!$result){
+        $result = DesignCheck::where('project_id', $design_check->project_id)->where('status', 0)->exists();
+        if (!$result) {
             $project->check_status = 5;
-        }else{
+        } else {
             $project->check_status = 1;
         }
         $project->save();
 
-        $stause=$request->status?'设计评审成功':'设计评审失败';
+        $stause = $request->status ? '设计评审成功' : '设计评审失败';
         activity()->inLog(3)
             ->performedOn($project)
             ->causedBy(auth('admin')->user())
-            ->withProperties(['description'=>$request->description,'remark'=>$request->remark])
-            ->log('更新'.$project->name.'状态为：'.$stause);
+            ->withProperties(['description' => $request->description, 'remark' => $request->remark])
+            ->log('更新' . $project->name . '状态为：' . $stause);
 
         $success = new MessageBag([
             'title' => 'Success',
@@ -981,9 +937,9 @@ EOT;
         return back()->with(compact('success'));
     }
 
-    public function html(Content $content,$id)
+    public function html(Content $content, $id)
     {
-        $html_check = HtmlCheck::with('project','staff')->find($id);
+        $html_check = HtmlCheck::with('project', 'staff')->find($id);
         return $content
             ->title($html_check->project->name)
             ->description($html_check->staff->name)
@@ -993,7 +949,7 @@ EOT;
                     $checks = HtmlCheck::with('staff')->where('project_id', $html_check->project->id)->get()->map(function ($model) {
                         $result = [
                             'name' => $model->staff->name,
-                            'status' => $model->status?'<span class="label label-success">已审核</span>':'<span class="label label-danger">待审核</span>',
+                            'status' => $model->status ? '<span class="label label-success">已审核</span>' : '<span class="label label-danger">待审核</span>',
                             'description' => $model->remark,
                         ];
                         return $result;
@@ -1028,8 +984,8 @@ EOT;
     {
         $html_check = HtmlCheck::find($request->id);
 
-        $project=Project::find($html_check->project_id);
-        if ($project->check_status != 2){
+        $project = Project::find($html_check->project_id);
+        if ($project->check_status != 2) {
             $error = new MessageBag([
                 'title' => 'Error',
                 'message' => '提交失败,请先完成设计审核....',
@@ -1042,20 +998,20 @@ EOT;
         $html_check->status = $request->status;
         $html_check->save();
 
-        $result=HtmlCheck::where('project_id',$html_check->project_id)->where('status',0)->exists();
-        if (!$result){
+        $result = HtmlCheck::where('project_id', $html_check->project_id)->where('status', 0)->exists();
+        if (!$result) {
             $project->check_status = 6;
-        }else{
+        } else {
             $project->check_status = 2;
         }
         $project->save();
 
-        $stause=$request->status?'前端评审成功':'前端评审失败';
+        $stause = $request->status ? '前端评审成功' : '前端评审失败';
         activity()->inLog(5)
             ->performedOn($project)
             ->causedBy(auth('admin')->user())
-            ->withProperties(['description'=>$request->description,'remark'=>$request->remark])
-            ->log('更新'.$project->name.'状态为：'.$stause);
+            ->withProperties(['description' => $request->description, 'remark' => $request->remark])
+            ->log('更新' . $project->name . '状态为：' . $stause);
 
 
         $success = new MessageBag([
@@ -1065,4 +1021,301 @@ EOT;
         return back()->with(compact('success'));
     }
 
+
+    //新增需求
+    public function demand(Content $content, $id)
+    {
+        $project = Project::find($id);
+        return $content
+            ->title($project->name)
+            ->description('新增需求')
+            ->row(function (Row $row) use ($project) {
+                $row->column(12, function (Column $column) use ($project) {
+                    $form = new \Encore\Admin\Widgets\Form();
+                    $form->action('/admin/projects/add_demand');
+
+                    $form->hidden('project_id')->default($project->id);
+
+                    $form->radio('pact', __('合同（有/无）'))->options([1 => '有', 0 => '无'])->default(1);
+                    $form->text('money', '金额');
+                    $form->textarea('description', '需求情况');
+                    $form->textarea('remark', '备注');
+
+
+                    $form->html('<a class="btn btn-sm btn-default mallto-next"  href="/admin/projects"><i class="fa fa-arrow-left"></i>&nbsp;返回</a>');
+
+                    $column->append(new Box('新增需求', $form->render()));
+                });
+            });
+    }
+
+    public function add_demand(Request $request)
+    {
+        $project = Project::find($request->project_id);
+        Demand::create([
+            'project_id' => $request->project_id,
+            'status' => 0,
+            'pact' => $request->get('pact'),
+            'money' => $project->money,
+            'description' => $request->get('description'),
+            'remark' => $request->get('remark'),
+        ]);
+
+        $project->is_add = 1;
+        $project->save();
+
+        $success = new MessageBag([
+            'title' => 'Success',
+            'message' => '新增需求成功,等待审核....',
+        ]);
+        return back()->with(compact('success'));
+    }
+
+    //设计验收
+    public function sj(Content $content, $id)
+    {
+        $project = Project::find($id);
+        return $content
+            ->title($project->name)
+            ->description('设计验收')
+            ->row(function (Row $row) use ($project) {
+                $row->column(12, function (Column $column) use ($project) {
+                    $form = new \Encore\Admin\Widgets\Form();
+                    $form->action('/admin/projects/sj_check');
+                    $form->hidden('project_id')->default($project->id);
+
+                    $form->text('name', '项目名称')->default($project->name)->disable();
+                    $form->text('money', '合同金额')->default($project->money)->disable();
+                    $form->text('qy_rate', '签约付款比列')->help('占合同总额百分比(%)')->default($project->qy_rate)->disable();
+                    $form->text('sj_rate', '设计付款比列')->help('占合同总额百分比(%)')->default($project->sj_rate)->disable();
+                    $form->text('qd_rate', '前端付款比列')->help('占合同总额百分比(%)')->default($project->qd_rate)->disable();
+                    $form->text('ys_rate', '验收付款比列')->help('占合同总额百分比(%)')->default($project->ys_rate)->disable();
+
+                    $form->select('status', __('项目进度状态'))->options([1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'])->default(1)->disable();
+                    $form->radio('pact', __('合同（有/无）'))->options([1 => '有', 0 => '无'])->default(1);
+                    $form->text('returned_money', '回款金额')->default($project->sj_rate * $project->money / 100);
+                    $form->text('rebate', '返渠道费');
+                    $form->text('returned_bag', '回款账户');
+                    $form->text('debtors', '未结余额')->default($project->qd_rate * $project->money / 100 + $project->ys_rate * $project->money / 100);
+                    $form->textarea('description', '开票情况');
+                    $form->textarea('remark', '项目备注');
+
+                    $form->html('<a class="btn btn-sm btn-default mallto-next"  href="/admin/projects"><i class="fa fa-arrow-left"></i>&nbsp;返回</a>');
+
+                    $column->append(new Box('设计验收', $form->render()));
+                });
+            });
+    }
+
+    public function sj_check(Request $request)
+    {
+        $project = Project::find($request->project_id);
+
+        if ($project->check_status!=5){
+
+            $error = new MessageBag([
+                'title' => 'Error',
+                'message' => '提交失败,设计评审未完成....',
+            ]);
+            return back()->with(compact('error'));
+        }
+
+        $patron=Patron::where('project_id',$project->id)->first();
+        Finance::create([
+            'staff_id' => auth('admin')->user()->id,
+            'customer_id'=>$patron?$patron->customer_id:0,
+            'project_id'=>$project->id,
+            'patron_id'=>$patron?$patron->id:0,
+            'status'=>2,
+            'pact'=>$request->get('pact'),
+            'money'=>$project->money,
+            'returned_money'=>$request->get('returned_money'),
+            'rebate'=>$request->get('rebate'),
+            'returned_bag'=>$request->get('returned_bag'),
+            'debtors'=>$request->get('debtors'),
+            'description'=>$request->get('description'),
+            'remark'=>$request->get('remark'),
+        ]);
+
+
+        $project->check_status=2;
+        $project->save();
+
+        activity()->inLog(4)
+            ->performedOn($project)
+            ->causedBy(auth('admin')->user())
+            ->withProperties([])
+            ->log('更新'.$project->name.'状态为：设计验收成功');
+
+        $success = new MessageBag([
+            'title' => 'Success',
+            'message' => '设计验收成功....',
+        ]);
+        return back()->with(compact('success'));
+    }
+
+    //前端验收
+    public function qd(Content $content, $id)
+    {
+        $project = Project::find($id);
+        return $content
+            ->title($project->name)
+            ->description('前端验收')
+            ->row(function (Row $row) use ($project) {
+                $row->column(12, function (Column $column) use ($project) {
+                    $form = new \Encore\Admin\Widgets\Form();
+                    $form->action('/admin/projects/qd_check');
+                    $form->hidden('project_id')->default($project->id);
+
+                    $form->text('name', '项目名称')->default($project->name)->disable();
+                    $form->text('money', '合同金额')->default($project->money)->disable();
+                    $form->text('qy_rate', '签约付款比列')->help('占合同总额百分比(%)')->default($project->qy_rate)->disable();
+                    $form->text('sj_rate', '设计付款比列')->help('占合同总额百分比(%)')->default($project->sj_rate)->disable();
+                    $form->text('qd_rate', '前端付款比列')->help('占合同总额百分比(%)')->default($project->qd_rate)->disable();
+                    $form->text('ys_rate', '验收付款比列')->help('占合同总额百分比(%)')->default($project->ys_rate)->disable();
+
+                    $form->select('status', __('项目进度状态'))->options([1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'])->default(1)->disable();
+                    $form->radio('pact', __('合同（有/无）'))->options([1 => '有', 0 => '无'])->default(1);
+                    $form->text('returned_money', '回款金额')->default($project->qd_rate * $project->money / 100);
+                    $form->text('rebate', '返渠道费');
+                    $form->text('returned_bag', '回款账户');
+                    $form->text('debtors', '未结余额')->default($project->ys_rate * $project->money / 100);
+                    $form->textarea('description', '开票情况');
+                    $form->textarea('remark', '项目备注');
+
+                    $form->html('<a class="btn btn-sm btn-default mallto-next"  href="/admin/projects"><i class="fa fa-arrow-left"></i>&nbsp;返回</a>');
+
+                    $column->append(new Box('前端验收', $form->render()));
+                });
+            });
+    }
+
+    public function qd_check(Request $request)
+    {
+        $project = Project::find($request->project_id);
+
+        if ($project->check_status != 6) {
+            $error = new MessageBag([
+                'title' => 'Error',
+                'message' => '提交失败,前端评审未完成....',
+            ]);
+            return back()->with(compact('error'));
+        }
+
+        $patron = Patron::where('project_id', $project->id)->first();
+        Finance::create([
+            'staff_id' => auth('admin')->user()->id,
+            'customer_id'=>$patron?$patron->customer_id:0,
+            'project_id'=>$project->id,
+            'patron_id'=>$patron?$patron->id:0,
+            'status' => 3,
+            'pact' => $request->get('pact'),
+            'money' => $project->money,
+            'returned_money' => $request->get('returned_money'),
+            'rebate' => $request->get('rebate'),
+            'returned_bag' => $request->get('returned_bag'),
+            'debtors' => $request->get('debtors'),
+            'description' => $request->get('description'),
+            'remark' => $request->get('remark'),
+        ]);
+
+
+        $project->check_status = 3;
+        $project->save();
+
+        activity()->inLog(6)
+            ->performedOn($project)
+            ->causedBy(auth('admin')->user())
+            ->withProperties([])
+            ->log('更新'.$project->name.'状态为：前端验收成功');
+
+        $success = new MessageBag([
+            'title' => 'Success',
+            'message' => '前端验收成功....',
+        ]);
+        return back()->with(compact('success'));
+    }
+
+    //整体验收
+    public function ys(Content $content, $id)
+    {
+        $project = Project::find($id);
+        return $content
+            ->title($project->name)
+            ->description('整体验收')
+            ->row(function (Row $row) use ($project) {
+                $row->column(12, function (Column $column) use ($project) {
+                    $form = new \Encore\Admin\Widgets\Form();
+                    $form->action('/admin/projects/ys_check');
+                    $form->hidden('project_id')->default($project->id);
+
+                    $form->text('name', '项目名称')->default($project->name)->disable();
+                    $form->text('money', '合同金额')->default($project->money)->disable();
+                    $form->text('qy_rate', '签约付款比列')->help('占合同总额百分比(%)')->default($project->qy_rate)->disable();
+                    $form->text('sj_rate', '设计付款比列')->help('占合同总额百分比(%)')->default($project->sj_rate)->disable();
+                    $form->text('qd_rate', '前端付款比列')->help('占合同总额百分比(%)')->default($project->qd_rate)->disable();
+                    $form->text('ys_rate', '验收付款比列')->help('占合同总额百分比(%)')->default($project->ys_rate)->disable();
+
+                    $form->select('status', __('项目进度状态'))->options([1 => '签约审核成功', 2 => '设计审核成功', 3 => '前端审核成功', 4 => '验收审核成功'])->default(1)->disable();
+                    $form->radio('pact', __('合同（有/无）'))->options([1 => '有', 0 => '无'])->default(1);
+                    $form->text('returned_money', '回款金额')->default($project->ys_rate * $project->money / 100);
+                    $form->text('rebate', '返渠道费');
+                    $form->text('returned_bag', '回款账户');
+                    $form->text('debtors', '未结余额')->default(0);
+                    $form->textarea('description', '开票情况');
+                    $form->textarea('remark', '项目备注');
+
+                    $form->html('<a class="btn btn-sm btn-default mallto-next"  href="/admin/projects"><i class="fa fa-arrow-left"></i>&nbsp;返回</a>');
+
+                    $column->append(new Box('整体验收', $form->render()));
+                });
+            });
+    }
+
+    public function ys_check(Request $request)
+    {
+        $project = Project::find($request->project_id);
+
+        if ($project->check_status!=3){
+            $error = new MessageBag([
+                'title' => 'Error',
+                'message' => '提交失败,审核状态错误....',
+            ]);
+            return back()->with(compact('error'));
+        }
+
+
+        $patron=Patron::where('project_id',$project->id)->first();
+        Finance::create([
+            'staff_id' => auth('admin')->user()->id,
+            'customer_id'=>$patron?$patron->customer_id:0,
+            'project_id'=>$project->id,
+            'patron_id'=>$patron?$patron->id:0,
+            'status'=>4,
+            'pact'=>$request->get('pact'),
+            'money'=>$project->money,
+            'returned_money'=>$request->get('returned_money'),
+            'rebate'=>$request->get('rebate'),
+            'returned_bag'=>$request->get('returned_bag'),
+            'debtors'=>$request->get('debtors'),
+            'description'=>$request->get('description'),
+            'remark'=>$request->get('remark'),
+        ]);
+
+
+        $project->check_status=4;
+        $project->save();
+
+        activity()->inLog(8)
+            ->performedOn($project)
+            ->causedBy(auth('admin')->user())
+            ->withProperties([])
+            ->log('更新'.$project->name.'状态为：整体验收成功');
+
+        $success = new MessageBag([
+            'title' => 'Success',
+            'message' => '整体验收成功....',
+        ]);
+        return back()->with(compact('success'));
+    }
 }
