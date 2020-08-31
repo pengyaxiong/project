@@ -67,69 +67,69 @@ class ProjectController extends AdminController
     {
         $grid = new Grid(new Project());
 
-//        $projects=Project::with('customers')->get()->map(function ($model){
-//            Finance::create([
-//                'staff_id' => 1,
-//                'customer_id' => $model->customers->first()->id,
-//                'project_id' => $model->id,
-//                'patron_id' => 6,
-//                'status' => 1,
-//                'pact' => 1,
-//                'money' => 4000,
-//                'returned_money' => 3000,
-//                'rebate' => 100,
-//                'returned_bag' => '对公账户',
-//                'debtors' => 0,
-//                'description' => '详情',
-//                'remark' => '备注',
-//            ]);
-//            Finance::create([
-//                'staff_id' => 1,
-//                'customer_id' =>  $model->customers->first()->id,
-//                'project_id' => $model->id,
-//                'patron_id' => 6,
-//                'status' => 2,
-//                'pact' => 1,
-//                'money' => 4000,
-//                'returned_money' => 3000,
-//                'rebate' => 100,
-//                'returned_bag' => '对公账户',
-//                'debtors' => 0,
-//                'description' => '详情',
-//                'remark' => '备注',
-//            ]);
-//            Finance::create([
-//                'staff_id' => 1,
-//                'customer_id' =>  $model->customers->first()->id,
-//                'project_id' => $model->id,
-//                'patron_id' => 6,
-//                'status' => 3,
-//                'pact' => 1,
-//                'money' => 4000,
-//                'returned_money' => 3000,
-//                'rebate' => 100,
-//                'returned_bag' => '对公账户',
-//                'debtors' => 0,
-//                'description' => '详情',
-//                'remark' => '备注',
-//            ]);
-//            Finance::create([
-//                'staff_id' => 1,
-//                'customer_id' =>  $model->customers->first()->id,
-//                'project_id' => $model->id,
-//                'patron_id' => 6,
-//                'status' => 4,
-//                'pact' => 1,
-//                'money' => 4000,
-//                'returned_money' => 3000,
-//                'rebate' => 100,
-//                'returned_bag' => '对公账户',
-//                'debtors' => 0,
-//                'description' => '详情',
-//                'remark' => '备注',
-//            ]);
-//
-//        });
+        $projects=Project::with('customers')->get()->map(function ($model){
+            Finance::create([
+                'staff_id' => 1,
+                'customer_id' => $model->customers->first()->id,
+                'project_id' => $model->id,
+                'patron_id' => 6,
+                'status' => 1,
+                'pact' => 1,
+                'money' => $model->money,
+                'returned_money' => $model->money*0.4,
+                'rebate' => 100,
+                'returned_bag' => '对公账户',
+                'debtors' => $model->money*0.6,
+                'description' => '详情',
+                'remark' => '备注',
+            ]);
+            Finance::create([
+                'staff_id' => 1,
+                'customer_id' =>  $model->customers->first()->id,
+                'project_id' => $model->id,
+                'patron_id' => 6,
+                'status' => 2,
+                'pact' => 1,
+                'money' => $model->money,
+                'returned_money' => $model->money*0.3,
+                'rebate' => 100,
+                'returned_bag' => '对公账户',
+                'debtors' => $model->money*0.3,
+                'description' => '详情',
+                'remark' => '备注',
+            ]);
+            Finance::create([
+                'staff_id' => 1,
+                'customer_id' =>  $model->customers->first()->id,
+                'project_id' => $model->id,
+                'patron_id' => 6,
+                'status' => 3,
+                'pact' => 1,
+                'money' => $model->money,
+                'returned_money' => $model->money*0.2,
+                'rebate' => 100,
+                'returned_bag' => '对公账户',
+                'debtors' => $model->money*0.1,
+                'description' => '详情',
+                'remark' => '备注',
+            ]);
+            Finance::create([
+                'staff_id' => 1,
+                'customer_id' =>  $model->customers->first()->id,
+                'project_id' => $model->id,
+                'patron_id' => 6,
+                'status' => 4,
+                'pact' => 1,
+                'money' => $model->money,
+                'returned_money' => $model->money*0.1,
+                'rebate' => 100,
+                'returned_bag' => '对公账户',
+                'debtors' => 0,
+                'description' => '详情',
+                'remark' => '备注',
+            ]);
+
+        });
 
 
         $grid->model()->orderBy('sort_order')->orderBy('contract_time', 'desc');
