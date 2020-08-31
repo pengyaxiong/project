@@ -13,6 +13,7 @@ use App\Models\DesignCheck;
 use App\Models\Finance;
 use App\Models\HtmlCheck;
 use App\Models\Node;
+use App\Models\Patron;
 use App\Models\Project;
 use App\Models\ProjectCustomer;
 use App\Models\ProjectNode;
@@ -45,7 +46,7 @@ class ProjectController extends AdminController
     protected $status = [];
     protected $node_status = [];
     protected $check_status = [];
-
+    protected $finance_status = [];
     public function __construct()
     {
         $this->grade = [1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E'];
@@ -53,6 +54,8 @@ class ProjectController extends AdminController
         $this->node_status = [1 => '未开始', 2 => '进行中', 3 => '已完成'];
 
         $this->check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功', 5 => '设计评审成功', 6 => '前端评审成功'];
+
+        $this->finance_status = [1 => '签约审核收款', 2 => '设计审核收款', 3 => '前端审核收款', 4 => '验收审核收款'];
     }
 
     /**
@@ -64,24 +67,70 @@ class ProjectController extends AdminController
     {
         $grid = new Grid(new Project());
 
-//        $projects=Project::all();
-//        foreach ($projects as $project){
-//            $result=ProjectNode::where('project_id',$project->id)->get()->map(function ($model){
-//                $nodes = [
-//                    'node_id' => $model->node_id,
-//                    'staff_id' => $model->staff_id,
-//                    'status' => $model->status,
-//                    'start_time' => $model->start_time,
-//                    'end_time' => $model->end_time,
-//                    'content' => $model->content
-//                ];
-//              return $nodes;
-//
-//            });
-//            Project::where('id',$project->id)->update([
-//                'node'=>json_encode(array_values($result->toarray()))
-//            ]);
-//        }
+        $projects=Project::with('customers')->get()->map(function ($model){
+            Finance::create([
+                'staff_id' => 1,
+                'customer_id' => $model->customers->first()->id,
+                'project_id' => $model->id,
+                'patron_id' => 6,
+                'status' => 1,
+                'pact' => 1,
+                'money' => 4000,
+                'returned_money' => 3000,
+                'rebate' => 100,
+                'returned_bag' => '对公账户',
+                'debtors' => 0,
+                'description' => '详情',
+                'remark' => '备注',
+            ]);
+            Finance::create([
+                'staff_id' => 1,
+                'customer_id' =>  $model->customers->first()->id,
+                'project_id' => $model->id,
+                'patron_id' => 6,
+                'status' => 2,
+                'pact' => 1,
+                'money' => 4000,
+                'returned_money' => 3000,
+                'rebate' => 100,
+                'returned_bag' => '对公账户',
+                'debtors' => 0,
+                'description' => '详情',
+                'remark' => '备注',
+            ]);
+            Finance::create([
+                'staff_id' => 1,
+                'customer_id' =>  $model->customers->first()->id,
+                'project_id' => $model->id,
+                'patron_id' => 6,
+                'status' => 3,
+                'pact' => 1,
+                'money' => 4000,
+                'returned_money' => 3000,
+                'rebate' => 100,
+                'returned_bag' => '对公账户',
+                'debtors' => 0,
+                'description' => '详情',
+                'remark' => '备注',
+            ]);
+            Finance::create([
+                'staff_id' => 1,
+                'customer_id' =>  $model->customers->first()->id,
+                'project_id' => $model->id,
+                'patron_id' => 6,
+                'status' => 4,
+                'pact' => 1,
+                'money' => 4000,
+                'returned_money' => 3000,
+                'rebate' => 100,
+                'returned_bag' => '对公账户',
+                'debtors' => 0,
+                'description' => '详情',
+                'remark' => '备注',
+            ]);
+
+        });
+
 
         $grid->model()->orderBy('sort_order')->orderBy('contract_time', 'desc');
         $auth = auth('admin')->user();
@@ -483,6 +532,43 @@ class ProjectController extends AdminController
 
 
             $form->textarea('remark', __('Remark'));
+
+            $form->rate('qy_rate', '签约付款比列')->help('占合同总额百分比')->default(40);
+            $form->rate('sj_rate', '设计付款比列')->help('占合同总额百分比')->default(30);
+            $form->rate('qd_rate', '前端付款比列')->help('占合同总额百分比')->default(20);
+            $form->rate('ys_rate', '验收付款比列')->help('占合同总额百分比')->default(10);
+
+            // 子表字段
+            $form->hasMany('finances', __('回款记录'), function (Form\NestedForm $form) {
+                $staffs = Staff::all()->toArray();
+                $select_ = array_prepend($staffs, ['id' => 1, 'name' => '超级管理员']);
+                $select_staff = array_column($select_, 'name', 'id');
+                $form->select('staff_id', '审核人')->options($select_staff)->default(1);
+
+                $patrons = Patron::all()->toArray();
+                $patron_array = array_column($patrons, 'name', 'id');
+                //创建select
+                $form->select('patron_id', '客户名称')->options($patron_array);
+
+                $customers = Customer::all()->toArray();
+                $customer_array = array_column($customers, 'name', 'id');
+                //创建select
+                $form->select('customer_id', '商务名称')->options($customer_array);
+
+                $form->select('status', __('Status'))->options($this->finance_status);
+
+                $states = [
+                    'on' => ['value' => 1, 'text' => '有', 'color' => 'success'],
+                    'off' => ['value' => 0, 'text' => '无', 'color' => 'danger'],
+                ];
+                $form->switch('pact', __('合同（有/无）'))->states($states)->default(0);
+                $form->text('returned_money', '回款金额');
+                $form->text('rebate', '返渠道费');
+                $form->text('returned_bag', '回款账户');
+                $form->text('debtors', '未结余额');
+                $form->textarea('description', '开票情况');
+                $form->textarea('remark', '项目备注');
+            });
         }
         $form->ueditor('content', __('Content'));
 
@@ -504,7 +590,7 @@ class ProjectController extends AdminController
 
 
         // 子表字段
-        $form->hasMany('design_checks', __('设计审核人员'), function (Form\NestedForm $form) {
+        $form->hasMany('design_checks', __('设计评审人员'), function (Form\NestedForm $form) {
             $staffs = Staff::all()->toArray();
             $select_staff = array_column($staffs, 'name', 'id');
             $form->select('staff_id', '审核人')->options($select_staff);
@@ -518,7 +604,7 @@ class ProjectController extends AdminController
         });
 
         // 子表字段
-        $form->hasMany('html_checks', __('前端审核人员'), function (Form\NestedForm $form) {
+        $form->hasMany('html_checks', __('前端评审人员'), function (Form\NestedForm $form) {
             $staffs = Staff::all()->toArray();
             $select_staff = array_column($staffs, 'name', 'id');
             $form->select('staff_id', '审核人')->options($select_staff);
