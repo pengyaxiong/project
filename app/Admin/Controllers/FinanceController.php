@@ -36,6 +36,7 @@ class FinanceController extends AdminController
         $grid = new Grid(new Finance());
 
         $auth = auth('admin')->user();
+        $slug = $auth->roles->pluck('slug')->toarray();
 
         $grid->column('id', __('Id'));
         $grid->column('project.name', __('项目名称'));
@@ -88,16 +89,16 @@ class FinanceController extends AdminController
             $filter->equal('pact', __('合同（有/无）'))->select($status_text);
         });
 
-        $grid->actions(function ($actions) use ($auth) {
-            if ($auth->id > 1) {
+        $grid->actions(function ($actions) use ($auth,$slug) {
+            if ($auth->id > 1 && !in_array('apply', $slug)) {
                 $actions->disableView();
                 //  $actions->disableEdit();
                 $actions->disableDelete();
             }
         });
 
-        $grid->tools(function ($tools) use ($auth) {
-            if ($auth->id > 1) {
+        $grid->tools(function ($tools) use ($auth,$slug) {
+            if ($auth->id > 1 && !in_array('apply', $slug)) {
                 // 禁用批量删除按钮
                 $tools->batch(function ($batch) {
                     $batch->disableDelete();
