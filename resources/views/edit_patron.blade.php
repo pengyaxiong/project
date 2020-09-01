@@ -121,12 +121,31 @@
         var images = '{{ implode(',',$patron->images) }}';
         var data = images.split(',');
         var html = [];
+
         data.forEach(function (element, index) {
             //初始化fileinput控件（第一次初始化）
             html[index] = "<img src=/storage/" + element + " class='file-preview-image'><i class='glyphicon glyphicon-trash text-danger delete_image' data-id='{{$patron->id}}' data-index='" + index + "'></i>"
         });
-        console.log(html);
-        initFileInput("images", "/api/upload_image?id={{$patron->id}}", html);
+        console.log(data);
+        if (data[0]) {
+            initFileInput("images", "/api/upload_image?id={{$patron->id}}", html);
+        } else {
+            initFileInputnull("images", "/api/upload_image?id={{$patron->id}}");
+        }
+
+        function initFileInputnull(ctrlName, uploadUrl) {
+            var control = $('#' + ctrlName);
+            control.fileinput({
+                language: 'zh', //设置语言
+                uploadUrl: uploadUrl, //上传的地址
+                allowedFileExtensions: ['jpg', 'jpeg', 'png', 'gif'],//接收的文件后缀
+                overwriteInitial: false,
+                showCaption: false,
+                maxFileSize: 3000,
+                browseClass: "btn btn-default", //按钮样式
+            });
+        }
+
 
         //初始化fileinput控件（第一次初始化）
         function initFileInput(ctrlName, uploadUrl, html) {
@@ -135,7 +154,7 @@
                 initialPreview: html,
                 language: 'zh', //设置语言
                 uploadUrl: uploadUrl, //上传的地址
-                allowedFileExtensions: ['jpg','jpeg', 'png', 'gif'],//接收的文件后缀
+                allowedFileExtensions: ['jpg', 'jpeg', 'png', 'gif'],//接收的文件后缀
                 overwriteInitial: false,
                 showCaption: false,
                 maxFileSize: 3000,

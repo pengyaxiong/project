@@ -12,8 +12,8 @@
 */
 
 Route::get('/', function () {
-    $notices=\App\Models\Notice::wherein('department_id',[0,12])->orderby('sort_order')->get();
-    return view('welcome',compact('notices'));
+    $notices = \App\Models\Notice::wherein('department_id', [0, 12])->orderby('sort_order')->get();
+    return view('welcome', compact('notices'));
 //    return redirect('/home');
 });
 
@@ -22,6 +22,10 @@ Auth::routes();
 //Route::redirect('/register', '/404', 301);
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/problem', function () {
+    return view('help');
+})->name('help');
 
 Route::get('/password', 'HomeController@password')->name('password');
 Route::post('/retrieve', 'HomeController@retrieve')->name('retrieve');

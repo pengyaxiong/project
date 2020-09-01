@@ -74,7 +74,6 @@
             </ul>
         </div>
     </div>
-
     <a class="btn btn-info" href="{{url('/patron/create')}}" role="button"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> 新增客户</a>
 @endsection
 @section('js')

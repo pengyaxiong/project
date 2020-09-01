@@ -21,7 +21,15 @@
         </div>
     @endforeach
 
-    <a class="btn btn-info" href="{{url('/home')}}" role="button"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> 个人中心</a>
+    <br>
+    <div class="bs-example" data-example-id="simple-pager">
+        <nav aria-label="...">
+            <ul class="pager">
+                <li class="previous"><a href="{{url('/problem')}}"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> 使用帮助</a></li>
+                <li class="next"><a href="{{url('/home')}}">个人中心 <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></a></li>
+            </ul>
+        </nav>
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

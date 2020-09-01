@@ -49,7 +49,7 @@ class HomeController extends Controller
 
     public function retrieve(Request $request)
     {
-        $customer=auth()->user();
+        $customer = auth()->user();
         $messages = [
             'password.min' => '密码最少为6位!',
         ];
