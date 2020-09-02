@@ -39,7 +39,15 @@ class HomeController extends Controller
             return $model;
         });
 
-        return view('home', compact('my_patrons', 'our_patrons'));
+        //我的组员
+        $my_children = Patron::with('customer')->wherein('customer_id', auth()->user()->children->pluck('id'))->get()->map(function ($model) {
+            $need_arr = [0 => 'APP', 1 => '小程序', 2 => '网站', 3 => '系统软件', 4 => '其它'];
+            $model['need'] = $need_arr[$model['need']];
+            $model['children'] = $model->customer->name;
+            return $model;
+        });
+
+        return view('home', compact('my_patrons', 'our_patrons','my_children'));
     }
 
     public function password()

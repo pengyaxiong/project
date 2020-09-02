@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Customer;
+use App\Models\Patron;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -27,6 +28,8 @@ class CustomerController extends AdminController
     {
         $grid = new Grid(new Customer());
 
+        $grid->model()->where('parent_id', 0);
+
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))->editable();
         $states = [
@@ -34,14 +37,34 @@ class CustomerController extends AdminController
             'off' => ['value' => 0, 'text' => '禁用', 'color' => 'danger'],
         ];
         $grid->column('status', __('Status'))->switch($states);
-        $grid->column('patrons', __('客户列表'))->display(function () {
-            return '点击查看';
+        $grid->column('parent_id', '组员')->display(function () {
+            return '查看';
         })->expand(function ($model) {
-            $patrons = $model->patrons->map(function ($model) {
-                $from_arr=[0=>'线上',1=>'线下',2=>'其它'];
-                $need_arr=[0=>'APP',1=>'小程序',2=>'网站',3=>'系统软件',4=>'其它'];
+            $children = $model->children->map(function ($child) {
+                return $child->only(['id', 'name', 'tel', 'remark']);
+            });
+            $array = $children->toArray();
+            foreach ($array as $k => $v) {
+                $url = route('admin.customers.edit', $v['id']);
+                $array[$k]['edit'] = '<div class="btn">
+              <a class=""  href="' . $url . '" rel="external" >
+              <i class="fa fa-edit"></i> 编辑</a>
+                 </div><div class="btn">
+                 </div>';
+            }
+
+            return new Table(['ID', __('名称'), __('Tel'), __('Remark'), '操作'], $array);
+        });
+        $grid->column('patrons', __('客户列表'))->display(function () {
+            return '查看';
+        })->expand(function ($model) {
+
+            $patrons = Patron::with('customer')->where('customer_id',$model->id)->orwherein('customer_id',$model->children->pluck('id'))->get()->map(function ($model) {
+                $from_arr = [0 => '线上', 1 => '线下', 2 => '其它'];
+                $need_arr = [0 => 'APP', 1 => '小程序', 2 => '网站', 3 => '系统软件', 4 => '其它'];
                 $result = [
                     'id' => $model->id,
+                    'customer' => $model->customer->name,
                     'from' => $from_arr[$model->from],
                     'company_name' => $model->company_name,
                     'name' => $model->name,
@@ -53,7 +76,7 @@ class CustomerController extends AdminController
                 ];
                 return $result;
             });
-            return new Table(['ID', '信息来源', ' 公司名称','客户姓名', '客户电话', '客户职位', '需求', '预算','详情'], $patrons->toArray());
+            return new Table(['ID', '录入者', '信息来源', ' 公司名称', '客户姓名', '客户电话', '客户职位', '需求', '预算', '详情'], $patrons->toArray());
         });
         $grid->column('openid', __('Openid'))->copyable();
         $grid->column('nickname', __('Nickname'))->copyable();
@@ -171,6 +194,14 @@ class CustomerController extends AdminController
         $form = new Form(new Customer());
 
         $form->text('name', __('Name'));
+
+        $parents = Customer::where('parent_id', 0)->get()->toArray();
+        $select_ = array_prepend($parents, ['id' => 0, 'name' => '顶级（组长）']);
+        $select_array = array_column($select_, 'name', 'id');
+        //创建select
+        $form->select('parent_id', '上级')->options($select_array);
+
+
         $states = [
             'on' => ['value' => 1, 'text' => '正常', 'color' => 'success'],
             'off' => ['value' => 0, 'text' => '禁用', 'color' => 'danger'],

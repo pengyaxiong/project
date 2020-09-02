@@ -44,3 +44,7 @@ Form::init(function (Form $form) {
     });
 });
 
+
+\Encore\Admin\Facades\Admin::navbar(function (\Encore\Admin\Widgets\Navbar $navbar){
+    $navbar->right(new \App\Admin\Extensions\Nav\Links());
+});

@@ -16,7 +16,8 @@
     !important;
         float: right;
     }
-    .follow{
+
+    .follow {
         display: inline-block;
         min-width: 10px;
         padding: 3px 13px;
@@ -41,7 +42,9 @@
                         <li class="list-group-item">
                             <span class="label label-primary">{{$patron['need']}}</span>
                             <span class="label label-success">{{$patron['money']}}</span>
-                            <span class="{{$patron['status']?'badge':'badge_ is_something'}}" data-id="{{$patron['id']}}" data-attr="status">{{$patron['status']?$patron['status']==1?'已签约':'已审核':'待签约'}}</span>
+                            <span class="{{$patron['status']?'badge':'badge_ is_something'}}"
+                                  data-id="{{$patron['id']}}"
+                                  data-attr="status">{{$patron['status']?$patron['status']==1?'已签约':'已审核':'待签约'}}</span>
                             <a href="{{route('patron.edit',$patron['id'])}}">
                                 {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
                             </a>
@@ -74,7 +77,30 @@
             </ul>
         </div>
     </div>
-    <a class="btn btn-info" href="{{url('/patron/create')}}" role="button"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> 新增客户</a>
+
+    @if(!empty($my_children))
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">组员客户资讯</h3>
+            </div>
+            <div class="panel-body">
+                <ul class="list-group">
+                    @foreach($my_children as $patron)
+                        <li class="list-group-item">
+                            <span class="label label-danger">{{$patron['children']}}</span>
+                            <span class="label label-success">{{$patron['need']}}</span>
+                            <span class="{{$patron['status']?'badge':'badge_'}}">{{$patron['status']?'已签约':'待签约'}}</span>
+                            <a href="{{route('patron.edit',$patron['id'])}}">
+                                {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
+    <a class="btn btn-info" href="{{url('/patron/create')}}" role="button"><span class="glyphicon glyphicon-plus-sign"
+                                                                                 aria-hidden="true"></span> 新增客户</a>
 @endsection
 @section('js')
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -98,45 +124,54 @@
                         }
                     },
                     dangerMode: true,
-                }).then((value) => {
-                    switch (value) {
-                    case "catch":
+                }).then((value) = > {
+                    switch(value) {
+                    case
+                        "catch"
+                    :
                         $.ajax({
                             type: "PATCH",
                             url: "/patron/is_something",
                             data: data,
                             success: function (data) {
-                                swal("恭喜!", "签约成功", "success").then((value) =>{
-                                    location.href=location.href;
-                                });
+                                swal("恭喜!", "签约成功", "success").then((value) = > {
+                                    location.href = location.href;
+                            })
+                                ;
                             }
                         });
                         break;
                     }
-            });
+                }
+            )
+                ;
             })
 
             $(".follow").on('click', function () {
                 var id = $(this).data('id');
                 swal("跟进记录", {
                     content: "input",
-                    }).then((value) => {
-                        if(!value){
-                            swal("失败!", "跟进记录不能为空", "error");
-                            return false;
-                        }
-                        $.ajax({
-                            type: "POST",
-                            url: "/patron/follow",
-                            data: {
-                                id:id,
-                                content:value,
-                            },
-                            success: function (data) {
-                                swal("恭喜!", "跟进成功", "success");
-                            }
-                        });
+                }).then((value) = > {
+                    if(
+                !value
+            )
+                {
+                    swal("失败!", "跟进记录不能为空", "error");
+                    return false;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/patron/follow",
+                    data: {
+                        id: id,
+                        content: value,
+                    },
+                    success: function (data) {
+                        swal("恭喜!", "跟进成功", "success");
+                    }
                 });
+            })
+                ;
             })
         })
     </script>

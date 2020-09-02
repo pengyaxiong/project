@@ -429,12 +429,12 @@ class VisualizationController extends Controller
 
     public function delete_image(Request $request)
     {
-        $patron_id=$request->id;
-        $index=$request->index;
+        $patron_id = $request->id;
+        $index = $request->index;
         $patron = Patron::find($patron_id);
-        $images=$patron->images;
-        foreach ($images as $key=>$image){
-            if ($index==$key){
+        $images = $patron->images;
+        foreach ($images as $key => $image) {
+            if ($index == $key) {
                 unset($images[$key]);
             }
         }
@@ -443,5 +443,23 @@ class VisualizationController extends Controller
         ]);
 
         return $this->null();
+    }
+
+
+    public function send_notice()
+    {
+        // 处理逻辑
+        $count = 0;   // 获取的结果
+
+        $getCount = session()->get('count');
+
+        if ($count > $getCount) {
+            session()->put('count', $count); // 存session
+            return ['code' => 200, 'msg' => '您有新的消息请及时处理','re'=>$count];
+        }
+        // 不成立的话则存最新的值
+        session()->put('count', $count);
+
+        return ['code' => 201];
     }
 }
