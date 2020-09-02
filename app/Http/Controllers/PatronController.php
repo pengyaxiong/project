@@ -33,12 +33,12 @@ class PatronController extends Controller
     {
         $customer_id = auth()->user()->id;
 
-        $start_time = str_replace('T', ' ', $request->start_time);
-        $request->merge(['start_time' => $start_time]);
+//        $start_time = str_replace('T', ' ', $request->start_time);
+//        $request->merge(['start_time' => $start_time]);
 
-        if ($request->customer_id>0){
-            $request->offsetSet('customer_id', $customer_id);
-        }
+//        if ($request->customer_id>0){
+//            $request->offsetSet('customer_id', $customer_id);
+//        }
         try {
             $messages = [
                 'company_name.required' =>'公司名称不能为空',
@@ -75,7 +75,8 @@ class PatronController extends Controller
     public function edit($id)
     {
         $patron = Patron::find($id);
-        $patron->start_time = str_replace(' ', 'T', $patron->start_time);
+//        $patron->start_time = str_replace(' ', 'T', $patron->start_time);
+        $patron->start_time = date('Y-m-d',strtotime($patron->start_time));
 
         $customer_id = auth()->user()->id;
         $parent_id = auth()->user()->parent_id;
@@ -115,8 +116,8 @@ class PatronController extends Controller
         if ($patron->customer_id != $customer_id && $parent_id>0) {
             return back()->with('notice', '您没用权限修改,请联系主管');
         }
-        $start_time = str_replace('T', ' ', $request->start_time);
-        $request->merge(['start_time' => $start_time]);
+//        $start_time = str_replace('T', ' ', $request->start_time);
+//        $request->merge(['start_time' => $start_time]);
 
 
         $patron->update($request->only('customer_id','company_name','name','phone','job','need','money','start_time','relation','remark'));

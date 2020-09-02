@@ -404,6 +404,18 @@ class VisualizationController extends Controller
         return $data;
     }
 
+    public function delete_patron(Request $request)
+    {
+        $patron_id = $request->id;
+        $customer_id = $request->customer_id;
+        $patron = Patron::find($patron_id);
+        if ($customer_id != $patron->customer_id) {
+            return $this->error(500, '您没有权限权限！');
+        }
+        Patron::destroy($patron_id);
+        return $this->null();
+    }
+
     public function upload_image(Request $request)
     {
         if ($request->id and $request->hasFile('file') and $request->file('file')->isValid()) {
@@ -455,7 +467,7 @@ class VisualizationController extends Controller
 
         if ($count > $getCount) {
             session()->put('count', $count); // 存session
-            return ['code' => 200, 'msg' => '您有新的消息请及时处理','re'=>$count];
+            return ['code' => 200, 'msg' => '您有新的消息请及时处理', 're' => $count];
         }
         // 不成立的话则存最新的值
         session()->put('count', $count);

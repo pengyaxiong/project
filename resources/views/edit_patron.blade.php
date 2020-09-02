@@ -64,6 +64,14 @@
                             </select>
                         </div>
                     @endif
+                @else
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">所属商务</label>
+                        <select name="customer_id" class="form-control">
+                            <option value="0" @if($patron->customer_id==0) selected @endif>共有池</option>
+                            <option value="{{auth()->user()->id}}" @if($patron->customer_id==auth()->user()->id) selected @endif>{{auth()->user()->name}}</option>
+                        </select>
+                    </div>
                 @endif
 
                 <div class="form-group">
@@ -102,7 +110,7 @@
 
                 <div class="form-group">
                     <label for="">签约时间</label>
-                    <input type="datetime-local" class="form-control" name="start_time" id=""
+                    <input type="date" class="form-control" name="start_time" id=""
                            value="{{$patron->start_time}}" placeholder="">
                 </div>
 
@@ -127,13 +135,18 @@
                 </div>
 
                 <button type="submit" class="btn btn-default">修改</button>
+
+                <button id="delete_patron" data-id="{{$patron->id}}" data-customer_id="{{auth()->user()->id}}" type="button" class="btn btn-danger">删除</button>
+
             </form>
+
         </div>
     </div>
 @endsection
 @section('js')
     <script src="/vendor/bootstrap-fileinput/js/fileinput.min.js"></script>
     <script src="/vendor/bootstrap-fileinput/js/fileinput_locale_zh.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
         var images = '{{ implode(',',$patron->images) }}';
         var data = images.split(',');
@@ -187,6 +200,40 @@
                     location.href = location.href;
                 }
             })
+        })
+
+        $("#delete_patron").on('click', function () {
+            var customer_id = $(this).data('customer_id');
+            var id = $(this).data('id');
+            swal({
+                title: "确定删除?",
+                text: " ",
+                icon: "warning",
+                buttons: {
+                    cancel: "取消",
+                    catch: {
+                        text: "确定!",
+                        value: "willDelete",
+                        className: "swal-button--danger",
+                    }
+                },
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.post('/api/delete_patron', {id: id, customer_id: customer_id}, function (data) {
+                        if (data.code == 200) {
+                            swal("恭喜!", "删除成功", "success").then((value) => {
+                                location.href = '/home';
+                            });
+
+                        }else{
+                            swal("失败!", "没有权限", "error")
+                        }
+                    })
+                 }
+
+            });
+
         })
     </script>
 @endsection

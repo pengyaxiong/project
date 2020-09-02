@@ -55,7 +55,10 @@ trait Helper
             $message = config("error.#{$code}.message");
             $statusCode = config("error.#{$code}.status_code");
         }
-
+        return new Response([
+            'code' => 500,
+            'message' => $message,
+        ]);
         throw new HttpException($statusCode, $message, null, [], $code);
     }
 }

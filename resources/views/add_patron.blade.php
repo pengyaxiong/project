@@ -38,6 +38,14 @@
                             </select>
                         </div>
                     @endif
+                @else
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">所属商务</label>
+                        <select name="customer_id" class="form-control">
+                            <option value="0">共有池</option>
+                            <option value="{{auth()->user()->id}}">{{auth()->user()->name}}</option>
+                        </select>
+                    </div>
                 @endif
                 <div class="form-group">
                     <label for="exampleInputEmail1">公司名称 </label>
@@ -72,7 +80,7 @@
 
                 <div class="form-group">
                     <label for="">签约时间</label>
-                    <input type="datetime-local" class="form-control" name="start_time" id="" placeholder="">
+                    <input type="date" class="form-control" name="start_time" id="" placeholder="">
                 </div>
 
                 <div class="form-group">
