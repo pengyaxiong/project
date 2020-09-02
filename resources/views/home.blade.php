@@ -79,25 +79,29 @@
     </div>
 
     @if(!empty($my_children))
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <h3 class="panel-title">组员客户资讯</h3>
+        @foreach($my_children as $children)
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{$children['name']}}</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                        @if(!empty($children['patrons']))
+                            @foreach($children['patrons'] as $patron)
+                                <li class="list-group-item">
+                                    <span class="label label-primary">{{$patron['need']}}</span>
+                                    <span class="label label-success">{{$patron['money']}}</span>
+                                    <span class="{{$patron['status']?'badge':'badge_'}}">{{$patron['status']?'已签约':'待签约'}}</span>
+                                    <a href="{{route('patron.edit',$patron['id'])}}">
+                                        {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
+                                    </a>
+                                </li>
+                            @endforeach
+                        @endif
+                    </ul>
+                </div>
             </div>
-            <div class="panel-body">
-                <ul class="list-group">
-                    @foreach($my_children as $patron)
-                        <li class="list-group-item">
-                            <span class="label label-danger">{{$patron['children']}}</span>
-                            <span class="label label-success">{{$patron['need']}}</span>
-                            <span class="{{$patron['status']?'badge':'badge_'}}">{{$patron['status']?'已签约':'待签约'}}</span>
-                            <a href="{{route('patron.edit',$patron['id'])}}">
-                                {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
+        @endforeach
     @endif
     <a class="btn btn-info" href="{{url('/patron/create')}}" role="button"><span class="glyphicon glyphicon-plus-sign"
                                                                                  aria-hidden="true"></span> 新增客户</a>

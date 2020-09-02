@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Patron;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -40,14 +41,16 @@ class HomeController extends Controller
         });
 
         //我的组员
-        $my_children = Patron::with('customer')->wherein('customer_id', auth()->user()->children->pluck('id'))->get()->map(function ($model) {
-            $need_arr = [0 => 'APP', 1 => '小程序', 2 => '网站', 3 => '系统软件', 4 => '其它'];
-            $model['need'] = $need_arr[$model['need']];
-            $model['children'] = $model->customer->name;
+        $my_children = Customer::with('patrons')->wherein('id', auth()->user()->children->pluck('id'))->get()->map(function ($model) {
+
+            foreach ($model->patrons as &$patron) {
+                $need_arr = [0 => 'APP', 1 => '小程序', 2 => '网站', 3 => '系统软件', 4 => '其它'];
+                $patron['need'] = $need_arr[$patron['need']];
+            }
             return $model;
         });
 
-        return view('home', compact('my_patrons', 'our_patrons','my_children'));
+        return view('home', compact('my_patrons', 'our_patrons', 'my_children'));
     }
 
     public function password()
