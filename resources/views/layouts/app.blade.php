@@ -77,7 +77,7 @@
                             </li>
                             <li role="separator" class="divider"></li>
                             <li><a class="dropdown-item" href="{{ route('home') }}">
-                                    {{ __('个人中') }}
+                                    {{ __('个人中心') }}
                                 </a>
                             </li>
                         </ul>

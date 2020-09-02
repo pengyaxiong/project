@@ -3,20 +3,22 @@
     <link href="/vendor/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet">
 @endsection
 @section('content')
-    @if(!empty($patron->follow) && $patron->customer_id==auth()->user()->id)
-        <div class="panel panel-default">
-            <div class="panel-heading">跟进记录</div>
-            <div class="panel-body">
-                <div class="list-group">
-                    @foreach($patron->follow as $follow)
-                        <a href="#" class="list-group-item">
-                            <h4 class="list-group-item-heading">{{$follow['time']}}</h4>
-                            <p class="list-group-item-text">{{$follow['content']}}</p>
-                        </a>
-                    @endforeach
+    @if(!empty($patron->follow))
+        @if($patron->customer_id==auth()->user()->id ||auth()->user()->parent_id==0)
+            <div class="panel panel-default">
+                <div class="panel-heading">跟进记录</div>
+                <div class="panel-body">
+                    <div class="list-group">
+                        @foreach($patron->follow as $follow)
+                            <a href="#" class="list-group-item">
+                                <h4 class="list-group-item-heading">{{$follow['time']}}</h4>
+                                <p class="list-group-item-text">{{$follow['content']}}</p>
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
     @endif
     <div class="panel panel-default">
         <div class="panel-heading">修改客户资讯</div>
@@ -56,7 +58,8 @@
                             <select name="customer_id" class="form-control">
                                 <option value="0" @if($patron->customer_id==0) selected @endif>共有池</option>
                                 @foreach($customers as $customer)
-                                    <option value="{{$customer->id}}"  @if($patron->customer_id==$customer->id) selected @endif>{{$customer->name}}</option>
+                                    <option value="{{$customer->id}}"
+                                            @if($patron->customer_id==$customer->id) selected @endif>{{$customer->name}}</option>
                                 @endforeach
                             </select>
                         </div>
