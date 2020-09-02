@@ -128,7 +128,7 @@
                         }
                     },
                     dangerMode: true,
-                }).then((value) = > {
+                }).then((value) => {
                     switch(value) {
                     case
                         "catch"
@@ -138,7 +138,7 @@
                             url: "/patron/is_something",
                             data: data,
                             success: function (data) {
-                                swal("恭喜!", "签约成功", "success").then((value) = > {
+                                swal("恭喜!", "签约成功", "success").then((value) => {
                                     location.href = location.href;
                             })
                                 ;
@@ -155,7 +155,7 @@
                 var id = $(this).data('id');
                 swal("跟进记录", {
                     content: "input",
-                }).then((value) = > {
+                }).then((value) => {
                     if(
                 !value
             )

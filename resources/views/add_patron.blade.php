@@ -8,7 +8,8 @@
         <div class="panel-body">
             @if (session('notice'))
                 <div class="alert alert-danger alert-dismissible" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                aria-hidden="true">&times;</span>
                     </button>
                     <strong>错误!</strong>{{ session('notice') }}
                 </div>
@@ -24,6 +25,20 @@
                         <option value="2">其它</option>
                     </select>
                 </div>
+
+                @if($parent_id==0)
+                    @if(!empty($customers))
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">所属商务</label>
+                            <select name="customer_id" class="form-control">
+                                <option value="0">共有池</option>
+                                @foreach($customers as $customer)
+                                    <option value="{{$customer->id}}">{{$customer->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+                @endif
                 <div class="form-group">
                     <label for="exampleInputEmail1">公司名称 </label>
                     <input type="text" class="form-control" name="company_name" id="" placeholder="">
@@ -56,18 +71,18 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="">开始时间</label>
+                    <label for="">签约时间</label>
                     <input type="datetime-local" class="form-control" name="start_time" id="" placeholder="">
                 </div>
 
                 <div class="form-group">
                     <label for="">客户关系</label>
-                    <input type="text" class="form-control" name="relation" id="" placeholder="">
+                    <textarea class="form-control" rows="3" name="relation"></textarea>
                 </div>
 
                 {{--<div class="form-group">--}}
-                    {{--<label for="">跟进记录</label>--}}
-                    {{--<input type="text" class="form-control" id="" placeholder="">--}}
+                {{--<label for="">跟进记录</label>--}}
+                {{--<input type="text" class="form-control" id="" placeholder="">--}}
                 {{--</div>--}}
 
                 <div class="form-group">
@@ -76,9 +91,9 @@
                 </div>
 
                 {{--<div class="form-group">--}}
-                    {{--<label for="exampleInputFile">附件</label>--}}
-                    {{--<input type="file" id="exampleInputFile">--}}
-                    {{--<p class="help-block">选择上传.</p>--}}
+                {{--<label for="exampleInputFile">附件</label>--}}
+                {{--<input type="file" id="exampleInputFile">--}}
+                {{--<p class="help-block">选择上传.</p>--}}
                 {{--</div>--}}
 
                 <button type="submit" class="btn btn-default">新增</button>

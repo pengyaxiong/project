@@ -48,6 +48,21 @@
                         <option value="2" @if($patron->from==2) selected @endif>其它</option>
                     </select>
                 </div>
+
+                @if($parent_id==0)
+                    @if(!empty($customers))
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">所属商务</label>
+                            <select name="customer_id" class="form-control">
+                                <option value="0" @if($patron->customer_id==0) selected @endif>共有池</option>
+                                @foreach($customers as $customer)
+                                    <option value="{{$customer->id}}"  @if($patron->customer_id==$customer->id) selected @endif>{{$customer->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+                @endif
+
                 <div class="form-group">
                     <label for="exampleInputEmail1">公司名称 </label>
                     <input type="text" class="form-control" name="company_name" value="{{$patron->company_name}}" id=""
@@ -83,15 +98,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="">开始时间</label>
+                    <label for="">签约时间</label>
                     <input type="datetime-local" class="form-control" name="start_time" id=""
                            value="{{$patron->start_time}}" placeholder="">
                 </div>
 
                 <div class="form-group">
                     <label for="">客户关系</label>
-                    <input type="text" class="form-control" name="relation" id="" value="{{$patron->relation}}"
-                           placeholder="">
+                    <textarea class="form-control" rows="3" name="relation">{{$patron->relation}}</textarea>
                 </div>
 
                 {{--<div class="form-group">--}}

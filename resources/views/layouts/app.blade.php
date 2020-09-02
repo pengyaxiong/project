@@ -75,6 +75,11 @@
                                     {{ __('修改密码') }}
                                 </a>
                             </li>
+                            <li role="separator" class="divider"></li>
+                            <li><a class="dropdown-item" href="{{ route('home') }}">
+                                    {{ __('个人中') }}
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 @endguest
