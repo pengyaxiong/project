@@ -10,7 +10,7 @@ class Links
     {
         $admin_id=auth('admin')->user()->id;
         return <<<HTML
-<audio style="display:none; height: 0" id="bg-music" preload="auto" src="http://downsc.chinaz.net/Files/DownLoad/sound1/201807/10402.mp3" loop="loop"></audio>
+<audio style="display:none; height: 0" id="bg-music" preload="auto" src="/wangwang.mp3" loop="loop"></audio>
  
 <li>
     <a href="/admin/notifications">
