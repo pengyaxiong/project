@@ -9,6 +9,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Spatie\Activitylog\Models\Activity;
 
 class AuditionController extends AdminController
 {
@@ -138,7 +139,12 @@ class AuditionController extends AdminController
                 ->performedOn($form->model())
                 ->causedBy(auth('admin')->user())
                 ->withProperties([])
-                ->log('更新状态为：'.$this->status[$form->model()->status]);
+                ->log('更新状态为：' . $this->status[$form->model()->status]);
+            $lastLoggedActivity = Activity::all()->last();
+            //执行消息分发
+            dispatch(new \App\Jobs\SendNotice($lastLoggedActivity, 5));
+            //SendMessage::dispatch($notice)
+
         });
 
         return $form;

@@ -3,16 +3,32 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Spatie\Activitylog\Models\Activity;
+use Illuminate\Notifications\Notifiable;
 class Staff extends Model
 {
+    use Notifiable;
+
     //黑名单为空
     protected $guarded = [];
     protected $table = 'wechat_staff';
 
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class, 'staff_activity', 'staff_id', 'activity_id')->withPivot(
+            'staff_id',
+            'activity_id'
+        );
+    }
+    //给用户增加通知
+    public function addActivity($activity)
+    {
+        return $this->activities()->save($activity);
+    }
+
     public function projects()
     {
-        return $this->belongsToMany(Project::class,'wechat_project_staff','project_id','staff_id')->withPivot(
+        return $this->belongsToMany(Project::class, 'wechat_project_staff', 'project_id', 'staff_id')->withPivot(
             'project_id',
             'staff_id'
         );
@@ -35,7 +51,7 @@ class Staff extends Model
 
     public function dailies()
     {
-        return $this->hasMany(Daily::class,'daily_id');
+        return $this->hasMany(Daily::class, 'daily_id');
     }
 
     public function project_nodes()
