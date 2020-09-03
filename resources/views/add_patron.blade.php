@@ -78,10 +78,10 @@
                     <input type="number" name="money" class="form-control" id="" placeholder="">
                 </div>
 
-                <div class="form-group">
-                    <label for="">签约时间</label>
-                    <input type="date" class="form-control" name="start_time" id="" placeholder="">
-                </div>
+                {{--<div class="form-group">--}}
+                    {{--<label for="">签约时间</label>--}}
+                    {{--<input type="date" class="form-control" name="start_time" id="" placeholder="">--}}
+                {{--</div>--}}
 
                 <div class="form-group">
                     <label for="">客户关系</label>

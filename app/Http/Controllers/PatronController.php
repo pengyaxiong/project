@@ -136,6 +136,7 @@ class PatronController extends Controller
         $patron = Patron::find($request->id);
         $value = $patron->$attr ? false : true;
         $patron->$attr = $value;
+        $patron->start_time = date('Y-m-d');
         $patron->save();
     }
 

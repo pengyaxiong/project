@@ -44,7 +44,7 @@ Route::group(['namespace' => 'Api','as'=>'api.'], function () {
     Route::post('delete_image', 'VisualizationController@delete_image');
 
     //消息通知
-    Route::get('send_notice', 'VisualizationController@send_notice');
+    Route::get('notifications', 'VisualizationController@notifications');
 
 });
 

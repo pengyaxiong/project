@@ -6,9 +6,12 @@ use App\Models\Company;
 use App\Models\Finance;
 use App\Models\Project;
 use App\Models\ProjectCustomer;
+use App\Models\Staff;
+use App\Notifications\TopicReplied;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Spatie\Activitylog\Models\Activity;
 
 class PatronCheck extends RowAction
 {
@@ -73,6 +76,12 @@ class PatronCheck extends RowAction
             ->causedBy(auth('admin')->user())
             ->withProperties([])
             ->log('更新'.$name.'状态为：签约审核成功');
+
+        $lastLoggedActivity = Activity::all()->last();
+
+        $staffs = Staff::where('admin_id', 1)->get();
+        //执行消息分发
+        dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
 
         return $this->response()->success('签约审核成功.')->redirect('/admin/projects');
         return $this->response()->success('签约审核成功.')->refresh();

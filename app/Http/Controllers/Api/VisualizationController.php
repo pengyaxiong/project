@@ -458,11 +458,17 @@ class VisualizationController extends Controller
     }
 
 
-    public function send_notice()
+    public function notifications(Request $request)
     {
-        // 处理逻辑
-        $count = 0;   // 获取的结果
+        $admin_id = $request->admin_id;
+        $staff = Staff::where('admin_id', $admin_id)->first();
 
+        $staff->unreadNotifications; // 获取所有未读通知
+        $staff->readNotifications; // 获取所有已读通知
+        $staff->notifications; // 获取所有通知
+
+        // 处理逻辑
+        $count = count($staff->unreadNotifications);   // 获取的结果
         $getCount = session()->get('count');
 
         if ($count > $getCount) {
@@ -473,5 +479,6 @@ class VisualizationController extends Controller
         session()->put('count', $count);
 
         return ['code' => 201];
+
     }
 }

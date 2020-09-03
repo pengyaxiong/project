@@ -2,7 +2,9 @@
 
 namespace App\Admin\Actions\Project;
 
-use App\Models\Company;
+use Spatie\Activitylog\Models\Activity;
+use App\Models\Staff;
+use App\Notifications\TopicReplied;
 use App\Models\Finance;
 use App\Models\Patron;
 use App\Models\Project;
@@ -50,6 +52,12 @@ class SjCheck extends RowAction
             ->causedBy(auth('admin')->user())
             ->withProperties([])
             ->log('更新'.$project->name.'状态为：设计验收成功');
+
+        $lastLoggedActivity = Activity::all()->last();
+
+        $staffs = Staff::where('admin_id', 1)->get();
+        //执行消息分发
+        dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
 
         return $this->response()->success('设计验收成功.')->refresh();
 

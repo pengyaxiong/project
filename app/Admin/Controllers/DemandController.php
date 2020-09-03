@@ -8,7 +8,9 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-
+use Spatie\Activitylog\Models\Activity;
+use App\Models\Staff;
+use App\Notifications\TopicReplied;
 class DemandController extends AdminController
 {
     /**
@@ -125,6 +127,13 @@ class DemandController extends AdminController
                 ->causedBy(auth('admin')->user())
                 ->withProperties(['description'=>$form->model()->description,'remark'=>$form->model()->remark])
                 ->log('更新状态为：'.$this->status[$form->model()->status]);
+
+            $lastLoggedActivity = Activity::all()->last();
+
+            $staffs = Staff::where('admin_id', 1)->get();
+            //执行消息分发
+            dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
+
         });
         return $form;
     }

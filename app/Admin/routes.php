@@ -69,6 +69,9 @@ Route::group([
     //操作日志
     $router->resource('activities', 'ActivityController');
 
+    //消息通知
+    $router->get('notifications', 'NotificationsController@index');
+
     $router->resource('calendar', 'CalendarController');
     $router->put('/drop/{id}', 'CalendarController@drop');
     $router->get('/event','CalendarController@event');

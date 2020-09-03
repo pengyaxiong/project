@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Models\Finance;
 use App\Models\Patron;
-
+use Spatie\Activitylog\Models\Activity;
+use App\Models\Staff;
+use App\Notifications\TopicReplied;
 class QdCheck extends RowAction
 {
     public $name = '前端验收';
@@ -50,6 +52,12 @@ class QdCheck extends RowAction
             ->causedBy(auth('admin')->user())
             ->withProperties([])
             ->log('更新'.$project->name.'状态为：前端验收成功');
+
+        $lastLoggedActivity = Activity::all()->last();
+
+        $staffs = Staff::where('admin_id', 1)->get();
+        //执行消息分发
+        dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
 
         return $this->response()->success('前端验收成功.')->refresh();
     }

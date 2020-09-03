@@ -21,6 +21,7 @@ use App\Models\ProjectNodeInfo;
 use App\Models\ProjectStaff;
 use App\Models\Staff;
 use App\Models\Task;
+use App\Notifications\TopicReplied;
 use Encore\Admin\Admin;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -33,6 +34,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\MessageBag;
+use Spatie\Activitylog\Models\Activity;
 
 class ProjectController extends AdminController
 {
@@ -191,7 +193,6 @@ class ProjectController extends AdminController
             ])->expand(function ($model) {
                 $check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功'];
                 $apply_status = [1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
-
 
                 $finances = $model->finances->map(function ($model) use ($check_status, $apply_status) {
                     $nodes = [
@@ -930,6 +931,12 @@ EOT;
             ->withProperties(['description' => $request->description, 'remark' => $request->remark])
             ->log('更新' . $project->name . '状态为：' . $stause);
 
+        $lastLoggedActivity = Activity::all()->last();
+
+        $staffs = Staff::where('admin_id', 1)->get();
+        //执行消息分发
+        dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
+
         $success = new MessageBag([
             'title' => 'Success',
             'message' => '提交成功....',
@@ -1013,6 +1020,11 @@ EOT;
             ->withProperties(['description' => $request->description, 'remark' => $request->remark])
             ->log('更新' . $project->name . '状态为：' . $stause);
 
+        $lastLoggedActivity = Activity::all()->last();
+
+        $staffs = Staff::where('admin_id', 1)->get();
+        //执行消息分发
+        dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
 
         $success = new MessageBag([
             'title' => 'Success',
@@ -1147,6 +1159,12 @@ EOT;
             ->withProperties([])
             ->log('更新'.$project->name.'状态为：设计验收成功');
 
+        $lastLoggedActivity = Activity::all()->last();
+
+        $staffs = Staff::where('admin_id', 1)->get();
+        //执行消息分发
+        dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
+
         $success = new MessageBag([
             'title' => 'Success',
             'message' => '设计验收成功....',
@@ -1228,6 +1246,12 @@ EOT;
             ->causedBy(auth('admin')->user())
             ->withProperties([])
             ->log('更新'.$project->name.'状态为：前端验收成功');
+
+        $lastLoggedActivity = Activity::all()->last();
+
+        $staffs = Staff::where('admin_id', 1)->get();
+        //执行消息分发
+        dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
 
         $success = new MessageBag([
             'title' => 'Success',
@@ -1311,6 +1335,12 @@ EOT;
             ->causedBy(auth('admin')->user())
             ->withProperties([])
             ->log('更新'.$project->name.'状态为：整体验收成功');
+
+        $lastLoggedActivity = Activity::all()->last();
+
+        $staffs = Staff::where('admin_id', 1)->get();
+        //执行消息分发
+        dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
 
         $success = new MessageBag([
             'title' => 'Success',

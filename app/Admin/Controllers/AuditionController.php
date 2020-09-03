@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Models\Audition;
 use App\Models\Department;
 use App\Models\Staff;
+use App\Notifications\TopicReplied;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -135,14 +136,17 @@ class AuditionController extends AdminController
 
         //保存后回调
         $form->saved(function (Form $form) {
+
             activity()->inLog(1)
                 ->performedOn($form->model())
                 ->causedBy(auth('admin')->user())
                 ->withProperties([])
-                ->log('更新状态为：' . $this->status[$form->model()->status]);
+                ->log('更新'.$form->model()->name.'状态为：' . $this->status[$form->model()->status]);
             $lastLoggedActivity = Activity::all()->last();
+
+            $staffs = Staff::where('admin_id', 1)->get();
             //执行消息分发
-            dispatch(new \App\Jobs\SendNotice($lastLoggedActivity, 5));
+            dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
             //SendMessage::dispatch($notice)
 
         });

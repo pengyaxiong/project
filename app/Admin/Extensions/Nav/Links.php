@@ -2,15 +2,18 @@
 
 namespace App\Admin\Extensions\Nav;
 
+use App\Models\Staff;
+
 class Links
 {
     public function __toString()
     {
+        $admin_id=auth('admin')->user()->id;
         return <<<HTML
 <audio style="display:none; height: 0" id="bg-music" preload="auto" src="http://downsc.chinaz.net/Files/DownLoad/sound1/201807/10402.mp3" loop="loop"></audio>
  
 <li>
-    <a href="/admin/activities">
+    <a href="/admin/notifications">
       <i class="fa fa-bell-o"></i>
       <span class="label label-warning" id="inventory"></span>
     </a>
@@ -19,14 +22,14 @@ class Links
 <script>
  
     var getting = {
-        url:'/api/send_notice',
+        url:'/api/notifications?admin_id=$admin_id',
         dataType:"json",
         success:function(res) {
           if(res.code == 200){
               toastr.options.timeOut=120000; // 保存2分钟
                 toastr.warning(res.msg); // 提示文字
                 toastr.options.onclick = function(){
-                    location='/admin/activities';  // 点击跳转页面
+                    location='/admin/notifications';  // 点击跳转页面
                 };
                var audio = document.getElementById('bg-music');  // 启用音频通知
                 audio.play();
@@ -42,7 +45,7 @@ class Links
     };
     window.setInterval(function() {
       $.ajax(getting)
-    },5000);
+    },1500);
 </script>
 HTML;
     }

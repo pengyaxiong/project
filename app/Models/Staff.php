@@ -2,29 +2,49 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Models\Activity;
 use Illuminate\Notifications\Notifiable;
-class Staff extends Model
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class Staff extends Authenticatable
 {
-    use Notifiable;
+    //别名
+    use Notifiable {
+        notify as protected laravelNotify;
+    }
+
+    public function notify($instance)
+    {
+        // 如果要通知的人是当前用户，就不必通知了！
+//        $admin = auth('admin')->user();
+//        if ($this->admin_id == $admin->id) {
+//            return;
+//        }
+        $this->laravelNotify($instance);// 发送通知
+        // 只有数据库类型通知才需提醒，直接发送 Email 或者其他的都 Pass
+        if (method_exists($instance, 'toDatabase')) {
+            $this->increment('notification_count'); //字段加1
+        }
+
+
+    }
+
+    /*
+     * $user->unreadNotifications; // 获取所有未读通知
+        $user->readNotifications; // 获取所有已读通知
+        $user->notifications; // 获取所有通知
+     */
+    public function markAsRead()
+    {
+        $this->notification_count = 0;
+        $this->save();
+        $this->unreadNotifications->markAsRead();
+        //批量更新方式标记通知为已读
+       // $this->unreadNotifications()->update(['read_at' => Carbon::now()]);
+    }
 
     //黑名单为空
     protected $guarded = [];
     protected $table = 'wechat_staff';
-
-    public function activities()
-    {
-        return $this->belongsToMany(Activity::class, 'staff_activity', 'staff_id', 'activity_id')->withPivot(
-            'staff_id',
-            'activity_id'
-        );
-    }
-    //给用户增加通知
-    public function addActivity($activity)
-    {
-        return $this->activities()->save($activity);
-    }
 
     public function projects()
     {
