@@ -94,6 +94,7 @@ class StaffController extends AdminController
         $grid->column('admin.name', __('管理员'));
         $grid->column('department.name', __('所属部门'));
         $grid->column('mobile', __('Mobile'));
+        $grid->column('email', __('Email'))->hide();
         $grid->column('sex', __('Sex'))->using([
             1 => '男',
             2 => '女',
@@ -141,6 +142,7 @@ class StaffController extends AdminController
         $show->field('admin.name', __('管理员'));
         $show->field('department_id', __('所属部门'));
         $show->field('mobile', __('Mobile'));
+        $show->field('email', __('Email'));
         $show->field('sex', __('Sex'));
         $show->field('sort_order', __('Sort order'));
         $show->field('remark', __('Remark'));
@@ -162,6 +164,7 @@ class StaffController extends AdminController
 
         $form->text('name', __('Name'))->rules('required');
         $form->mobile('mobile', __('Mobile'));
+        $form->email('email', __('Email'));
 
         $states = [
             'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
