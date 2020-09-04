@@ -7,7 +7,9 @@ use App\Models\Patron;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-
+use Spatie\Activitylog\Models\Activity;
+use App\Models\Staff;
+use App\Notifications\TopicReplied;
 class PatronController extends Controller
 {
     /**
@@ -43,7 +45,7 @@ class PatronController extends Controller
             $messages = [
                 'company_name.required' =>'公司名称不能为空',
                 'name.required' => '联系人不能为空',
-                'phone.required' => '联系人电话不能为空',
+//                'phone.required' => '联系人电话不能为空',
                 'phone.unique' => '联系人已经存在',
                 'job.required' => '联系人职位不能为空',
                 'need.required' => '需求不能为空',
@@ -51,7 +53,8 @@ class PatronController extends Controller
             $rules = [
                 'company_name' => 'required',
                 'name' => 'required',
-                'phone' => 'required|unique:wechat_patron',
+                'phone' => 'unique:wechat_patron',
+//                'phone' => 'required|unique:wechat_patron',
                 'job' => 'required',
                 'need' => 'required',
             ];
@@ -133,11 +136,23 @@ class PatronController extends Controller
     public function is_something(Request $request)
     {
         $attr = $request->attr;
-        $patron = Patron::find($request->id);
+        $patron = Patron::with('customer')->find($request->id);
         $value = $patron->$attr ? false : true;
         $patron->$attr = $value;
         $patron->start_time = date('Y-m-d');
+
         $patron->save();
+
+        activity()->inLog(2)
+            ->performedOn($patron)
+            ->causedBy(auth()->user())
+            ->withProperties([])
+            ->log(auth()->user()->name.'与客户'.$patron->name.'已签约');
+
+        $lastLoggedActivity = Activity::all()->last();
+        $staffs = Staff::where('is_notice', 1)->get();
+        //执行消息分发
+        dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
     }
 
     public function follow(Request $request)

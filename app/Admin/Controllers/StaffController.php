@@ -85,6 +85,11 @@ class StaffController extends AdminController
 
             return new Table(['项目ID', '项目名称', '项目状态', '节点名称', '节点状态', '负责人', '开始时间', '结束时间', '耗时(天)', '详情'], $project_nodes->toArray());
         });
+        $states = [
+            'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
+            'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+        ];
+        $grid->column('is_notice', __('是否接收项目动态'))->switch($states);
 
         $grid->column('admin.name', __('管理员'));
         $grid->column('department.name', __('所属部门'));
@@ -157,6 +162,12 @@ class StaffController extends AdminController
 
         $form->text('name', __('Name'))->rules('required');
         $form->mobile('mobile', __('Mobile'));
+
+        $states = [
+            'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
+            'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+        ];
+        $form->switch('is_notice', __('是否接收项目动态'))->states($states)->default(0);
 
         $class = config('admin.database.users_model');
         $admin=new $class();

@@ -77,6 +77,7 @@ class DailyController extends AdminController
             $departments = Department::all()->toArray();
             $select_array = array_column($departments, 'name', 'id');
             $filter->equal('staff.department.id', __('所属部门'))->select($select_array);
+            $filter->between('created_at', __('时间'))->date();
         });
 
         if ($auth->id > 1) {

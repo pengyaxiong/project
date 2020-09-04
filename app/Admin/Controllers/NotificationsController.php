@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Notifications;
 use App\Models\Staff;
 use Encore\Admin\Admin;
 use Encore\Admin\Controllers\AdminController;
@@ -12,12 +13,68 @@ use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Table;
-use Illuminate\Http\Request;
 use Encore\Admin\Widgets\Box;
 
 class NotificationsController extends AdminController
 {
-    public function index(Content $content)
+
+    protected $title = '消息通知';
+
+    protected function grid()
+    {
+        $grid = new Grid(new Notifications());
+        $auth = auth('admin')->user();
+
+        if ($auth->id > 1) {
+            $staff = Staff::where('admin_id', $auth->id)->first();
+            $staff->markAsRead();
+            $grid->model()->where('notifiable_id', $staff->id);
+        }
+
+        $grid->column('created_at', __('时间'));
+        $grid->column('title', __('类型'))->display(function () {
+            return $this['data']['title'];
+        });
+        $grid->column('causer', __('操作者'))->display(function () {
+            return $this['data']['name'];
+        });
+
+        $grid->column('name', __('接收者'))->display(function () {
+            $class=new $this['notifiable_type']();
+            $people = $class->find($this['notifiable_id']);
+            return $people->name;
+        });
+        $grid->column('description', __('详情'))->display(function () {
+            return $this['data']['description'];
+        });
+
+        $grid->filter(function ($filter) {
+
+            // 去掉默认的id过滤器
+            $filter->disableIdFilter();
+
+            $filter->between('created_at', __('时间'))->date();
+
+        });
+
+        $grid->filter(function ($filter) {
+
+//            $filter->equal('log_name', __('Log name'))->select($this->log_name);
+
+        });
+
+        #禁用创建按钮
+        $grid->disableCreateButton();
+        $grid->disableActions();
+        $grid->actions(function ($actions) {
+            $actions->disableDelete();
+            $actions->disableView();
+            $actions->disableEdit();
+        });
+        return $grid;
+    }
+
+    public function indexxxx(Content $content)
     {
 
         // 获取登录用户的所有通知
@@ -34,14 +91,14 @@ class NotificationsController extends AdminController
                             'id' => $model->id,
                             'name' => $model->data['name'],
                             'log_name' => $model->data['title'],
+                            'time' => $model->created_at,
                             'description' => $model->data['description'],
-
 //                            'content' => "<a class='btn btn-xs action-btn btn-danger grid-row-refuse' data-id='{$model->id}'><i class='fa fa-eye' title='详情'>详情</i></a>"
                         ];
                         return $nodes;
                     });
 
-                    $table = new Table(['ID', '操作者', '类型', '详情'], $notifications->toArray());
+                    $table = new Table(['ID', '操作者', '类型', '时间', '详情'], $notifications->toArray());
 
                     $column->append(new Box('', $table->render()));
 

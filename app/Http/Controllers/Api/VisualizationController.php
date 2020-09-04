@@ -466,18 +466,13 @@ class VisualizationController extends Controller
         $staff->unreadNotifications; // 获取所有未读通知
         $staff->readNotifications; // 获取所有已读通知
         $staff->notifications; // 获取所有通知
-
         // 处理逻辑
         $count = count($staff->unreadNotifications);   // 获取的结果
-        $getCount = session()->get('count');
 
-        if ($count > $getCount) {
-            session()->put('count', $count); // 存session
+        if ($count > 0) {
+            $staff->markAsRead();
             return ['code' => 200, 'msg' => '您有新的消息请及时处理', 're' => $count];
         }
-        // 不成立的话则存最新的值
-        session()->put('count', $count);
-
         return ['code' => 201];
 
     }

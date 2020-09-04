@@ -55,7 +55,7 @@ class SjCheck extends RowAction
 
         $lastLoggedActivity = Activity::all()->last();
 
-        $staffs = Staff::where('admin_id', 1)->get();
+        $staffs = Staff::where('is_notice', 1)->get();
         //执行消息分发
         dispatch(new \App\Jobs\SendNotice($staffs, new TopicReplied($lastLoggedActivity), 5));
 

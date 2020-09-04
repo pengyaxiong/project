@@ -45,7 +45,7 @@ class Links
     };
     window.setInterval(function() {
       $.ajax(getting)
-    },1500);
+    },5000);
 </script>
 HTML;
     }
