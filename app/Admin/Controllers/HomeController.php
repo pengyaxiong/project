@@ -7,6 +7,7 @@ use App\Models\DesignCheck;
 use App\Models\HtmlCheck;
 use App\Models\Node;
 use App\Models\Notice;
+use App\Models\Patron;
 use App\Models\Project;
 use App\Models\ProjectNode;
 use App\Models\ProjectStaff;
@@ -55,6 +56,9 @@ class HomeController extends Controller
                         });
                         $row->column(2, function (Column $column) {
                             $column->append($this->info_5());
+                        });
+                        $row->column(2, function (Column $column) {
+                            $column->append($this->info_6());
                         });
                     });
                 });
@@ -210,7 +214,15 @@ class HomeController extends Controller
     {
         $status = Project::where('is_check', 1)->count();
         // 参数1为标题 参数2为图标 参数3为颜色 参数4为跳转链接 参数5为数据
-        $infoBox = new InfoBox('已交付', 'smile-o', 'green', '/admin/projects?status=5', $status);
+        $infoBox = new InfoBox('已交付', 'smile-o', 'green', '/admin/projects?is_check=1', $status);
+        return $infoBox->render();
+    }
+
+    public function info_6()
+    {
+        $status = Patron::where('status', 1)->count();
+        // 参数1为标题 参数2为图标 参数3为颜色 参数4为跳转链接 参数5为数据
+        $infoBox = new InfoBox('签约待审核', 'user', 'maroon', '/admin/patrons?status=1', $status);
         return $infoBox->render();
     }
 
