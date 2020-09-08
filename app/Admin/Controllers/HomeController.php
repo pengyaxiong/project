@@ -218,6 +218,11 @@ class HomeController extends Controller
         return $infoBox->render();
     }
 
+    /*
+     * .bg-red    .bg-yellow   .bg-aqua   .bg-blue   .bg-light-blue   .bg-green,
+        .bg-navy   .bg-teal   .bg-olive   .bg-lime    .bg-orange   .bg-fuchsia   .bg-purple
+        .bg-maroon    .bg-black
+     */
     public function info_6()
     {
         $status = Patron::where('status', 1)->count();

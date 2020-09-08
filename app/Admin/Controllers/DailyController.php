@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Imports\DailyImport;
 use App\Models\Daily;
 use App\Models\Department;
 use App\Models\Staff;
@@ -63,6 +64,8 @@ class DailyController extends AdminController
         $grid->column('done', __('完成情况'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
+
+        $grid->exporter(new DailyImport());
 
         $grid->filter(function ($filter) {
             $filter->like('staff.name', __('Name'));

@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Imports\AuditionImport;
 use App\Models\Audition;
 use App\Models\Department;
 use App\Models\Staff;
@@ -56,6 +57,8 @@ class AuditionController extends AdminController
         $grid->column('updated_at', __('Updated at'))->hide();
 
 
+        $grid->exporter(new AuditionImport());
+
         $grid->filter(function ($filter) {
 
             $departments = Department::all()->toArray();
@@ -88,15 +91,15 @@ class AuditionController extends AdminController
         $show = new Show(Audition::findOrFail($id));
 
         $show->field('id', __('Id'));
-        $show->field('department_id', __('所属部门'));
-        $show->field('staff_id', __('面试官'));
+        $show->field('department.name', __('所属部门'));
+        $show->field('staff.name', __('面试官'));
         $show->field('name', __('Name'));
         $show->field('job', __('Job'));
         $show->field('point', __('分数'));
         $show->field('phone', __('Phone'));
         $show->field('money', __('期望薪资'));
         $show->field('status', __('Status'));
-        $show->field('images', __('Images'));
+        $show->field('images', __('Images'))->carousel();
         $show->field('remark', __('Remark'));
         $show->field('start_time', __('面试时间'));
         $show->field('created_at', __('Created at'));
@@ -141,7 +144,7 @@ class AuditionController extends AdminController
                 ->performedOn($form->model())
                 ->causedBy(auth('admin')->user())
                 ->withProperties([])
-                ->log('更新'.$form->model()->name.'状态为：' . $this->status[$form->model()->status]);
+                ->log('更新' . $form->model()->name . '状态为：' . $this->status[$form->model()->status]);
             $lastLoggedActivity = Activity::all()->last();
 
             $staffs = Staff::where('is_notice', 1)->get();

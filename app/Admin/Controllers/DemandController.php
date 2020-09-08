@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Imports\DemandImport;
 use App\Models\Demand;
 use App\Models\Project;
 use Encore\Admin\Controllers\AdminController;
@@ -51,6 +52,8 @@ class DemandController extends AdminController
         $grid->column('remark', __('Remark'))->width(288)->editable('textarea');
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
+
+        $grid->exporter(new DemandImport());
 
         $grid->filter(function ($filter) {
             $projects = Project::all()->toArray();

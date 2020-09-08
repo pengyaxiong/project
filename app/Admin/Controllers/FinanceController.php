@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Imports\FinanceImport;
 use App\Models\Customer;
 use App\Models\Finance;
 use App\Models\Patron;
@@ -65,6 +66,8 @@ class FinanceController extends AdminController
         $grid->column('remark', __('Remark'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
+
+        $grid->exporter(new FinanceImport());
 
         $grid->filter(function ($filter) {
 

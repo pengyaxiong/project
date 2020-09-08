@@ -7,6 +7,7 @@ use App\Admin\Actions\Project\Calendar;
 use App\Admin\Actions\Project\QdCheck;
 use App\Admin\Actions\Project\SjCheck;
 use App\Admin\Actions\Project\YsCheck;
+use App\Imports\ProjectImport;
 use App\Models\Customer;
 use App\Models\Demand;
 use App\Models\DesignCheck;
@@ -258,6 +259,8 @@ class ProjectController extends AdminController
 
         $grid->fixColumns(3, -1);
 
+        $grid->exporter(new ProjectImport());
+
         $grid->filter(function ($filter) {
 
             $filter->like('name', __('Name'));
@@ -291,30 +294,30 @@ class ProjectController extends AdminController
 
         });
 
-        $grid->export(function ($export) {
-
-            $export->filename('项目列表');
-
-            $export->originalValue(['money', 'contract_time']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
-
-            // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
-
-            $export->except(['sort_order', 'updated_at']); //用来指定哪些列不需要被导出
-            $export->column('customer_name', function ($value, $original) {
-                return $this->cutstr_html($value);
-            });
-            $export->column('staff_name', function ($value, $original) {
-                return $this->cutstr_html($value);
-            });
-            $export->column('is_check', function ($value, $original) {
-                switch ($original) {
-                    case 1:
-                        return '是';
-                    default:
-                        return '否';
-                }
-            });
-        });
+//        $grid->export(function ($export) {
+//
+//            $export->filename('项目列表');
+//
+//            $export->originalValue(['money', 'contract_time']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
+//
+//            // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
+//
+//            $export->except(['sort_order', 'updated_at']); //用来指定哪些列不需要被导出
+//            $export->column('customer_name', function ($value, $original) {
+//                return  cutstr_html($value);
+//            });
+//            $export->column('staff_name', function ($value, $original) {
+//                return  cutstr_html($value);
+//            });
+//            $export->column('is_check', function ($value, $original) {
+//                switch ($original) {
+//                    case 1:
+//                        return '是';
+//                    default:
+//                        return '否';
+//                }
+//            });
+//        });
         if ($auth->id > 1) {
             #禁用创建按钮
             $grid->disableCreateButton();
@@ -356,27 +359,6 @@ class ProjectController extends AdminController
             }
         });
         return $grid;
-    }
-
-    //去掉文本中的HTML标签
-    public function cutstr_html($string, $length = 0, $ellipsis = '…')
-    {
-        $string = strip_tags($string);
-        $string = preg_replace('/\n/is', '', $string);
-        $string = preg_replace('/ |　/is', '', $string);
-        $string = preg_replace('/ /is', '', $string);
-        $string = preg_replace('/<br \/>([\S]*?)<br \/>/', '<p>$1<\/p>', $string);
-        preg_match_all("/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|\xe0[\xa0-\xbf][\x80-\xbf]|[\xe1-\xef][\x80-\xbf][\x80-\xbf]|\xf0[\x90-\xbf][\x80-\xbf][\x80-\xbf]|[\xf1-\xf7][\x80-\xbf][\x80-\xbf][\x80-\xbf]/", $string, $string);
-        if (is_array($string) && !empty($string[0])) {
-            if (is_numeric($length) && $length) {
-                $string = join('', array_slice($string[0], 0, $length)) . $ellipsis;
-            } else {
-                $string = implode('', $string[0]);
-            }
-        } else {
-            $string = '';
-        }
-        return $string;
     }
 
     /**

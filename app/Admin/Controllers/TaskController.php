@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Imports\TaskImport;
 use App\Models\Customer;
 use App\Models\Node;
 use App\Models\Project;
@@ -94,33 +95,7 @@ class TaskController extends AdminController
         });
 
 
-        $grid->export(function ($export) {
-
-            $export->filename('任务列表');
-
-            $export->originalValue(['']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
-
-            // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
-
-            $export->except(['sort_order', 'updated_at']); //用来指定哪些列不需要被导出
-
-            $export->column('is_contract', function ($value, $original) {
-                switch ($original) {
-                    case 1:
-                        return '是';
-                    default:
-                        return '否';
-                }
-            });
-            $export->column('is_finish', function ($value, $original) {
-                switch ($original) {
-                    case 1:
-                        return '是';
-                    default:
-                        return '否';
-                }
-            });
-        });
+        $grid->exporter(new TaskImport());
 
         if ($auth->id > 1) {
             #禁用创建按钮

@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Actions\Patron\PatronBatchCheck;
 use App\Admin\Actions\Patron\PatronCheck;
+use App\Imports\PatronImport;
 use App\Models\Customer;
 use App\Models\Patron;
 use Encore\Admin\Controllers\AdminController;
@@ -86,6 +87,8 @@ class PatronController extends AdminController
         $grid->column('remark', __('Remark'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
+
+        $grid->exporter(new PatronImport());
 
         $grid->filter(function ($filter) {
 
