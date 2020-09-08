@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Imports\StaffImport;
 use App\Models\Department;
 use App\Models\Node;
 use App\Models\Project;
@@ -108,6 +109,8 @@ class StaffController extends AdminController
         $grid->column('remark', __('Remark'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
+
+        $grid->exporter(new StaffImport());
 
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));

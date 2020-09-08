@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Imports\CustomerImport;
 use App\Models\Customer;
 use App\Models\Patron;
 use Encore\Admin\Controllers\AdminController;
@@ -101,6 +102,8 @@ class CustomerController extends AdminController
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 
+        $grid->exporter(new CustomerImport());
+
         //禁用创建按钮
         //  $grid->disableCreateButton();
         $grid->actions(function ($actions) {
@@ -128,28 +131,6 @@ class CustomerController extends AdminController
             $filter->equal('status', __('Status'))->select($status_text);
         });
 
-
-        $grid->export(function ($export) {
-
-            $export->filename('客户列表');
-
-            $export->originalValue(['name', 'openid', 'nickname', 'headimgurl', 'tel', 'remark']);  //比如对列使用了$grid->column('name')->label()方法之后，那么导出的列内容会是一段HTML，如果需要某些列导出存在数据库中的原始内容，使用originalValue方法
-
-            // $export->only(['name', 'nickname', 'sex']); //用来指定只能导出哪些列。
-
-            $export->except(['sort_order', 'updated_at']); //用来指定哪些列不需要被导出
-
-            $export->column('sex', function ($value, $original) {
-                switch ($original) {
-                    case 1:
-                        return '男';
-                    case 2:
-                        return '女';
-                    default:
-                        return '其它';
-                }
-            });
-        });
 
         return $grid;
     }

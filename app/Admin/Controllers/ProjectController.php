@@ -186,12 +186,7 @@ class ProjectController extends AdminController
         $slug = $auth->roles->pluck('slug')->toarray();
 
         if ($auth->id == 1 || in_array('apply', $slug)) {
-            $grid->column('check_status', __('回款状态'))->using($this->check_status)->label([
-                1 => 'default',
-                2 => 'info',
-                3 => 'warning',
-                4 => 'danger',
-            ])->expand(function ($model) {
+            $grid->column('check_status', __('回款状态'))->using($this->check_status)->expand(function ($model) {
                 $check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功'];
                 $apply_status = [1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
 
@@ -249,15 +244,15 @@ class ProjectController extends AdminController
             $grid->column('y_check_time', __('预计交付时间'));
         } else {
             $grid->column('is_check', __('是否交付'))->switch($states);
-            $grid->column('contract_time', __('Contract time'))->date('Y-m-d')->editable('combodate');
-            $grid->column('check_time', __('交付时间'))->date('Y-m-d');
-            $grid->column('y_check_time', __('预计交付时间'))->date('Y-m-d')->editable('combodate');
+            $grid->column('contract_time', __('Contract time'))->date();
+            $grid->column('check_time', __('交付时间'))->date();
+            $grid->column('y_check_time', __('预计交付时间'))->date();
         }
 
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
-        $grid->fixColumns(3, -1);
+         $grid->fixColumns(1, -1);
 
         $grid->exporter(new ProjectImport());
 
