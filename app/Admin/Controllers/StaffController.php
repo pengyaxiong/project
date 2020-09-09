@@ -91,6 +91,7 @@ class StaffController extends AdminController
             'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
         ];
         $grid->column('is_notice', __('是否接收项目动态'))->switch($states);
+        $grid->column('is_daily', __('是否写日志'))->switch($states);
 
         $grid->column('admin.name', __('管理员'));
         $grid->column('department.name', __('所属部门'));
@@ -143,7 +144,7 @@ class StaffController extends AdminController
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
         $show->field('admin.name', __('管理员'));
-        $show->field('department_id', __('所属部门'));
+        $show->field('department.name', __('所属部门'));
         $show->field('mobile', __('Mobile'));
         $show->field('email', __('Email'));
         $show->field('sex', __('Sex'));
@@ -174,6 +175,7 @@ class StaffController extends AdminController
             'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
         ];
         $form->switch('is_notice', __('是否接收项目动态'))->states($states)->default(0);
+        $form->switch('is_daily', __('是否写日志'))->states($states)->default(1);
 
         $class = config('admin.database.users_model');
         $admin=new $class();

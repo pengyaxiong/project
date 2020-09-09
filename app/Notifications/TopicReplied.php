@@ -42,7 +42,7 @@ class TopicReplied extends Notification
         } else {
             $staff = Staff::where('admin_id', $this->activity->causer_id)->first();
         }
-        $arr = [1 => '面试审核', 2 => '签约审核', 3 => '设计评审', 4 => '设计验收', 5 => '前端评审', 6 => '前端验收', 7 => '新增需求审核', 8 => '整体验收'];
+        $arr = [1 => '面试审核', 2 => '签约审核', 3 => '设计评审', 4 => '设计验收', 5 => '前端评审', 6 => '前端验收', 7 => '新增需求审核', 8 => '整体验收',9 => '分配任务'];
         // 存入数据库里的数据
         return [
             'title' => $arr[$this->activity->log_name],
@@ -65,7 +65,7 @@ class TopicReplied extends Notification
         } else {
             $staff = Staff::where('admin_id', $this->activity->causer_id)->first();
         }
-        $arr = [1 => '面试审核', 2 => '签约审核', 3 => '设计评审', 4 => '设计验收', 5 => '前端评审', 6 => '前端验收', 7 => '新增需求审核', 8 => '整体验收'];
+        $arr = [1 => '面试审核', 2 => '签约审核', 3 => '设计评审', 4 => '设计验收', 5 => '前端评审', 6 => '前端验收', 7 => '新增需求审核', 8 => '整体验收',9 => '分配任务'];
         return (new MailMessage)
             ->subject('消息通知')
             ->greeting($arr[$this->activity->log_name])

@@ -33,7 +33,7 @@ class DailyController extends AdminController
 
         $grid->header(function ($query) {
             $dailies = $query->wherebetween('created_at', [Carbon::today(), Carbon::tomorrow()])->get()->pluck('staff_id')->toArray();
-            $staffs = Staff::wherenotin('id', $dailies)->pluck('name')->toArray();
+            $staffs = Staff::where('is_daily',1)->wherenotin('id', $dailies)->pluck('name')->toArray();
             return '<span class="label" style="font-weight:unset; color: #fff; background-color: #d9534f">今日未完成人员:</span>&nbsp;' . implode('--', $staffs);
         });
 

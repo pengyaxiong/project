@@ -20,7 +20,17 @@ class ActivityController extends AdminController
 
     public function __construct()
     {
-        $this->log_name = [1 => '面试审核', 2 => '签约审核', 3 => '设计评审', 4 => '设计验收', 5 => '前端评审', 6 => '前端验收', 7 => '新增需求审核', 8 => '整体验收'];
+        $this->log_name = [
+            1 => '面试审核',
+            2 => '签约审核',
+            3 => '设计评审',
+            4 => '设计验收',
+            5 => '前端评审',
+            6 => '前端验收',
+            7 => '新增需求审核',
+            8 => '整体验收',
+            9 => '分配任务'
+        ];
     }
 
     /**
@@ -31,6 +41,7 @@ class ActivityController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Activity());
+        $grid->model()->orderBy('created_at','desc');
 
         $grid->column('id', __('Id'));
         $grid->column('log_name', __('Log name'))->using($this->log_name);

@@ -23,6 +23,7 @@ class NotificationsController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Notifications());
+        $grid->model()->orderBy('created_at','desc');
         $auth = auth('admin')->user();
 
         if ($auth->id > 1) {

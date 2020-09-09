@@ -23,6 +23,7 @@ use App\Models\ProjectStaff;
 use App\Models\Staff;
 use App\Models\Task;
 use App\Notifications\TopicReplied;
+use Carbon\Carbon;
 use Encore\Admin\Admin;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -526,6 +527,12 @@ class ProjectController extends AdminController
                 $form->datetime('start_time', '开始时间')->default(date('Y-m-d', time()));
                 $form->datetime('end_time', '结束时间')->default(date('Y-m-d', time()));
                 $form->textarea('content', '备注');
+
+                $states = [
+                    'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
+                    'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
+                ];
+                $form->switch('is_notice', __('发送通知消息'))->states($states)->default(0);
             });
         });
 
@@ -591,6 +598,25 @@ EOT;
                     ProjectNode::where('project_id', $id)->where('node_id', $value['node_id'])->where('staff_id', $value['staff_id'])->update([
                         'days' => $this->get_weekend_days($value['start_time'], $value['end_time']),
                     ]);
+
+                    //是否发送消息通知
+                    $is_notice=$value['is_notice'];
+                    $name=\Request('name');
+                    $staff=Staff::find($value['staff_id']);
+                    $node_name=Node::find($value['node_id'])->name;
+                    if ($is_notice == 'on') {
+                        activity()->inLog(9)
+                            ->performedOn($staff)
+                            ->causedBy(auth('admin')->user())
+                            ->withProperties([])
+                            ->log($name.'项目'.$node_name.'任务：'.$value['content']);
+
+                        $lastLoggedActivity = Activity::all()->last();
+
+                        $when = Carbon::now()->addSeconds(10);
+                        $staff->notify(new TopicReplied($lastLoggedActivity))->delay($when);
+                    }
+
                 }
             }
         });
