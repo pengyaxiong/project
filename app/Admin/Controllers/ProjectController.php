@@ -253,7 +253,7 @@ class ProjectController extends AdminController
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
-         $grid->fixColumns(1, -1);
+        $grid->fixColumns(1, -1);
 
         $grid->exporter(new ProjectImport());
 
@@ -600,21 +600,21 @@ EOT;
                     ]);
 
                     //是否发送消息通知
-                    $is_notice=$value['is_notice'];
-                    $name=\Request('name');
-                    $staff=Staff::find($value['staff_id']);
-                    $node_name=Node::find($value['node_id'])->name;
+                    $is_notice = $value['is_notice'];
+                    $name = \Request('name');
+                    $staff = Staff::find($value['staff_id']);
+                    $node_name = Node::find($value['node_id'])->name;
                     if ($is_notice == 'on') {
                         activity()->inLog(9)
                             ->performedOn($staff)
                             ->causedBy(auth('admin')->user())
                             ->withProperties([])
-                            ->log($name.'项目'.$node_name.'任务：'.$value['content']);
+                            ->log($name . '项目' . $node_name . '任务：' . $value['content']);
 
                         $lastLoggedActivity = Activity::all()->last();
 
                         $when = Carbon::now()->addSeconds(10);
-                        $staff->notify(new TopicReplied($lastLoggedActivity))->delay($when);
+                        $staff->notify((new TopicReplied($lastLoggedActivity))->delay($when));
                     }
 
                 }
@@ -1126,7 +1126,7 @@ EOT;
     {
         $project = Project::find($request->project_id);
 
-        if ($project->check_status!=5){
+        if ($project->check_status != 5) {
 
             $error = new MessageBag([
                 'title' => 'Error',
@@ -1135,32 +1135,32 @@ EOT;
             return back()->with(compact('error'));
         }
 
-        $patron=Patron::where('project_id',$project->id)->first();
+        $patron = Patron::where('project_id', $project->id)->first();
         Finance::create([
             'staff_id' => auth('admin')->user()->id,
-            'customer_id'=>$patron?$patron->customer_id:0,
-            'project_id'=>$project->id,
-            'patron_id'=>$patron?$patron->id:0,
-            'status'=>2,
-            'pact'=>$request->get('pact'),
-            'money'=>$project->money,
-            'returned_money'=>$request->get('returned_money'),
-            'rebate'=>$request->get('rebate'),
-            'returned_bag'=>$request->get('returned_bag'),
-            'debtors'=>$request->get('debtors'),
-            'description'=>$request->get('description'),
-            'remark'=>$request->get('remark'),
+            'customer_id' => $patron ? $patron->customer_id : 0,
+            'project_id' => $project->id,
+            'patron_id' => $patron ? $patron->id : 0,
+            'status' => 2,
+            'pact' => $request->get('pact'),
+            'money' => $project->money,
+            'returned_money' => $request->get('returned_money'),
+            'rebate' => $request->get('rebate'),
+            'returned_bag' => $request->get('returned_bag'),
+            'debtors' => $request->get('debtors'),
+            'description' => $request->get('description'),
+            'remark' => $request->get('remark'),
         ]);
 
 
-        $project->check_status=2;
+        $project->check_status = 2;
         $project->save();
 
         activity()->inLog(4)
             ->performedOn($project)
             ->causedBy(auth('admin')->user())
             ->withProperties([])
-            ->log('更新'.$project->name.'状态为：设计验收成功');
+            ->log('更新' . $project->name . '状态为：设计验收成功');
 
         $lastLoggedActivity = Activity::all()->last();
 
@@ -1226,9 +1226,9 @@ EOT;
         $patron = Patron::where('project_id', $project->id)->first();
         Finance::create([
             'staff_id' => auth('admin')->user()->id,
-            'customer_id'=>$patron?$patron->customer_id:0,
-            'project_id'=>$project->id,
-            'patron_id'=>$patron?$patron->id:0,
+            'customer_id' => $patron ? $patron->customer_id : 0,
+            'project_id' => $project->id,
+            'patron_id' => $patron ? $patron->id : 0,
             'status' => 3,
             'pact' => $request->get('pact'),
             'money' => $project->money,
@@ -1248,7 +1248,7 @@ EOT;
             ->performedOn($project)
             ->causedBy(auth('admin')->user())
             ->withProperties([])
-            ->log('更新'.$project->name.'状态为：前端验收成功');
+            ->log('更新' . $project->name . '状态为：前端验收成功');
 
         $lastLoggedActivity = Activity::all()->last();
 
@@ -1303,7 +1303,7 @@ EOT;
     {
         $project = Project::find($request->project_id);
 
-        if ($project->check_status!=3){
+        if ($project->check_status != 3) {
             $error = new MessageBag([
                 'title' => 'Error',
                 'message' => '提交失败,审核状态错误....',
@@ -1312,32 +1312,32 @@ EOT;
         }
 
 
-        $patron=Patron::where('project_id',$project->id)->first();
+        $patron = Patron::where('project_id', $project->id)->first();
         Finance::create([
             'staff_id' => auth('admin')->user()->id,
-            'customer_id'=>$patron?$patron->customer_id:0,
-            'project_id'=>$project->id,
-            'patron_id'=>$patron?$patron->id:0,
-            'status'=>4,
-            'pact'=>$request->get('pact'),
-            'money'=>$project->money,
-            'returned_money'=>$request->get('returned_money'),
-            'rebate'=>$request->get('rebate'),
-            'returned_bag'=>$request->get('returned_bag'),
-            'debtors'=>$request->get('debtors'),
-            'description'=>$request->get('description'),
-            'remark'=>$request->get('remark'),
+            'customer_id' => $patron ? $patron->customer_id : 0,
+            'project_id' => $project->id,
+            'patron_id' => $patron ? $patron->id : 0,
+            'status' => 4,
+            'pact' => $request->get('pact'),
+            'money' => $project->money,
+            'returned_money' => $request->get('returned_money'),
+            'rebate' => $request->get('rebate'),
+            'returned_bag' => $request->get('returned_bag'),
+            'debtors' => $request->get('debtors'),
+            'description' => $request->get('description'),
+            'remark' => $request->get('remark'),
         ]);
 
 
-        $project->check_status=4;
+        $project->check_status = 4;
         $project->save();
 
         activity()->inLog(8)
             ->performedOn($project)
             ->causedBy(auth('admin')->user())
             ->withProperties([])
-            ->log('更新'.$project->name.'状态为：整体验收成功');
+            ->log('更新' . $project->name . '状态为：整体验收成功');
 
         $lastLoggedActivity = Activity::all()->last();
 
