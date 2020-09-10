@@ -83,11 +83,15 @@
                     <label for="">联系人</label>
                     <input type="text" class="form-control" name="name" value="{{$patron->name}}" id="" placeholder="">
                 </div>
+
+                @if($patron->customer_id==auth()->user()->id)
                 <div class="form-group">
                     <label for="">手机号</label>
                     <input type="text" class="form-control" name="phone" value="{{$patron->phone}}" id=""
                            placeholder="">
                 </div>
+                @endif
+
                 <div class="form-group">
                     <label for="">职位</label>
                     <input type="text" class="form-control" name="job" value="{{$patron->job}}" id="" placeholder="">
