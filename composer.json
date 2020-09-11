@@ -9,6 +9,7 @@
         "encore/laravel-admin": "^1.8",
         "fideloper/proxy": "^4.0",
         "fruitcake/laravel-cors": "^2.0",
+        "ichynul/iframe-tabs": "^1.3",
         "james.xue/login": "^1.2",
         "laravel-admin-ext/chartjs": "^1.0",
         "laravel-admin-ext/config": "^1.1",

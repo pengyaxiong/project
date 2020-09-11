@@ -451,5 +451,38 @@ return [
                 ],
             ]
         ],
+        'iframe-tabs' => [
+            // Set to `false` if you want to disable this extension
+            'enable' => true,
+            // The controller and action of dashboard page `/admin/dashboard`
+            'home_action' => App\Admin\Controllers\HomeController::class . '@index',
+            // Default page tab-title
+            'home_title' => 'Home',
+            // Default page tab-title icon
+            'home_icon' => 'fa-home',
+            // Whether show icon befor titles for all tab
+            'use_icon' => true,
+            // dashboard css
+            'tabs_css' =>'vendor/laravel-admin-ext/iframe-tabs/dashboard.css',
+            // layer.js path
+            'layer_path' => 'vendor/laravel-admin-ext/iframe-tabs/layer/layer.js',
+            /**
+             * href links do not open in tab .
+             * selecter : .sidebar-menu li a,.navbar-nav>li a,.sidebar .user-panel a,.sidebar-form .dropdown-menu li a
+             * if(href.indexOf(pass_urls[i]) > -1) //pass
+             */
+            'pass_urls' => ['/auth/logout', '/auth/lock'],
+            // When login session state of a tab-page was expired , force top-level window goto login page .
+            //登录超时是是否强制整体跳转到登录页面，设为false的话只在触发超时登录的页面跳转，最大程度保留已打开页面。
+            'force_login_in_top' => true,
+            // tabs left offset
+            'tabs_left'  => 42,
+            // bind click event of table actions [edit / view / create]
+            'bind_urls' => 'popup', //[ popup / new_tab / none]
+            //table actions dom selecter, [view / edit / create]buttons ,and any thing has class pupop : <a class="pupop" popw="400px" poph="200px" href="someurl">mylink</a>
+            'bind_selecter' => 'a.grid-row-view,a.grid-row-edit,.column-__actions__ ul.dropdown-menu a,.box-header .pull-right .btn-success,.popup',
+            //layer popup size
+            'layer_size' => '1100px,98%',
+        ]
     ],
 ];
