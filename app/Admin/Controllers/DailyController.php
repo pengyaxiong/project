@@ -37,7 +37,7 @@ class DailyController extends AdminController
             return '<span class="label" style="font-weight:unset; color: #fff; background-color: #d9534f">今日未完成人员:</span>&nbsp;' . implode('--', $staffs);
         });
 
-        if ($auth->id > 1) {
+        if (!in_array($auth->id,[1,2])) {
             $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
             $grid->model()->where('staff_id', $staff_id);
         }
@@ -83,7 +83,7 @@ class DailyController extends AdminController
             $filter->between('created_at', __('时间'))->date();
         });
 
-        if ($auth->id > 1) {
+        if (!in_array($auth->id,[1,2])) {
             #禁用创建按钮
             //$grid->disableCreateButton();
             #禁用导出数据按钮
@@ -93,7 +93,7 @@ class DailyController extends AdminController
         }
 
         $grid->tools(function ($tools) use ($auth) {
-            if ($auth->id > 1) {
+            if (!in_array($auth->id,[1,2])) {
                 // 禁用批量删除按钮
                 $tools->batch(function ($batch) {
                     $batch->disableDelete();
@@ -102,7 +102,7 @@ class DailyController extends AdminController
         });
 
         $grid->actions(function ($actions) use ($auth) {
-            if ($auth->id > 1) {
+            if (!in_array($auth->id,[1,2])) {
                 $actions->disableDelete();
                 $actions->disableView();
             }

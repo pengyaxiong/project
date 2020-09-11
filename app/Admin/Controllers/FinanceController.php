@@ -93,7 +93,7 @@ class FinanceController extends AdminController
         });
 
         $grid->actions(function ($actions) use ($auth,$slug) {
-            if ($auth->id > 1 && !in_array('apply', $slug)) {
+            if (!in_array($auth->id,[1,2]) && !in_array('apply', $slug)) {
                 $actions->disableView();
                 //  $actions->disableEdit();
                 $actions->disableDelete();
@@ -101,7 +101,7 @@ class FinanceController extends AdminController
         });
 
         $grid->tools(function ($tools) use ($auth,$slug) {
-            if ($auth->id > 1 && !in_array('apply', $slug)) {
+            if (!in_array($auth->id,[1,2]) && !in_array('apply', $slug)) {
                 // 禁用批量删除按钮
                 $tools->batch(function ($batch) {
                     $batch->disableDelete();

@@ -35,7 +35,7 @@ class TaskController extends AdminController
 
         $grid->model()->orderBy('sort_order')->orderBy('created_at', 'desc');
         $auth = auth('admin')->user();
-        if ($auth->id > 1) {
+        if (!in_array($auth->id,[1,2])) {
             $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
             $grid->model()->where('staff_id', $staff_id);
         }
@@ -52,7 +52,7 @@ class TaskController extends AdminController
             'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
         ];
-        if ($auth->id > 1) {
+        if (!in_array($auth->id,[1,2])) {
             $grid->column('is_contract', __('是否签约'))->bool();
         } else {
             $grid->column('is_contract', __('是否签约'))->switch($states);
@@ -97,7 +97,7 @@ class TaskController extends AdminController
 
         $grid->exporter(new TaskImport());
 
-        if ($auth->id > 1) {
+        if (!in_array($auth->id,[1,2])) {
             #禁用创建按钮
             $grid->disableCreateButton();
             #禁用导出数据按钮
@@ -106,7 +106,7 @@ class TaskController extends AdminController
             $grid->disableRowSelector();
         }
         $grid->tools(function ($tools) use ($auth) {
-            if ($auth->id > 1) {
+            if (!in_array($auth->id,[1,2])) {
                 // 禁用批量删除按钮
                 $tools->batch(function ($batch) {
                     $batch->disableDelete();
@@ -115,7 +115,7 @@ class TaskController extends AdminController
         });
 
         $grid->actions(function ($actions) use ($auth) {
-            if ($auth->id > 1) {
+            if (!in_array($auth->id,[1,2])) {
                 $actions->disableDelete();
                 $actions->disableView();
                 $actions->disableEdit();

@@ -38,7 +38,7 @@ class NoticeController extends AdminController
         $auth = auth('admin')->user();
         $slug = $auth->roles->pluck('slug')->toarray();
         $grid = new Grid(new Notice());
-        if ($auth->id > 1 && !in_array('auditions', $slug)) {
+        if (!in_array($auth->id,[1,2]) && !in_array('auditions', $slug)) {
             $staff = Staff::where('admin_id', $auth->id)->first();
             $grid->model()->where('department_id', $staff->department_id)->orwhere('department_id', 0)->orderBy('sort_order');
         } else {

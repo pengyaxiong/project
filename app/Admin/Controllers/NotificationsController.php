@@ -26,7 +26,7 @@ class NotificationsController extends AdminController
         $grid->model()->orderBy('created_at','desc');
         $auth = auth('admin')->user();
 
-        if ($auth->id > 1) {
+        if (!in_array($auth->id,[1,2])) {
             $staff = Staff::where('admin_id', $auth->id)->first();
             $staff->markAsRead();
             $grid->model()->where('notifiable_id', $staff->id);

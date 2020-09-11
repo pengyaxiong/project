@@ -116,7 +116,7 @@ class PatronController extends AdminController
             $filter->equal('status', __('Status'))->select($status_text);
         });
 
-        if ($auth->id > 1) {
+        if (!in_array($auth->id,[1,2])) {
             #禁用创建按钮
             $grid->disableCreateButton();
             #禁用导出数据按钮
@@ -126,7 +126,7 @@ class PatronController extends AdminController
         }
 
         $grid->tools(function ($tools) use ($auth) {
-            if ($auth->id > 1) {
+            if (!in_array($auth->id,[1,2])) {
                 // 禁用批量删除按钮
                 $tools->batch(function ($batch) {
                     $batch->disableDelete();
@@ -135,7 +135,7 @@ class PatronController extends AdminController
         });
 
         $grid->actions(function ($actions) use ($auth) {
-            if ($auth->id > 1) {
+            if (!in_array($auth->id,[1,2])) {
                 $actions->disableDelete();
                 $actions->disableView();
             }
