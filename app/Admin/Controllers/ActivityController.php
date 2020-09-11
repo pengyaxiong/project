@@ -45,7 +45,7 @@ class ActivityController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('log_name', __('Log name'))->using($this->log_name);
-        $grid->column('description', __('Description'));
+        $grid->column('description', __('Description'))->limit(10);
         $grid->column('subject_id', __('Subject id'));
         $grid->column('subject_type', __('Subject type'));
         $grid->column('causer_id', __('Causer id'));

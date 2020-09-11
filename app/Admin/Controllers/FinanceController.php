@@ -40,7 +40,7 @@ class FinanceController extends AdminController
         $slug = $auth->roles->pluck('slug')->toarray();
 
         $grid->column('id', __('Id'));
-        $grid->column('project.name', __('项目名称'));
+        $grid->column('project.name', __('项目名称'))->limit(10);
         $grid->column('status', __('Status'))->using($this->check_status)->label([
             1 => 'default',
             2 => 'info',
@@ -62,8 +62,8 @@ class FinanceController extends AdminController
         $grid->column('rebate', __('返渠道费'));
         $grid->column('returned_bag', __('回款账户'));
         $grid->column('debtors', __('未结余额'));
-        $grid->column('description', __('开票情况'));
-        $grid->column('remark', __('Remark'));
+        $grid->column('description', __('开票情况'))->limit(10);
+        $grid->column('remark', __('Remark'))->limit(10);
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 

@@ -59,9 +59,9 @@ class DailyController extends AdminController
             2 => 'danger',
             0 => 'success',
         ], 'warning');
-        $grid->column('work', __('今日工作内容'));
-        $grid->column('problem', __('待处理问题'));
-        $grid->column('done', __('完成情况'));
+        $grid->column('work', __('今日工作内容'))->limit(10);
+        $grid->column('problem', __('待处理问题'))->limit(10);
+        $grid->column('done', __('完成情况'))->limit(10);
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 

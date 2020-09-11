@@ -38,7 +38,7 @@ class DemandController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('project_id', __('项目名称'))->display(function () {
-            return "<a href='/admin/projects/'  .$this->project_id . '>" . $this->project->name . "</a>";
+            return "<a href='/admin/projects/'  .$this->project_id . '>" . sub($this->project->name,10) . "</a>";
         });
         $grid->column('pact', __('合同（有/无）'))->bool();
         $grid->column('money', __('Money'));
@@ -48,7 +48,7 @@ class DemandController extends AdminController
             'off' => ['value' => 0, 'text' => '未审核', 'color' => 'danger'],
         ];
         $grid->column('status', __('Status'))->switch($states);
-        $grid->column('description', __('Description'));
+        $grid->column('description', __('Description'))->limit(10);
         $grid->column('remark', __('Remark'))->width(288)->editable('textarea');
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();

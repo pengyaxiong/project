@@ -42,10 +42,10 @@ class TaskController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('node.name', __('类型'));
-        $grid->column('name', __('Name'));
+        $grid->column('name', __('Name'))->limit(10);
         $grid->column('staff.name', __('负责人'));
         $grid->column('customer.name', __('对接人'));
-        $grid->column('remark', __('Remark'));
+        $grid->column('remark', __('Remark'))->limit(10);
         $grid->column('days', __('时间周期(天)'));
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
         $states = [

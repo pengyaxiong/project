@@ -107,7 +107,7 @@ class StaffController extends AdminController
             0 => 'success',
         ], 'warning');
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
-        $grid->column('remark', __('Remark'));
+        $grid->column('remark', __('Remark'))->limit(10);
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 

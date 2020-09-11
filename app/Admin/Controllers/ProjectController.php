@@ -84,10 +84,10 @@ class ProjectController extends AdminController
 
         $grid->column('id', __('Id'));
         if ($auth->id > 1) {
-            $grid->column('name', __('Name'));
+            $grid->column('name', __('Name'))->limit(10);
         } else {
             $grid->column('name', __('Name'))->display(function () {
-                return '<a href="/admin/projects/' . $this->id . '/edit">' . $this->name . '</a>';
+                return '<a href="/admin/projects/' . $this->id . '/edit">' . sub($this->name,10) . '</a>';
             });
         }
 
@@ -210,7 +210,7 @@ class ProjectController extends AdminController
                 return new Table(['ID', '客户名称', '合同金额', '状态', '预计回款金额', '实际回款金额', '返渠道费', '回款账户', '未结余额', '详情'], $finances->toarray());
             });
 
-            $grid->column('remark', __('Remark'))->width(288)->editable('textarea');
+            $grid->column('remark', __('Remark'))->limit(10);
             $grid->column('money', __('Money'))->editable();
         }
 

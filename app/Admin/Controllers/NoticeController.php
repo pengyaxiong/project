@@ -10,6 +10,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Table;
+
 class NoticeController extends AdminController
 {
     /**
@@ -26,6 +27,7 @@ class NoticeController extends AdminController
         $select_ = array_prepend($departments, ['id' => 0, 'name' => '所有人']);
         $this->departments = array_column($select_, 'name', 'id');
     }
+
     /**
      * Make a grid builder.
      *
@@ -37,15 +39,15 @@ class NoticeController extends AdminController
         $slug = $auth->roles->pluck('slug')->toarray();
         $grid = new Grid(new Notice());
         if ($auth->id > 1 && !in_array('auditions', $slug)) {
-            $staff=Staff::where('admin_id', $auth->id)->first();
-            $grid->model()->where('department_id',$staff->department_id)->orwhere('department_id', 0)->orderBy('sort_order');
-        }else{
+            $staff = Staff::where('admin_id', $auth->id)->first();
+            $grid->model()->where('department_id', $staff->department_id)->orwhere('department_id', 0)->orderBy('sort_order');
+        } else {
             $grid->model()->orderBy('sort_order');
         }
         $grid->column('id', __('Id'));
         $grid->column('title', __('Title'));
-        $grid->column('department_id', __('可见'))->editable('select', $this->departments);
-        $grid->column('description', __('Description'));
+        $grid->column('department_id', __('可见'))->using($this->departments);
+        $grid->column('description', __('Description'))->limit(10);
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'))->hide();

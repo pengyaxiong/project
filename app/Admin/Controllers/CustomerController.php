@@ -98,7 +98,7 @@ class CustomerController extends AdminController
         $grid->column('city', __('City'))->hide();
         $grid->column('email', __('Email'))->hide();
         $grid->column('sort_order', __('Sort order'))->sortable()->editable()->help('按数字大小正序排序');
-        $grid->column('remark', __('Remark'))->editable();
+        $grid->column('remark', __('Remark'))->limit(10);
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 

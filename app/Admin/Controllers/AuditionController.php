@@ -51,7 +51,7 @@ class AuditionController extends AdminController
             2 => 'info',
         ]);
         $grid->column('images', __('Images'))->carousel();
-        $grid->column('remark', __('Remark'));
+        $grid->column('remark', __('Remark'))->limit(10);
         $grid->column('start_time', __('面试时间'));
         $grid->column('created_at', __('Created at'))->hide();
         $grid->column('updated_at', __('Updated at'))->hide();

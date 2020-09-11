@@ -72,11 +72,13 @@ class PatronController extends AdminController
             }
         });
         $grid->column('start_time', __('开始时间'));
-        $grid->column('relation', __('客户关系'));
-        $grid->column('follow', __('跟进记录'))->display(function ($follow) {
+        $grid->column('relation', __('客户关系'))->limit(10);
+
+        $grid->column('follow', __('跟进记录'))
+            ->display(function ($follow) {
             foreach ($follow as $k => $v) {
                 $follow[$k] = [
-                    'time' => $v['time'],
+                    'time' => date('Y-m-d',strtotime($v['time'])),
                     'content' => isset($v['content']) ? $v['content'] : '',
                 ];
             }
@@ -84,7 +86,7 @@ class PatronController extends AdminController
             return new Table([], $follow);
         });
         $grid->column('images', __('Images'))->carousel();
-        $grid->column('remark', __('Remark'));
+        $grid->column('remark', __('Remark'))->limit(10);
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 
