@@ -63,7 +63,7 @@ class HomeController extends Controller
                     });
                 });
 
-                if ($auth->id == 1) {
+                if (in_array($auth->id,[1,2])) {
                     $row->column(12, function (Column $column) {
                         $column->row(function (Row $row) {
 //                        $row->column(6, function (Column $column) {

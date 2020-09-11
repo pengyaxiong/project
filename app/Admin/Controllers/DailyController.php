@@ -141,7 +141,7 @@ class DailyController extends AdminController
     {
         $form = new Form(new Daily());
         $auth = auth('admin')->user();
-        if ($auth->id == 1) {
+        if (in_array($auth->id,[1,2])) {
             $staffs = Staff::orderby('sort_order')->pluck('name', 'id')->toArray();
         } else {
             $staffs = Staff::where('admin_id', $auth->id)->pluck('name', 'id')->toArray();

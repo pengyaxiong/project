@@ -74,7 +74,7 @@ class PatronController extends AdminController
         $grid->column('start_time', __('开始时间'));
         $grid->column('relation', __('客户关系'))->limit(10);
 
-        $grid->column('follow', __('跟进记录'))
+        $grid->column('follow', __('查看'))
             ->display(function ($follow) {
             foreach ($follow as $k => $v) {
                 $follow[$k] = [

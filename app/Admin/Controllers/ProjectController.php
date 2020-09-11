@@ -186,7 +186,7 @@ class ProjectController extends AdminController
         $auth = auth('admin')->user();
         $slug = $auth->roles->pluck('slug')->toarray();
 
-        if ($auth->id == 1 || in_array('apply', $slug)) {
+        if (in_array($auth->id,[1,2]) || in_array('apply', $slug)) {
             $grid->column('check_status', __('回款状态'))->using($this->check_status)->expand(function ($model) {
                 $check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功'];
                 $apply_status = [1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
@@ -415,7 +415,7 @@ class ProjectController extends AdminController
         $auth = auth('admin')->user();
         $slug = $auth->roles->pluck('slug')->toarray();
 
-        if ($auth->id == 1 || in_array('apply', $slug)) {
+        if (in_array($auth->id,[1,2]) || in_array('apply', $slug)) {
 
             $form->tab('基础信息', function ($form) {
 
