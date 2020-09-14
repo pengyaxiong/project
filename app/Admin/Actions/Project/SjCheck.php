@@ -18,12 +18,12 @@ class SjCheck extends RowAction
     public function handle(Model $model,Request $request)
     {
         // $model ...
-//        if ($model->check_status!=1){
-//            return $this->response()->error('审核状态错误')->refresh();
-//        }
-        if ($model->check_status!=5){
-            return $this->response()->error('设计评审未完成')->refresh();
+        if ($model->check_status!=1){
+            return $this->response()->error('审核状态错误')->refresh();
         }
+//        if ($model->check_status!=5){
+//            return $this->response()->error('设计评审未完成')->refresh();
+//        }
 
         $patron=Patron::where('project_id',$model->id)->first();
         Finance::create([

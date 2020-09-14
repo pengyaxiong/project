@@ -1126,14 +1126,14 @@ EOT;
     {
         $project = Project::find($request->project_id);
 
-        if ($project->check_status != 5) {
-
-            $error = new MessageBag([
-                'title' => 'Error',
-                'message' => '提交失败,设计评审未完成....',
-            ]);
-            return back()->with(compact('error'));
-        }
+//        if ($project->check_status != 5) {
+//
+//            $error = new MessageBag([
+//                'title' => 'Error',
+//                'message' => '提交失败,设计评审未完成....',
+//            ]);
+//            return back()->with(compact('error'));
+//        }
 
         $patron = Patron::where('project_id', $project->id)->first();
         Finance::create([
@@ -1215,13 +1215,13 @@ EOT;
     {
         $project = Project::find($request->project_id);
 
-        if ($project->check_status != 6) {
-            $error = new MessageBag([
-                'title' => 'Error',
-                'message' => '提交失败,前端评审未完成....',
-            ]);
-            return back()->with(compact('error'));
-        }
+//        if ($project->check_status != 6) {
+//            $error = new MessageBag([
+//                'title' => 'Error',
+//                'message' => '提交失败,前端评审未完成....',
+//            ]);
+//            return back()->with(compact('error'));
+//        }
 
         $patron = Patron::where('project_id', $project->id)->first();
         Finance::create([
