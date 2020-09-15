@@ -46,7 +46,10 @@ class StatisticsController extends AdminController
             ->row(function (Row $row) {
                 $row->column(12, function (Column $column) {
                     //欠款
-                    $debtors = Finance::all()->sum('debtors');
+                    $money = Project::all()->sum('money');
+                    $returned_money = Finance::all()->sum('returned_money');
+                    $debtors = $money-$returned_money;
+
                     $column->append(new Box('', view('admin.statistics.finance', compact('debtors'))));
                 });
                 $row->column(12, function (Column $column) {
@@ -110,7 +113,10 @@ class StatisticsController extends AdminController
                     $quarter = date('Y-m-d', strtotime($this->quarter_start)) . '--' . date('Y-m-d', strtotime($this->quarter_end));
                     $year = date('Y-m-d', strtotime($this->year_start)) . '--' . date('Y-m-d', strtotime($this->year_end));
                     //欠款
-                    $debtors = Finance::wherebetween('created_at', [$this->month_start, $this->month_end])->sum('debtors');
+                    $money = Project::wherebetween('contract_time', [$this->month_start, $this->month_end])->sum('money');
+                    $returned_money = Finance::wherebetween('created_at', [$this->month_start, $this->month_end])->sum('returned_money');
+                    $debtors = $money-$returned_money;
+
                     $column->append(new Box('', view('admin.statistics.finance_month', compact('month', 'quarter', 'year', 'debtors'))));
                 });
                 $row->column(12, function (Column $column) {
@@ -172,7 +178,11 @@ class StatisticsController extends AdminController
                     $month = date('Y-m-d', strtotime($this->month_start)) . '--' . date('Y-m-d', strtotime($this->month_end));
                     $quarter = date('Y-m-d', strtotime($this->quarter_start)) . '--' . date('Y-m-d', strtotime($this->quarter_end));
                     $year = date('Y-m-d', strtotime($this->year_start)) . '--' . date('Y-m-d', strtotime($this->year_end));
-                    $debtors = Finance::wherebetween('created_at', [$this->quarter_start, $this->quarter_end])->sum('debtors');
+
+                    $money = Project::wherebetween('contract_time', [$this->quarter_start, $this->quarter_end])->sum('money');
+                    $returned_money = Finance::wherebetween('created_at', [$this->quarter_start, $this->quarter_end])->sum('returned_money');
+                    $debtors = $money-$returned_money;
+
                     $column->append(new Box('', view('admin.statistics.finance_quarter', compact('month', 'quarter', 'year', 'debtors'))));
                 });
                 $row->column(12, function (Column $column) {
@@ -233,7 +243,11 @@ class StatisticsController extends AdminController
                     $month = date('Y-m-d', strtotime($this->month_start)) . '--' . date('Y-m-d', strtotime($this->month_end));
                     $quarter = date('Y-m-d', strtotime($this->quarter_start)) . '--' . date('Y-m-d', strtotime($this->quarter_end));
                     $year = date('Y-m-d', strtotime($this->year_start)) . '--' . date('Y-m-d', strtotime($this->year_end));
-                    $debtors = Finance::wherebetween('created_at', [$this->year_start, $this->year_end])->sum('debtors');
+
+                    $money = Project::wherebetween('contract_time', [$this->year_start, $this->year_end])->sum('money');
+                    $returned_money = Finance::wherebetween('created_at', [$this->year_start, $this->year_end])->sum('returned_money');
+                    $debtors = $money-$returned_money;
+
                     $column->append(new Box('', view('admin.statistics.finance_year', compact('month', 'quarter', 'year', 'debtors'))));
                 });
                 $row->column(12, function (Column $column) {
