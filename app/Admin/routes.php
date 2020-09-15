@@ -72,6 +72,12 @@ Route::group([
     //消息通知
     $router->get('notifications', 'NotificationsController@index');
 
+    //回款统计 月、季、年
+    $router->get('finance_statistics', 'StatisticsController@finance');
+    $router->get('finance_month', 'StatisticsController@finance_month');
+    $router->get('finance_quarter', 'StatisticsController@finance_quarter');
+    $router->get('finance_year', 'StatisticsController@finance_year');
+
     $router->resource('calendar', 'CalendarController');
     $router->put('/drop/{id}', 'CalendarController@drop');
     $router->get('/event','CalendarController@event');

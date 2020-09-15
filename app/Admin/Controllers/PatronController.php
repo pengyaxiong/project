@@ -71,7 +71,11 @@ class PatronController extends AdminController
                     return '<span class="label" style="font-weight:unset; color: #444; background-color: #FFA3BE"><i class="fa fa-pause-circle"></i>&nbsp;已审核</span>';
             }
         });
-        $grid->column('start_time', __('开始时间'));
+        $grid->column('start_time', __('开始时间'))->display(function ($model){
+            if ($model){
+                return date('Y-m-d',strtotime($model));
+            }
+        });
         $grid->column('relation', __('客户关系'))->limit(10);
 
         $grid->column('follow', __('查看'))

@@ -211,7 +211,7 @@ class ProjectController extends AdminController
             });
 
             $grid->column('remark', __('Remark'))->limit(10);
-            $grid->column('money', __('Money'))->editable();
+            $grid->column('money', __('Money'));
         }
 
         $grid->column('demands', __('新增需求'))->display(function ($model) {
@@ -241,13 +241,33 @@ class ProjectController extends AdminController
         ];
         if (!in_array($auth->id,[1,2])) {
             $grid->column('is_check', __('是否交付'))->bool();
-            $grid->column('check_time', __('交付时间'));
-            $grid->column('y_check_time', __('预计交付时间'));
+            $grid->column('check_time', __('交付时间'))->display(function ($model){
+                if ($model){
+                    return date('Y-m-d',strtotime($model));
+                }
+            });
+            $grid->column('y_check_time', __('预计交付时间'))->display(function ($model){
+                if ($model){
+                    return date('Y-m-d',strtotime($model));
+                }
+            });
         } else {
             $grid->column('is_check', __('是否交付'))->switch($states);
-            $grid->column('contract_time', __('Contract time'))->date();
-            $grid->column('check_time', __('交付时间'))->date();
-            $grid->column('y_check_time', __('预计交付时间'))->date();
+            $grid->column('contract_time', __('Contract time'))->display(function ($model){
+                if ($model){
+                    return date('Y-m-d',strtotime($model));
+                }
+            });
+            $grid->column('check_time', __('交付时间'))->display(function ($model){
+                if ($model){
+                    return date('Y-m-d',strtotime($model));
+                }
+            });
+            $grid->column('y_check_time', __('预计交付时间'))->display(function ($model){
+                if ($model){
+                    return date('Y-m-d',strtotime($model));
+                }
+            });
         }
 
         $grid->column('created_at', __('Created at'))->hide();

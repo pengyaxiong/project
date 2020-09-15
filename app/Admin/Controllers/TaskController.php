@@ -87,7 +87,8 @@ class TaskController extends AdminController
 
                 return new Box('周期比列', view('admin.task_days'));
 
-            });
+            }
+        );
 
         $grid->footer(function ($query) {
             $days = $query->sum('days');

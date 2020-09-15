@@ -463,9 +463,9 @@ class VisualizationController extends Controller
         $admin_id = $request->admin_id;
         $staff = Staff::where('admin_id', $admin_id)->first();
 
-        $staff->unreadNotifications; // 获取所有未读通知
-        $staff->readNotifications; // 获取所有已读通知
-        $staff->notifications; // 获取所有通知
+//        $staff->unreadNotifications; // 获取所有未读通知
+//        $staff->readNotifications; // 获取所有已读通知
+//        $staff->notifications; // 获取所有通知
         // 处理逻辑
         $count = count($staff->unreadNotifications);   // 获取的结果
 

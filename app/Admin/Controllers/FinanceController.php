@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Extensions\Button\FinanceStatistics;
 use App\Imports\FinanceImport;
 use App\Models\Customer;
 use App\Models\Finance;
@@ -36,6 +37,25 @@ class FinanceController extends AdminController
     {
         $grid = new Grid(new Finance());
 
+//        $grid->selector(function (Grid\Tools\Selector $selector) {
+//            $selector->selectOne('created_at', '回款金额', ['月度回款', '季度回款', '年度回款'], function ($query, $value) {
+//                $month_start=date("Y-m-d H:i:s",mktime(0, 0 , 0,date("m"),1,date("Y")));
+//                $month_end=date("Y-m-d H:i:s",mktime(23,59,59,date("m"),date("t"),date("Y")));
+//                $season = ceil((date('n'))/3);//当月是第几季度
+//                $jidu_start=date('Y-m-d H:i:s', mktime(0, 0, 0,$season*3-3+1,1,date('Y')));
+//                $jidu_end=date('Y-m-d H:i:s', mktime(23,59,59,$season*3,date('t',mktime(0, 0 , 0,$season*3,1,date("Y"))),date('Y')));
+//                $year_start=date('Y-m-d H:i:s',strtotime(date("Y",time())."-1"."-1"));
+//                $year_end=date('Y-m-d H:i:s',strtotime(date("Y",time())."-12"."-31"));
+//                $between = [
+//                    [$month_start, $month_end],
+//                    [$jidu_start, $jidu_end],
+//                    [$year_start, $year_end]
+//                ];
+//                $query->whereBetween('created_at', $between[$value]);
+//            });
+//        });
+
+
         $auth = auth('admin')->user();
         $slug = $auth->roles->pluck('slug')->toarray();
 
@@ -64,8 +84,16 @@ class FinanceController extends AdminController
         $grid->column('debtors', __('未结余额'));
         $grid->column('description', __('开票情况'))->limit(10);
         $grid->column('remark', __('Remark'))->limit(10);
-        $grid->column('created_at', __('Created at'));
-        $grid->column('updated_at', __('Updated at'));
+        $grid->column('created_at', __('Created at'))->display(function ($model){
+            if ($model){
+                return date('Y-m-d',strtotime($model));
+            }
+        });
+        $grid->column('updated_at', __('Updated at'))->display(function ($model){
+            if ($model){
+                return date('Y-m-d',strtotime($model));
+            }
+        });
 
         $grid->exporter(new FinanceImport());
 
@@ -86,6 +114,8 @@ class FinanceController extends AdminController
             //创建select
             $filter->equal('customer_id', '商务名称')->select($customer_array);
 
+            $filter->equal('status',__('Status'))->select($this->check_status);
+
             $filter->between('created_at', __('Created at'))->date();
 
             $status_text = [1 => '有', 0 => '无'];
@@ -101,6 +131,10 @@ class FinanceController extends AdminController
         });
 
         $grid->tools(function ($tools) use ($auth,$slug) {
+
+            if (in_array($auth->id,[1,2])){
+                $tools->append(new FinanceStatistics());
+            }
             if (!in_array($auth->id,[1,2]) && !in_array('apply', $slug)) {
                 // 禁用批量删除按钮
                 $tools->batch(function ($batch) {
@@ -171,6 +205,7 @@ class FinanceController extends AdminController
         $form->decimal('rebate', __('返渠道费'))->default(0.00);
         $form->text('returned_bag', __('回款账户'));
         $form->decimal('debtors', __('未结余额'))->default(0.00);
+        $form->date('created_at', __('Created at'));
         $form->textarea('description', __('开票情况'));
         $form->textarea('remark', __('Remark'));
 
