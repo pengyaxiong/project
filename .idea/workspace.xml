@@ -14,8 +14,8 @@
       <file leaf-file-name="FinanceController.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/FinanceController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
-              <caret line="48" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
+            <state relative-caret-position="441">
+              <caret line="135" column="56" lean-forward="true" selection-start-line="135" selection-start-column="56" selection-end-line="135" selection-end-column="56" />
               <folding>
                 <element signature="e#41#91#0#PHP" expanded="true" />
               </folding>
@@ -33,11 +33,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="StatisticsController.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="StatisticsController.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/StatisticsController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="392">
-              <caret line="265" column="137" lean-forward="false" selection-start-line="265" selection-start-column="137" selection-end-line="265" selection-end-column="137" />
+            <state relative-caret-position="1652">
+              <caret line="91" column="155" lean-forward="false" selection-start-line="91" selection-start-column="155" selection-end-line="91" selection-end-column="155" />
               <folding>
                 <element signature="e#41#64#0#PHP" expanded="true" />
               </folding>
@@ -48,8 +48,8 @@
       <file leaf-file-name="ProjectController.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/ProjectController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-4242">
-              <caret line="60" column="121" lean-forward="false" selection-start-line="60" selection-start-column="8" selection-end-line="60" selection-end-column="121" />
+            <state relative-caret-position="399">
+              <caret line="281" column="46" lean-forward="true" selection-start-line="281" selection-start-column="46" selection-end-line="281" selection-end-column="46" />
               <folding>
                 <marker date="1600075260785" expanded="true" signature="3384:3441" ph="..." />
                 <marker date="1600075260785" expanded="true" signature="3476:3482" ph=" " />
@@ -84,7 +84,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="finance.blade.php" pinned="false" current-in-tab="false">
+      <file leaf-file-name="finance.blade.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/resources/views/admin/statistics/finance.blade.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="441">
@@ -103,27 +103,26 @@
       <file leaf-file-name="finance_detail.blade.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/resources/views/admin/statistics/finance_detail.blade.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1071">
-              <caret line="51" column="60" lean-forward="false" selection-start-line="51" selection-start-column="56" selection-end-line="51" selection-end-column="60" />
+            <state relative-caret-position="420">
+              <caret line="47" column="49" lean-forward="true" selection-start-line="47" selection-start-column="49" selection-end-line="47" selection-end-column="49" />
               <folding>
-                <element signature="n#style#0;n#div#0;n#div#0;n#td#4;n#tr#0;n#tbody#0;n#table#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <marker date="1600160799098" expanded="true" signature="30:73" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="307:321" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="340:373" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1389:1406" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1425:1446" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1523:1535" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1541:1555" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1590:1591" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1590:1608" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1590:2324" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1591:1607" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1639:1654" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1684:1708" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="1788:1810" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="2015:2029" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="2087:2101" ph="..." />
-                <marker date="1600160799098" expanded="true" signature="2138:2152" ph="..." />
+                <element signature="n#style#0;n#div#0;n#div#0;n#td#5;n#tr#0;n#tbody#0;n#table#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <marker date="1600162854480" expanded="true" signature="30:73" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="307:321" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="340:373" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="1411:1428" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="1447:1468" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="1545:1557" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="1563:1577" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="1612:1632" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="1635:2398" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="1664:1682" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="1713:1728" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="1758:1782" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="1862:1884" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="2089:2103" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="2161:2175" ph="..." />
+                <marker date="1600162854480" expanded="true" signature="2212:2226" ph="..." />
               </folding>
             </state>
           </provider>
@@ -300,14 +299,14 @@
         <option value="$PROJECT_DIR$/resources/views/admin/tools/finance_statistics.blade.php" />
         <option value="$PROJECT_DIR$/app/Admin/Extensions/Button/FinanceStatistics.php" />
         <option value="$PROJECT_DIR$/app/Admin/routes.php" />
-        <option value="$PROJECT_DIR$/app/Admin/Controllers/FinanceController.php" />
         <option value="$PROJECT_DIR$/app/Http/Controllers/Api/VisualizationController.php" />
         <option value="$PROJECT_DIR$/resources/views/admin/statistics/finance.blade.php" />
         <option value="$PROJECT_DIR$/resources/views/admin/statistics/finance_month.blade.php" />
         <option value="$PROJECT_DIR$/resources/views/admin/statistics/finance_year.blade.php" />
         <option value="$PROJECT_DIR$/resources/views/admin/statistics/finance_quarter.blade.php" />
-        <option value="$PROJECT_DIR$/resources/views/admin/statistics/finance_detail.blade.php" />
+        <option value="$PROJECT_DIR$/app/Admin/Controllers/FinanceController.php" />
         <option value="$PROJECT_DIR$/app/Admin/Controllers/StatisticsController.php" />
+        <option value="$PROJECT_DIR$/resources/views/admin/statistics/finance_detail.blade.php" />
       </list>
     </option>
   </component>
@@ -557,12 +556,12 @@
       <workItem from="1599726166360" duration="3567000" />
       <workItem from="1599785928027" duration="11908000" />
       <workItem from="1600044553337" duration="19897000" />
-      <workItem from="1600132311588" duration="19350000" />
+      <workItem from="1600132311588" duration="20595000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="663810000" />
+    <option name="totallyTimeSpent" value="665055000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
@@ -878,16 +877,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/FinanceController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="48" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-          <folding>
-            <element signature="e#41#91#0#PHP" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/Models/Project.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="630">
@@ -928,14 +917,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="671">
           <caret line="470" column="0" lean-forward="true" selection-start-line="470" selection-start-column="0" selection-end-line="470" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/Admin/routes.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="581">
-          <caret line="75" column="36" lean-forward="false" selection-start-line="75" selection-start-column="18" selection-end-line="75" selection-end-column="36" />
           <folding />
         </state>
       </provider>
@@ -988,51 +969,38 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/resources/views/admin/statistics/finance_detail.blade.php">
+    <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/FinanceController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1071">
-          <caret line="51" column="60" lean-forward="false" selection-start-line="51" selection-start-column="56" selection-end-line="51" selection-end-column="60" />
+        <state relative-caret-position="441">
+          <caret line="135" column="56" lean-forward="true" selection-start-line="135" selection-start-column="56" selection-end-line="135" selection-end-column="56" />
           <folding>
-            <element signature="n#style#0;n#div#0;n#div#0;n#td#4;n#tr#0;n#tbody#0;n#table#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <marker date="1600160799098" expanded="true" signature="30:73" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="307:321" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="340:373" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1389:1406" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1425:1446" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1523:1535" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1541:1555" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1590:1591" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1590:1608" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1590:2324" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1591:1607" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1639:1654" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1684:1708" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="1788:1810" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="2015:2029" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="2087:2101" ph="..." />
-            <marker date="1600160799098" expanded="true" signature="2138:2152" ph="..." />
+            <element signature="e#41#91#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/resources/views/admin/statistics/finance.blade.php">
+    <entry file="file://$PROJECT_DIR$/app/Admin/routes.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="441">
-          <caret line="45" column="10" lean-forward="false" selection-start-line="31" selection-start-column="4" selection-end-line="45" selection-end-column="10" />
+        <state relative-caret-position="581">
+          <caret line="75" column="36" lean-forward="false" selection-start-line="75" selection-start-column="18" selection-end-line="75" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/StatisticsController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1652">
+          <caret line="91" column="155" lean-forward="false" selection-start-line="91" selection-start-column="155" selection-end-line="91" selection-end-column="155" />
           <folding>
-            <element signature="e#1552#1558#0#HTML" expanded="true" />
-            <marker date="1600156960435" expanded="true" signature="30:73" ph="..." />
-            <marker date="1600156960435" expanded="true" signature="307:321" ph="..." />
-            <marker date="1600156960435" expanded="true" signature="340:373" ph="..." />
-            <marker date="1600156960435" expanded="true" signature="1717:1725" ph="..." />
+            <element signature="e#41#64#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/ProjectController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4242">
-          <caret line="60" column="121" lean-forward="false" selection-start-line="60" selection-start-column="8" selection-end-line="60" selection-end-column="121" />
+        <state relative-caret-position="399">
+          <caret line="281" column="46" lean-forward="true" selection-start-line="281" selection-start-column="46" selection-end-line="281" selection-end-column="46" />
           <folding>
             <marker date="1600075260785" expanded="true" signature="3384:3441" ph="..." />
             <marker date="1600075260785" expanded="true" signature="3476:3482" ph=" " />
@@ -1066,12 +1034,42 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/Admin/Controllers/StatisticsController.php">
+    <entry file="file://$PROJECT_DIR$/resources/views/admin/statistics/finance_detail.blade.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="392">
-          <caret line="265" column="137" lean-forward="false" selection-start-line="265" selection-start-column="137" selection-end-line="265" selection-end-column="137" />
+        <state relative-caret-position="420">
+          <caret line="47" column="49" lean-forward="true" selection-start-line="47" selection-start-column="49" selection-end-line="47" selection-end-column="49" />
           <folding>
-            <element signature="e#41#64#0#PHP" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#div#0;n#td#5;n#tr#0;n#tbody#0;n#table#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <marker date="1600162854480" expanded="true" signature="30:73" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="307:321" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="340:373" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="1411:1428" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="1447:1468" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="1545:1557" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="1563:1577" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="1612:1632" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="1635:2398" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="1664:1682" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="1713:1728" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="1758:1782" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="1862:1884" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="2089:2103" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="2161:2175" ph="..." />
+            <marker date="1600162854480" expanded="true" signature="2212:2226" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/views/admin/statistics/finance.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="441">
+          <caret line="45" column="10" lean-forward="false" selection-start-line="31" selection-start-column="4" selection-end-line="45" selection-end-column="10" />
+          <folding>
+            <element signature="e#1552#1558#0#HTML" expanded="true" />
+            <marker date="1600156960435" expanded="true" signature="30:73" ph="..." />
+            <marker date="1600156960435" expanded="true" signature="307:321" ph="..." />
+            <marker date="1600156960435" expanded="true" signature="340:373" ph="..." />
+            <marker date="1600156960435" expanded="true" signature="1717:1725" ph="..." />
           </folding>
         </state>
       </provider>

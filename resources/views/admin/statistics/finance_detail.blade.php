@@ -32,6 +32,7 @@
     <thead>
     <tr>
         <th>项目名称</th>
+        <th>交付情况</th>
         <th>项目状态</th>
         <th>合同金额</th>
         <th>回款金额</th>
@@ -43,6 +44,7 @@
         @foreach($projects as $project)
             <tr>
                 <td><a href="/admin/finances?project_id={{$project->id}}">{{$project->name}}</a></td>
+                <td>{!! $project->is_check !!}</td>
                 <td>{!! $project->status !!}</td>
                 <td>{{$project->money}}</td>
                 <td>{{$project->returned_money}}</td>

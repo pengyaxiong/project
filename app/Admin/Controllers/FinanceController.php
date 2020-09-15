@@ -132,7 +132,7 @@ class FinanceController extends AdminController
 
         $grid->tools(function ($tools) use ($auth,$slug) {
 
-            if (in_array($auth->id,[1,2])){
+            if (in_array($auth->id,[1,2]) || in_array('apply', $slug)){
                 $tools->append(new FinanceStatistics());
             }
             if (!in_array($auth->id,[1,2]) && !in_array('apply', $slug)) {

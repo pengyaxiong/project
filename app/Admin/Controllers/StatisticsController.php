@@ -89,6 +89,7 @@ class StatisticsController extends AdminController
                         $project->status='<span class="label label-'.$color[$project->status].'">'.$status[$project->status].'</span>';
                         $project->returned_money=$returned_money;
                         $project->check_status=$check_status[$project->check_status];
+                        $project->is_check=$project->is_check?'<span class="label label-success">已交付</span>':'<span class="label label-danger">未交付</span>';
                         $project->rate=floor($returned_money/($project->money+1)*1000)/10;
                         return $project;
                     });
@@ -152,6 +153,7 @@ class StatisticsController extends AdminController
                         $project->status='<span class="label label-'.$color[$project->status].'">'.$status[$project->status].'</span>';
                         $project->returned_money=$returned_money;
                         $project->check_status=$check_status[$project->check_status];
+                        $project->is_check=$project->is_check?'<span class="label label-success">已交付</span>':'<span class="label label-danger">未交付</span>';
                         $project->rate=floor($returned_money/($project->money+1)*1000)/10;
                         return $project;
                     });
@@ -212,6 +214,7 @@ class StatisticsController extends AdminController
                         $project->status='<span class="label label-'.$color[$project->status].'">'.$status[$project->status].'</span>';
                         $project->returned_money=$returned_money;
                         $project->check_status=$check_status[$project->check_status];
+                        $project->is_check=$project->is_check?'<span class="label label-success">已交付</span>':'<span class="label label-danger">未交付</span>';
                         $project->rate=floor($returned_money/($project->money+1)*1000)/10;
                         return $project;
                     });
@@ -271,6 +274,7 @@ class StatisticsController extends AdminController
                         $returned_money=Finance::where('project_id',$project->id)->wherebetween('created_at', [$this->year_start, $this->year_end])->sum('returned_money');
                         $project->status='<span class="label label-'.$color[$project->status].'">'.$status[$project->status].'</span>';
                         $project->returned_money=$returned_money;
+                        $project->is_check=$project->is_check?'<span class="label label-success">已交付</span>':'<span class="label label-danger">未交付</span>';
                         $project->check_status=$check_status[$project->check_status];
                         $project->rate=floor($returned_money/($project->money+1)*1000)/10;
                         return $project;
