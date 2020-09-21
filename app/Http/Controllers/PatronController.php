@@ -45,7 +45,7 @@ class PatronController extends Controller
             $messages = [
                 'company_name.required' =>'公司名称不能为空',
                 'name.required' => '联系人不能为空',
-//                'phone.required' => '联系人电话不能为空',
+                'phone.required' => '联系人电话不能为空',
                 'phone.unique' => '联系人已经存在',
                 'job.required' => '联系人职位不能为空',
                 'need.required' => '需求不能为空',
@@ -53,8 +53,8 @@ class PatronController extends Controller
             $rules = [
                 'company_name' => 'required',
                 'name' => 'required',
-                'phone' => 'unique:wechat_patron',
-//                'phone' => 'required|unique:wechat_patron',
+//                'phone' => 'unique:wechat_patron',
+                'phone' => 'required|unique:wechat_patron',
                 'job' => 'required',
                 'need' => 'required',
             ];
@@ -96,13 +96,14 @@ class PatronController extends Controller
             'company_name.required' =>'公司名称不能为空',
             'name.required' => '联系人不能为空',
             'phone.unique' => '联系人已经存在',
+            'phone.required' => '联系人电话不能为空',
             'job.required' => '联系人职位不能为空',
             'need.required' => '需求不能为空',
         ];
         $rules = [
             'company_name' => 'required',
             'name' => 'required',
-            'phone' => 'unique:wechat_patron,phone,'.$patron->id,
+            'phone' => 'required|unique:wechat_patron,phone,'.$patron->id,
             'job' => 'required',
             'need' => 'required',
         ];

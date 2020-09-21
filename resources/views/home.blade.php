@@ -93,7 +93,7 @@
                                     <span class="label label-success">{{$patron['money']}}</span>
                                     <span class="{{$patron['status']?'badge':'badge_'}}">{{$patron['status']?'已签约':'待签约'}}</span>
                                     <a href="{{route('patron.edit',$patron['id'])}}">
-                                        {{$patron['company_name'].'-'.$patron['name']}}
+                                        {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
                                     </a>
                                 </li>
                             @endforeach
