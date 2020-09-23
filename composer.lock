@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05eed38fac2ce42b2629f3db43071156",
+    "content-hash": "27048bc21d093c07e6048ef4861d14a3",
     "packages": [
         {
             "name": "anahkiasen/underscore-php",
@@ -7326,6 +7326,65 @@
                 }
             ],
             "time": "2020-07-14T17:54:18+00:00"
+        },
+        {
+            "name": "zuweie/field-interaction",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zuweie/FieldInteraction.git",
+                "reference": "d3b8d0eeb7065aabc41c226e9d0084feeb1e846e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zuweie/FieldInteraction/zipball/d3b8d0eeb7065aabc41c226e9d0084feeb1e846e",
+                "reference": "d3b8d0eeb7065aabc41c226e9d0084feeb1e846e",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "encore/laravel-admin": "^1.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Field\\Interaction\\InteractionServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Field\\Interaction\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "zuweie",
+                    "email": "51930505@qq.com"
+                }
+            ],
+            "description": "make the laravel-admin field has a interaction",
+            "keywords": [
+                "fields interactive",
+                "form field",
+                "interaction",
+                "laravel admin"
+            ],
+            "support": {
+                "issues": "https://github.com/zuweie/FieldInteraction/issues",
+                "source": "https://github.com/zuweie/FieldInteraction/tree/1.10.0"
+            },
+            "time": "2019-12-24T07:13:03+00:00"
         }
     ],
     "packages-dev": [

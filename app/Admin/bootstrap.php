@@ -49,3 +49,6 @@ Form::init(function (Form $form) {
     $navbar->right(new \App\Admin\Extensions\Nav\Links());
 });
 
+
+// 注册scriptinjecter，稍后使用。
+Encore\Admin\Form::extend('scriptinjecter', Field\Interaction\ScriptInjecter::class);

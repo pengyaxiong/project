@@ -37,9 +37,12 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\MessageBag;
 use Spatie\Activitylog\Models\Activity;
+use Field\Interaction\FieldTriggerTrait;
+use Field\Interaction\FieldSubscriberTrait;
 
 class ProjectController extends AdminController
 {
+    use FieldTriggerTrait, FieldSubscriberTrait;
     /**
      * Title for current resource.
      *
@@ -76,18 +79,18 @@ class ProjectController extends AdminController
         $auth = auth('admin')->user();
         $slug = $auth->roles->pluck('slug')->toarray();
 
-        if (!in_array($auth->id,[1,2]) && !in_array('apply', $slug)) {
+        if (!in_array($auth->id, [1, 2]) && !in_array('apply', $slug)) {
             $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
             $project_ids = ProjectNode::where('staff_id', $staff_id)->pluck('project_id');
             $grid->model()->whereIn('id', $project_ids);
         }
 
         $grid->column('id', __('Id'));
-        if (!in_array($auth->id,[1,2])) {
+        if (!in_array($auth->id, [1, 2])) {
             $grid->column('name', __('Name'))->limit(10);
         } else {
             $grid->column('name', __('Name'))->display(function () {
-                return '<a href="/admin/projects/' . $this->id . '/edit">' . sub($this->name,10) . '</a>';
+                return '<a href="/admin/projects/' . $this->id . '/edit">' . sub($this->name, 10) . '</a>';
             });
         }
 
@@ -186,7 +189,7 @@ class ProjectController extends AdminController
         $auth = auth('admin')->user();
         $slug = $auth->roles->pluck('slug')->toarray();
 
-        if (in_array($auth->id,[1,2]) || in_array('apply', $slug)) {
+        if (in_array($auth->id, [1, 2]) || in_array('apply', $slug)) {
             $grid->column('check_status', __('回款状态'))->using($this->check_status)->expand(function ($model) {
                 $check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功'];
                 $apply_status = [1 => 'qy_rate', 2 => 'sj_rate', 3 => 'qd_rate', 4 => 'ys_rate'];
@@ -239,33 +242,33 @@ class ProjectController extends AdminController
             'on' => ['value' => 1, 'text' => '是', 'color' => 'success'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'danger'],
         ];
-        if (!in_array($auth->id,[1,2])) {
+        if (!in_array($auth->id, [1, 2])) {
             $grid->column('is_check', __('是否交付'))->bool();
-            $grid->column('check_time', __('交付时间'))->display(function ($model){
-                if ($model){
-                    return date('Y-m-d',strtotime($model));
+            $grid->column('check_time', __('交付时间'))->display(function ($model) {
+                if ($model) {
+                    return date('Y-m-d', strtotime($model));
                 }
             });
-            $grid->column('y_check_time', __('预计交付时间'))->display(function ($model){
-                if ($model){
-                    return date('Y-m-d',strtotime($model));
+            $grid->column('y_check_time', __('预计交付时间'))->display(function ($model) {
+                if ($model) {
+                    return date('Y-m-d', strtotime($model));
                 }
             });
         } else {
             $grid->column('is_check', __('是否交付'))->switch($states);
-            $grid->column('contract_time', __('Contract time'))->display(function ($model){
-                if ($model){
-                    return date('Y-m-d',strtotime($model));
+            $grid->column('contract_time', __('Contract time'))->display(function ($model) {
+                if ($model) {
+                    return date('Y-m-d', strtotime($model));
                 }
             });
-            $grid->column('check_time', __('交付时间'))->display(function ($model){
-                if ($model){
-                    return date('Y-m-d',strtotime($model));
+            $grid->column('check_time', __('交付时间'))->display(function ($model) {
+                if ($model) {
+                    return date('Y-m-d', strtotime($model));
                 }
             });
-            $grid->column('y_check_time', __('预计交付时间'))->display(function ($model){
-                if ($model){
-                    return date('Y-m-d',strtotime($model));
+            $grid->column('y_check_time', __('预计交付时间'))->display(function ($model) {
+                if ($model) {
+                    return date('Y-m-d', strtotime($model));
                 }
             });
         }
@@ -334,7 +337,7 @@ class ProjectController extends AdminController
 //                }
 //            });
 //        });
-        if (!in_array($auth->id,[1,2])) {
+        if (!in_array($auth->id, [1, 2])) {
             #禁用创建按钮
             $grid->disableCreateButton();
             #禁用导出数据按钮
@@ -343,7 +346,7 @@ class ProjectController extends AdminController
             $grid->disableRowSelector();
         }
         $grid->tools(function ($tools) use ($auth) {
-            if (!in_array($auth->id,[1,2])) {
+            if (!in_array($auth->id, [1, 2])) {
                 // 禁用批量删除按钮
                 $tools->batch(function ($batch) {
                     $batch->disableDelete();
@@ -352,7 +355,7 @@ class ProjectController extends AdminController
         });
 
         $grid->actions(function ($actions) use ($auth) {
-            if (!in_array($auth->id,[1,2])) {
+            if (!in_array($auth->id, [1, 2])) {
                 $actions->disableDelete();
                 $actions->disableView();
                 $actions->disableEdit();
@@ -435,9 +438,31 @@ class ProjectController extends AdminController
         $auth = auth('admin')->user();
         $slug = $auth->roles->pluck('slug')->toarray();
 
-        if (in_array($auth->id,[1,2]) || in_array('apply', $slug)) {
+        if (in_array($auth->id, [1, 2]) || in_array('apply', $slug)) {
 
-            $form->tab('基础信息', function ($form) {
+
+            // 弄一个触发事件的Script对象。
+            $triggerScript = $this->createTriggerScript($form);
+// 弄-个接收并处理事件的Script对象。
+            $subscribeScript = $this->createSubscriberScript($form, function($builder){
+                // 添加事件响应函数
+                $builder->subscribe('money', 'change', function($event){
+
+                    // 这里填写处理事件的javascript脚本，注意：一定要返回一个完整的 javascript function ，否则报错！！！！
+                    return <<< EOT
+               
+               // function中的参数data，是事件自带数据，方便做逻辑处理！data会因为事件不同而类型不同，具体可以在chrome中的console中查看。
+               
+                function (data) {
+                        console.log ('catch an event -> {$event}');
+                       console.log(data);
+                }
+               
+EOT;
+                });
+            });
+
+            $form->tab('基础信息', function ($form)use ($triggerScript, $subscribeScript) {
 
                 $form->text('name', __('Name'))->rules('required');
 
@@ -474,7 +499,7 @@ class ProjectController extends AdminController
 
                 $form->ueditor('content', __('Content'));
 
-                $form->decimal('money', __('Money'))->default(0.00);
+                $form->decimal('money', __('Money'))->default(0.00)->rules('required');
 
                 $form->number('sort_order', __('Sort order'))->default(99);
                 $states = [
@@ -487,7 +512,12 @@ class ProjectController extends AdminController
                 $form->datetime('y_check_time', __('预计交付时间'));
 
 
+                // 最后把 $triggerScript 和 $subscribeScript 注入到Form中去。
+                // scriptinjecter 第一个参数可以为任何字符，但不能为空！！！！
+                $form->scriptinjecter('anyname_but_not_null', $triggerScript, $subscribeScript);
+
             }, true);
+
 
             $form->tab('回款情况', function ($form) {
                 $form->rate('qy_rate', '签约付款比列')->help('占合同总额百分比')->default(40);
@@ -495,7 +525,7 @@ class ProjectController extends AdminController
                 $form->rate('qd_rate', '前端付款比列')->help('占合同总额百分比')->default(20);
                 $form->rate('ys_rate', '验收付款比列')->help('占合同总额百分比')->default(10);
 
-                $form->select('check_status', '回款状态')->options($this->check_status);
+                $form->select('check_status', '回款状态')->options($this->check_status)->default(1);
 
                 // 子表字段
                 $form->hasMany('finances', __('回款记录'), function (Form\NestedForm $form) {
@@ -521,6 +551,7 @@ class ProjectController extends AdminController
                         'off' => ['value' => 0, 'text' => '无', 'color' => 'danger'],
                     ];
                     $form->switch('pact', __('合同（有/无）'))->states($states)->default(0);
+
                     $form->text('returned_money', '回款金额');
                     $form->text('rebate', '返渠道费');
                     $form->text('returned_bag', '回款账户');
@@ -536,7 +567,7 @@ class ProjectController extends AdminController
             $form->hasMany('project_nodes', __('节点情况'), function (Form\NestedForm $form) {
                 $staffs = Staff::all()->toArray();
                 $select_staff = array_column($staffs, 'name', 'id');
-                $form->select('staff_id', '项目负责人')->options($select_staff);
+                $form->select('staff_id', '项目负责人')->options($select_staff)->rules('required');
 
                 $nodes = Node::where('is_project', true)->get()->toArray();
                 $select_node = array_column($nodes, 'name', 'id');
@@ -589,14 +620,25 @@ class ProjectController extends AdminController
         });
 
         $this->style = <<<EOT
-               h4{background-color: cornflowerblue;
-    padding: 9px;
-    border-radius: 24%;};
+//               h4{background-color: cornflowerblue;
+//    padding: 9px;
+//    border-radius: 24%;};
 EOT;
         Admin::style($this->style);
 
+
         //保存前回调
         $form->saving(function (Form $form) {
+
+            $project_nodes = \Request('project_nodes');
+            if ($project_nodes==null){
+                $error = new MessageBag([
+                    'title'   => '错误...',
+                    'message' => '项目节点不能为空....',
+                ]);
+
+                return back()->with(compact('error'));
+            }
 
             $is_check = \Request('is_check');
             if ($is_check == 'on') {
@@ -611,7 +653,11 @@ EOT;
         $form->saved(function (Form $form) {
             $id = $form->model()->id;
             $project_nodes = array_filter(\Request('project_nodes'));
-//           dump($is_check);
+
+            Finance::where('project_id', $id)->update([
+                'money' => $form->model()->money,
+            ]);
+//           dump($id);
 //           exit();
             if (!empty($project_nodes)) {
                 foreach ($project_nodes as $value) {
@@ -639,6 +685,8 @@ EOT;
 
                 }
             }
+
+
         });
 
         return $form;
