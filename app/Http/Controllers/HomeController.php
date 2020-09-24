@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Handlers\WechatConfigHandler;
 use App\Models\Customer;
 use App\Models\Patron;
 use Illuminate\Http\Request;
@@ -9,23 +10,42 @@ use Illuminate\Support\Facades\Validator;
 
 class HomeController extends Controller
 {
+    private $wechat;
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(WechatConfigHandler $wechat)
     {
+        $this->wechat = $wechat;
         $this->middleware('auth');
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
+        $app=$this->wechat->app();
+        //是否在微信浏览器打开
+        if (is_wei_xin()){
+            $response = $app->oauth->scopes(['snsapi_userinfo'])
+                ->redirect($request->fullUrl());
+        }
+        //声明CODE，获取小程序传过来的CODE
+        $code = $request->code;
+        $user = $app->oauth->userFromCode($code);
+        $customer = Customer::where('openid', $user['openid'])->first();
+        if ($customer) {
+
+
+        }else{
+
+            return redirect('/wechat_login');
+        }
+
         $customer_id = auth()->user()->id;
         //我的资讯
         $my_patrons = Patron::where('customer_id', $customer_id)->get()->map(function ($model) {

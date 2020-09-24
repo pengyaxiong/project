@@ -2,10 +2,8 @@
 
 namespace App\Admin\Actions\Patron;
 
-use App\Models\Company;
 use App\Models\Finance;
 use App\Models\Project;
-use App\Models\ProjectCustomer;
 use App\Models\Staff;
 use App\Notifications\TopicReplied;
 use Encore\Admin\Actions\RowAction;
@@ -37,6 +35,8 @@ class PatronCheck extends RowAction
         $money = $request->get('money');
 
         $project = Project::create([
+            'patron_id' => $model->id,
+            'customer_id' => $model->customer_id,
             'name' => $name,
             'remark' => $remark,
             'money' => $money,
@@ -47,10 +47,6 @@ class PatronCheck extends RowAction
             'ys_rate' => $request->get('ys_rate'),
         ]);
 
-        ProjectCustomer::create([
-            'customer_id' => $customer_id,
-            'project_id' => $project->id,
-        ]);
         $model->project_id = $project->id;
         $model->status = 2;
         $model->save();

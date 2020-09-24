@@ -49,8 +49,6 @@ Route::group([
     $router->get('projects/ys/{id}', 'ProjectController@ys');
     $router->post('projects/ys_check', 'ProjectController@ys_check');
 
-    $router->resource('companies', 'CompanyController');
-
     $router->resource('tasks', 'TaskController');
 
     $router->resource('auditions', 'AuditionController');

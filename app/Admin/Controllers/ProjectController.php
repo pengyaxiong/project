@@ -16,7 +16,6 @@ use App\Models\HtmlCheck;
 use App\Models\Node;
 use App\Models\Patron;
 use App\Models\Project;
-use App\Models\ProjectCustomer;
 use App\Models\ProjectNode;
 use App\Models\ProjectNodeInfo;
 use App\Models\ProjectStaff;
@@ -118,14 +117,7 @@ class ProjectController extends AdminController
 
         $grid->column('content', __('Content'))->hide();
         // 不存在的`full_name`字段
-        $grid->column('customer_name', '商务')->display(function () {
-            $customer_ids = ProjectCustomer::where('project_id', $this->id)->pluck('customer_id')->toArray();
-            $customer_name = Customer::wherein('id', $customer_ids)->pluck('name')->toArray();
-            return $customer_name;
-        })->map(function ($customer_name) {
-            return $customer_name;
-        })->implode(',');
-
+        $grid->column('customer.name', '商务');
 
         $grid->column('staff_name', '项目负责人')->display(function () {
             $staff_ids = ProjectStaff::where('project_id', $this->id)->pluck('staff_id')->toArray();
@@ -295,13 +287,11 @@ class ProjectController extends AdminController
             $filter->equal('grade', __('优先级'))->select($this->grade);
             $filter->equal('status', __('Status'))->select($this->status);
 
-            $filter->where(function ($query) {
-
-                $query->whereHas('customers', function ($query) {
-                    $query->where('name', 'like', "%{$this->input}%");
-                });
-
-            }, '商务');
+            $customers = Customer::all()->toArray();
+//            $select_ = array_prepend($customers, ['id' => 0, 'name' => '公有池']);
+            $customer_array = array_column($customers, 'name', 'id');
+            //创建select
+            $filter->equal('customer_id', '商务')->select($customer_array);
 
             $filter->where(function ($query) {
 
@@ -474,19 +464,23 @@ EOT;
                 $form->select('task_id', '任务名称')->options($select_task);
 
                 $staffs = Staff::orderby('sort_order')->pluck('name', 'id')->toArray();
-                $customers = Customer::orderby('sort_order')->pluck('name', 'id')->toArray();
+
+                $customers = Customer::orderby('sort_order')->get()->toArray();
+                $customer_array = array_column($customers, 'name', 'id');
+
+                $form->select('customer_id', __('商务'))->options($customer_array);
+
+                $patrons = Patron::all()->toArray();
+                $patron_array = array_column($patrons, 'name', 'id');
+                //创建select
+                $form->select('patron_id', '客户名称')->options($patron_array);
+
                 if ($form->isEditing()) {
                     $id = request()->route()->parameters()['project'];
-                    $customer_ids = ProjectCustomer::where('project_id', $id)->pluck('customer_id')->toArray();
                     $staff_ids = ProjectStaff::where('project_id', $id)->pluck('staff_id')->toArray();
-
-                    $form->multipleSelect('customers', __('商务'))
-                        ->options($customers)->default($customer_ids);
                     $form->multipleSelect('staffs', __('项目负责人'))
                         ->options($staffs)->default($staff_ids);
                 } else {
-                    $form->multipleSelect('customers', __('商务'))
-                        ->options($customers);
                     $form->multipleSelect('staffs', __('项目负责人'))
                         ->options($staffs);
                 }
@@ -533,19 +527,7 @@ EOT;
                     $select_ = array_prepend($staffs, ['id' => 1, 'name' => '超级管理员']);
                     $select_staff = array_column($select_, 'name', 'id');
                     $form->select('staff_id', '审核人')->options($select_staff)->default(1);
-
-                    $patrons = Patron::all()->toArray();
-                    $patron_array = array_column($patrons, 'name', 'id');
-                    //创建select
-                    $form->select('patron_id', '客户名称')->options($patron_array);
-
-                    $customers = Customer::all()->toArray();
-                    $customer_array = array_column($customers, 'name', 'id');
-                    //创建select
-                    $form->select('customer_id', '商务名称')->options($customer_array);
-
                     $form->select('status', __('Status'))->options($this->finance_status);
-
                     $states = [
                         'on' => ['value' => 1, 'text' => '有', 'color' => 'success'],
                         'off' => ['value' => 0, 'text' => '无', 'color' => 'danger'],
@@ -654,9 +636,14 @@ EOT;
             $id = $form->model()->id;
             $project_nodes = array_filter(\Request('project_nodes'));
 
+            $finances = array_filter(\Request('finances'));
+
             Finance::where('project_id', $id)->update([
                 'money' => $form->model()->money,
+                'customer_id' =>$form->model()->customer_id,
+                'patron_id' =>$form->model()->patron_id,
             ]);
+
 //           dump($id);
 //           exit();
             if (!empty($project_nodes)) {

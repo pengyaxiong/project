@@ -86,3 +86,15 @@ function tree(&$data, $parent_id = 0, $count = 1)
     }
     return $treeList;
 }
+
+
+//判断是否在微信中打开
+function is_wei_xin(){
+    $sUserAgent = strtolower($_SERVER["HTTP_USER_AGENT"]);
+
+    if (strpos($sUserAgent, 'micromessenger') !== false) {
+        return true;
+    } else {
+        return false;
+    }
+}

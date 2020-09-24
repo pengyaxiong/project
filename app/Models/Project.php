@@ -30,7 +30,6 @@ class Project extends Model
             //这样可以拿到当前操作id
             $project_id=$model->id;
             ProjectNode::where('project_id',$project_id)->delete();
-            ProjectCustomer::where('project_id',$project_id)->delete();
             ProjectStaff::where('project_id',$project_id)->delete();
         });
     }
@@ -43,12 +42,9 @@ class Project extends Model
         );
     }
 
-    public function customers()
+    public function customer()
     {
-        return $this->belongsToMany(Customer::class,'wechat_project_customer','project_id','customer_id')->withPivot(
-            'customer_id',
-            'project_id'
-        );
+        return $this->belongsTo(Customer::class);
     }
 
     public function project_nodes()
@@ -59,6 +55,11 @@ class Project extends Model
     public function task()
     {
         return $this->belongsTo(Task::class);
+    }
+
+    public function patron()
+    {
+        return $this->belongsTo(Patron::class);
     }
 
     public function finances()

@@ -100,6 +100,7 @@ class NoticeController extends AdminController
         $form->select('department_id', __('可见'))->options($this->departments);
         $form->textarea('description', __('Description'));
         $form->number('sort_order', __('Sort order'))->default(99);
+
         return $form;
     }
 }
