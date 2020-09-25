@@ -34,7 +34,6 @@ class HomeController extends Controller
         $original = $user->original;
         $openid = $original['openid'];
         if ($openid!=null){
-            return $original;
             Customer::where('id',$customer_id)->update([
                 'openid' => $original['openid'],
                 'headimgurl' => $original['headimgurl'],
