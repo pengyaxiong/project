@@ -26,7 +26,7 @@ class WelcomeController extends Controller
 
         $app = $this->wechat->app();
         $wechat = session('wechat.oauth_user.default'); //拿到授权用户资料
-        if ($wechat){
+        if ($wechat['openid']!=null){
             $customer = Customer::where('openid', $wechat['openid'])->first();
             if ($customer) {
                 Auth::loginUsingId($customer->id);
