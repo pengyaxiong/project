@@ -188,15 +188,12 @@ class FinanceController extends AdminController
         //创建select
         $form->select('project_id', '项目名称')->options($project_array);
 
-        $patrons = Patron::all()->toArray();
-        $patron_array = array_column($patrons, 'name', 'id');
-        //创建select
-        $form->select('patron_id', '客户名称')->options($patron_array);
-
-        $customers = Customer::all()->toArray();
+        $customers = Customer::orderby('sort_order')->get()->toArray();
         $customer_array = array_column($customers, 'name', 'id');
-        //创建select
-        $form->select('customer_id', '商务名称')->options($customer_array);
+
+        $form->select('customer_id', __('商务'))->options($customer_array)->load('patron_id', '/api/customer_patron');
+
+        $form->select('patron_id', '客户名称');
 
 
         $form->radio('pact', __('合同（有/无）'))->options([1 => '有', 0 => '无'])->default(1);

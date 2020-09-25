@@ -46,6 +46,9 @@ Route::group(['namespace' => 'Api','as'=>'api.'], function () {
     //消息通知
     Route::get('notifications', 'VisualizationController@notifications');
 
+
+    //select联动
+    Route::get('customer_patron','VisualizationController@customer_patron');
 });
 
 

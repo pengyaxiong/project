@@ -476,4 +476,15 @@ class VisualizationController extends Controller
         return ['code' => 201];
 
     }
+
+
+
+    public function customer_patron(Request $request)
+    {
+        $customerId = $request->get('q');
+
+        $patrons=Patron::where('customer_id',$customerId)->get(['id', \DB::raw('name as text')]);
+
+        return $patrons;
+    }
 }

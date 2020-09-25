@@ -468,12 +468,9 @@ EOT;
                 $customers = Customer::orderby('sort_order')->get()->toArray();
                 $customer_array = array_column($customers, 'name', 'id');
 
-                $form->select('customer_id', __('商务'))->options($customer_array);
+                $form->select('customer_id', __('商务'))->options($customer_array)->load('patron_id', '/api/customer_patron');
 
-                $patrons = Patron::all()->toArray();
-                $patron_array = array_column($patrons, 'name', 'id');
-                //创建select
-                $form->select('patron_id', '客户名称')->options($patron_array);
+                $form->select('patron_id', '客户名称');
 
                 if ($form->isEditing()) {
                     $id = request()->route()->parameters()['project'];
@@ -678,7 +675,6 @@ EOT;
 
         return $form;
     }
-
 
     /**
      * | @param char|int $start_date 一个有效的日期格式，例如：20091016，2009-10-16

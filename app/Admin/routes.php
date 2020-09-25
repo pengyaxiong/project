@@ -79,4 +79,5 @@ Route::group([
     $router->resource('calendar', 'CalendarController');
     $router->put('/drop/{id}', 'CalendarController@drop');
     $router->get('/event','CalendarController@event');
+
 });
