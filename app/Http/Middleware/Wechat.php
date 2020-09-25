@@ -26,9 +26,7 @@ class Wechat
                     'openid'=>$openid,
                 ]);
             } else {
-                $customer = Customer::create([
-                    'openid'=>$openid,
-                ]);
+               return redirect('/wechat_auth');
             }
             session(['wechat.customer' => $customer]);
         }

@@ -11,11 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    $notices = \App\Models\Notice::wherein('department_id', [0, 12])->orderby('sort_order')->get();
-    return view('welcome', compact('notices'));
-//    return redirect('/home');
-});
+Route::get('/', 'WelcomeController@index')->name('welcome');
 
 Auth::routes();
 

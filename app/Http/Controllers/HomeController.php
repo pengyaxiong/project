@@ -26,29 +26,21 @@ class HomeController extends Controller
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function index(Request $request)
+    public function index()
     {
-        $app=$this->wechat->app();
-        //是否在微信浏览器打开
-        if (is_wei_xin()){
-            $response = $app->oauth->scopes(['snsapi_userinfo'])
-                ->redirect($request->fullUrl());
-
-            return $response;
-        }
-        //声明CODE，获取小程序传过来的CODE
-        $code = $request->code;
-        $user = $app->oauth->userFromCode($code);
-        $customer = Customer::where('openid', $user['openid'])->first();
-        if ($customer) {
-
-
-        }else{
-
-            return redirect('/wechat_login');
-        }
-
         $customer_id = auth()->user()->id;
+
+        $wechat = session('wechat.oauth_user.default'); //拿到授权用户资料
+        if ($wechat){
+            Customer::where('id',$customer_id)->update([
+                'openid' => $wechat['openid'],
+                'headimgurl' => $wechat['headimgurl'],
+                'nickname' => $wechat['nickname'],
+//                'tel' => $wechat['tel'],
+                'sex' => $wechat['sex'],
+            ]);
+        }
+
         //我的资讯
         $my_patrons = Patron::where('customer_id', $customer_id)->get()->map(function ($model) {
             $need_arr = [0 => 'APP', 1 => '小程序', 2 => '网站', 3 => '系统软件', 4 => '其它'];
