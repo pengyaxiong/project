@@ -24,7 +24,7 @@ class HomeController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function index(Request $request)
     {
@@ -33,6 +33,8 @@ class HomeController extends Controller
         if (is_wei_xin()){
             $response = $app->oauth->scopes(['snsapi_userinfo'])
                 ->redirect($request->fullUrl());
+
+            return $response;
         }
         //声明CODE，获取小程序传过来的CODE
         $code = $request->code;
