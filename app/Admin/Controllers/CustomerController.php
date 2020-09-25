@@ -42,10 +42,11 @@ class CustomerController extends AdminController
             return '查看';
         })->expand(function ($model) {
             $children = $model->children->map(function ($child) {
-                return $child->only(['id', 'name', 'tel', 'remark']);
+                return $child->only(['id', 'headimgurl','nickname','name', 'tel', 'remark']);
             });
             $array = $children->toArray();
             foreach ($array as $k => $v) {
+                $array[$k]['headimgurl']='<img src="'.$v['headimgurl'].'" style="max-width:200px;max-height:200px" class="img img-thumbnail">';
                 $url = route('admin.customers.edit', $v['id']);
                 $array[$k]['edit'] = '<div class="btn">
               <a class=""  href="' . $url . '" rel="external" >
@@ -54,7 +55,7 @@ class CustomerController extends AdminController
                  </div>';
             }
 
-            return new Table(['ID', __('名称'), __('Tel'), __('Remark'), '操作'], $array);
+            return new Table(['ID',  __('Headimgurl'), __('Nickname'),__('名称'), __('Tel'), __('Remark'), '操作'], $array);
         });
         $grid->column('patrons', __('客户列表'))->display(function () {
             return '查看';
