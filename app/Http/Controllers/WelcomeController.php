@@ -25,9 +25,11 @@ class WelcomeController extends Controller
         $notices = Notice::wherein('department_id', [0, 12])->orderby('sort_order')->get();
 
         $app = $this->wechat->app();
-        $wechat = session('wechat.oauth_user.default'); //拿到授权用户资料
-        if ($wechat['openid']!=null){
-            $customer = Customer::where('openid', $wechat['openid'])->first();
+        $user = session('wechat.oauth_user.default'); //拿到授权用户资料
+        $original = $user->original;
+        $openid = $original['openid'];
+        if ($openid!=null){
+            $customer = Customer::where('openid', $openid)->first();
             if ($customer) {
                 Auth::loginUsingId($customer->id);
             }

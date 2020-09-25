@@ -30,14 +30,16 @@ class HomeController extends Controller
     {
         $customer_id = auth()->user()->id;
 
-        $wechat = session('wechat.oauth_user.default'); //拿到授权用户资料
-        if ($wechat){
+        $user = session('wechat.oauth_user.default'); //拿到授权用户资料
+        $original = $user->original;
+        $openid = $original['openid'];
+        if ($openid!=null){
             Customer::where('id',$customer_id)->update([
-                'openid' => $wechat['openid'],
-                'headimgurl' => $wechat['headimgurl'],
-                'nickname' => $wechat['nickname'],
+                'openid' => $original['openid'],
+                'headimgurl' => $original['headimgurl'],
+                'nickname' => $original['nickname'],
 //                'tel' => $wechat['tel'],
-                'sex' => $wechat['sex'],
+                'sex' => $original['sex'],
             ]);
         }
 
