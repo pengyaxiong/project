@@ -59,10 +59,10 @@ return [
      */
     'official_account' => [
         'default' => [
-            'app_id' => config('wechat_app_id'),         // AppID
-            'secret' => config('wechat_secret'),    // AppSecret
-            'token' => config('wechat_token'),           // Token
-            'aes_key' => config('wechat_aes_key'),                 // EncodingAESKey
+            'app_id' => env('WECHAT_OFFICIAL_ACCOUNT_APPID', 'your-app-id'),         // AppID
+            'secret' => env('WECHAT_OFFICIAL_ACCOUNT_SECRET', 'your-app-secret'),    // AppSecret
+            'token' => env('WECHAT_OFFICIAL_ACCOUNT_TOKEN', 'your-token'),           // Token
+            'aes_key' => env('WECHAT_OFFICIAL_ACCOUNT_AES_KEY', ''),                 // EncodingAESKey
 
             /*
              * OAuth 配置
@@ -70,12 +70,13 @@ return [
              * scopes：公众平台（snsapi_userinfo / snsapi_base），开放平台：snsapi_login
              * callback：OAuth授权完成后的回调页地址(如果使用中间件，则随便填写。。。)
              */
-             'oauth' => [
-                 'scopes'   => array_map('trim', explode(',', config('oauth_scopes','snsapi_userinfo'))),
-                 'callback' =>config('oauth_callback','/examples/oauth_callback.php'),
-             ],
+            'oauth' => [
+                'scopes'   => array_map('trim', explode(',', env('WECHAT_OFFICIAL_ACCOUNT_OAUTH_SCOPES', 'snsapi_userinfo'))),
+                'callback' => env('WECHAT_OFFICIAL_ACCOUNT_OAUTH_CALLBACK', '/examples/oauth_callback.php'),
+            ],
         ],
     ],
+
 
     /*
      * 开放平台第三方平台
