@@ -29,20 +29,20 @@ class HomeController extends Controller
     public function index()
     {
         $customer_id = auth()->user()->id;
-
-        $user = session('wechat.oauth_user.default'); //拿到授权用户资料
-        $original = $user->original;
-        $openid = $original['openid'];
-        if ($openid!=null){
-            Customer::where('id',$customer_id)->update([
-                'openid' => $original['openid'],
-                'headimgurl' => $original['headimgurl'],
-                'nickname' => $original['nickname'],
+        if (is_wei_xin()) {
+            $user = session('wechat.oauth_user.default'); //拿到授权用户资料
+            $original = $user->original;
+            $openid = $original['openid'];
+            if ($openid != null) {
+                Customer::where('id', $customer_id)->update([
+                    'openid' => $original['openid'],
+                    'headimgurl' => $original['headimgurl'],
+                    'nickname' => $original['nickname'],
 //                'tel' => $wechat['tel'],
-                'sex' => $original['sex'],
-            ]);
+                    'sex' => $original['sex'],
+                ]);
+            }
         }
-
         //我的资讯
         $my_patrons = Patron::where('customer_id', $customer_id)->get()->map(function ($model) {
             $need_arr = [0 => 'APP', 1 => '小程序', 2 => '网站', 3 => '系统软件', 4 => '其它'];
