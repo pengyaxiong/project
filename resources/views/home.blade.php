@@ -46,7 +46,7 @@
                                   data-id="{{$patron['id']}}"
                                   data-attr="status">{{$patron['status']?$patron['status']==1?'已签约':'已审核':'待签约'}}</span>
                             <a href="{{route('patron.edit',$patron['id'])}}">
-                                {{$patron['company_name'].'-'.$patron['name']}}
+                                {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
                             </a>
                             <span class="follow" data-id="{{$patron['id']}}">跟进</span>
                         </li>
@@ -69,7 +69,7 @@
                             <span class="label label-success">{{$patron['money']}}</span>
                             <span class="{{$patron['status']?'badge':'badge_'}}">{{$patron['status']?'已签约':'待签约'}}</span>
                             <a href="{{route('patron.edit',$patron['id'])}}">
-                                {{$patron['company_name'].'-'.$patron['name']}}
+                                {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
                             </a>
                         </li>
                     @endforeach

@@ -80,8 +80,12 @@ class ProjectController extends AdminController
 
         if (!in_array($auth->id, [1, 2]) && !in_array('apply', $slug)) {
             $staff_id = Staff::where('admin_id', $auth->id)->first()->id;
-            $project_ids = ProjectNode::where('staff_id', $staff_id)->pluck('project_id');
-            $grid->model()->whereIn('id', $project_ids);
+            $project_ids = ProjectNode::where('staff_id', $staff_id)->pluck('project_id')->toarray();
+            $project_staff_ids = ProjectStaff::where('staff_id', $staff_id)->pluck('project_id')->toarray();
+
+            $ids=array_merge($project_ids,$project_staff_ids);
+
+            $grid->model()->whereIn('id', $ids);
         }
 
         $grid->column('id', __('Id'));

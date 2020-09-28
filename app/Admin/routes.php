@@ -13,17 +13,20 @@ Route::group([
 
     $router->get('/', 'HomeController@index')->name('home');
 
+    //微信配置
     $router->resource('configs', 'ConfigController');
 
+    //员工管理
     $router->resource('staff', 'StaffController');
 
-
+    //商务管理
     $router->resource('customers', 'CustomerController');
 
+    //部门管理
     $router->resource('departments', 'DepartmentController');
-
+    //节点管理
     $router->resource('nodes', 'NodeController');
-
+    //项目管理
     $router->resource('projects', 'ProjectController');
 
     $router->get('projects/node/{project_id}', 'ProjectController@project_node');
@@ -49,16 +52,17 @@ Route::group([
     $router->get('projects/ys/{id}', 'ProjectController@ys');
     $router->post('projects/ys_check', 'ProjectController@ys_check');
 
+    //任务管理
     $router->resource('tasks', 'TaskController');
-
+    //面试邀约
     $router->resource('auditions', 'AuditionController');
-
+    //客户管理
     $router->resource('patrons', 'PatronController');
-
+    //公告管理
     $router->resource('notices', 'NoticeController');
-
+    //项目回款
     $router->resource('finances', 'FinanceController');
-
+    //日志管理
     $router->resource('dailies', 'DailyController');
 
     //新增需求

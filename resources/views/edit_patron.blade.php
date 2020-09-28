@@ -4,7 +4,7 @@
 @endsection
 @section('content')
     @if(!empty($patron->follow))
-        @if($patron->customer_id==auth()->user()->id ||auth()->user()->parent_id==0)
+        @if($patron->customer_id==auth()->user()->id ||auth()->user()->parent_id==0 || $patron->customer_id==0)
             <div class="panel panel-default">
                 <div class="panel-heading">跟进记录</div>
                 <div class="panel-body">
@@ -84,13 +84,13 @@
                     <input type="text" class="form-control" name="name" value="{{$patron->name}}" id="" placeholder="">
                 </div>
 
-                @if($patron->customer_id==auth()->user()->id)
+
                 <div class="form-group">
                     <label for="">手机号</label>
                     <input type="text" class="form-control" name="phone" value="{{$patron->phone}}" id=""
                            placeholder="">
                 </div>
-                @endif
+
 
                 <div class="form-group">
                     <label for="">职位</label>
