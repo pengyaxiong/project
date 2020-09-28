@@ -48,6 +48,8 @@
                             <a href="{{route('patron.edit',$patron['id'])}}">
                                 {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
                             </a>
+                            <br>
+                            <span>录入时间：{{$patron['created_at']}}</span>
                             <span class="follow" data-id="{{$patron['id']}}">跟进</span>
                         </li>
                     @endforeach
@@ -71,6 +73,8 @@
                             <a href="{{route('patron.edit',$patron['id'])}}">
                                 {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
                             </a>
+                            <br>
+                            <span>录入时间：{{$patron['created_at']}}</span>
                         </li>
                     @endforeach
                 @endif
@@ -95,6 +99,8 @@
                                     <a href="{{route('patron.edit',$patron['id'])}}">
                                         {{$patron['company_name'].'-'.$patron['name'].'-'.$patron['phone']}}
                                     </a>
+                                    <br>
+                                    <span>录入时间：{{$patron['created_at']}}</span>
                                 </li>
                             @endforeach
                         @endif
