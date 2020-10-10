@@ -10,11 +10,17 @@
                 <div class="panel-body">
                     <div class="list-group">
                         @foreach($patron->follow as $follow)
-                            <a href="#" class="list-group-item">
-                                <h4 class="list-group-item-heading">{{$follow['time']}}</h4>
-                                <p class="list-group-item-text">{{$follow['content']}}</p>
-                            </a>
+                            <li class="list-group-item">
+                                <span class="label label-success">{{$follow['time']}}</span>
+                                <input type="hidden" class="follow_time" name="time" value="{{$follow['time']}}">
+                                <br>
+                                <br>
+                                <textarea class="form-control follow_content" name="content" rows="3" >{{$follow['content']}}</textarea>
+                            </li>
                         @endforeach
+                        <li class="list-group-item">
+                            <button type="button" data-id="{{$patron->id}}"  data-customer_id="{{auth()->user()->id}}" id="edit_follow" class="btn btn-primary">修改</button>
+                        </li>
                     </div>
                 </div>
             </div>
@@ -235,6 +241,43 @@
                         }
                     })
                  }
+
+            });
+
+        })
+        $("#edit_follow").on('click', function () {
+            var follow_time = $(".follow_time").serializeArray();
+            var follow_content = $(".follow_content").serializeArray();
+            var id = $(this).data('id');
+            var customer_id = $(this).data('customer_id');
+            console.log(follow_time);
+            swal({
+                title: "确定修改?",
+                text: " ",
+                icon: "warning",
+                buttons: {
+                    cancel: "取消",
+                    catch: {
+                        text: "确定!",
+                        value: "willDelete",
+                        className: "swal-button--danger",
+                    }
+                },
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.post('/api/follow_edit', {id: id, customer_id: customer_id, follow_time: follow_time, follow_content: follow_content}, function (data) {
+                        if (data.code == 200) {
+                            swal("恭喜!", "修改成功", "success").then((value) => {
+                                location.href = location.href;
+                        });
+
+                        }else{
+                            swal("失败!", "没有权限", "error")
+                        }
+                    })
+
+                }
 
             });
 

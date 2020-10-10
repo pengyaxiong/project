@@ -39,6 +39,8 @@ Route::group(['namespace' => 'Api','as'=>'api.'], function () {
     //删除客户资讯
     Route::post('delete_patron', 'VisualizationController@delete_patron');
 
+    Route::post('follow_edit', 'VisualizationController@follow_edit');
+
     //上传图片
     Route::post('upload_image', 'VisualizationController@upload_image');
     Route::post('delete_image', 'VisualizationController@delete_image');

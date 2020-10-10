@@ -416,6 +416,28 @@ class VisualizationController extends Controller
         return $this->null();
     }
 
+    public function follow_edit(Request $request)
+    {
+        $patron_id = $request->id;
+        $customer_id = $request->customer_id;
+        $patron = Patron::find($patron_id);
+        if ($customer_id != $patron->customer_id) {
+            return $this->error(500, '您没有权限权限！');
+        }
+        $arr =[];
+        if (!empty($request->follow_content)){
+            foreach ($request->follow_content as $k=>$v){
+                $arr[$k]['time']=$request->follow_time[$k]['value'];
+                $arr[$k]['content']=$v['value'];
+            }
+        }
+        $patron->follow =$arr;
+
+        $patron->save();
+
+        return $this->null();
+    }
+
     public function upload_image(Request $request)
     {
         if ($request->id and $request->hasFile('file') and $request->file('file')->isValid()) {

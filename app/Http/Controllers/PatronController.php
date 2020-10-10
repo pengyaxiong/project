@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Spatie\Activitylog\Models\Activity;
 use App\Models\Staff;
 use App\Notifications\TopicReplied;
+
 class PatronController extends Controller
 {
     /**
@@ -26,9 +27,9 @@ class PatronController extends Controller
     {
         $customer_id = auth()->user()->id;
         $parent_id = auth()->user()->parent_id;
-        $customers=Customer::where('parent_id',$customer_id)->orwhere('id',$customer_id)->where('status',1)->get();
+        $customers = Customer::where('parent_id', $customer_id)->orwhere('id', $customer_id)->where('status', 1)->get();
 
-        return view('add_patron',compact('parent_id','customers'));
+        return view('add_patron', compact('parent_id', 'customers'));
     }
 
     public function store(Request $request)
@@ -43,7 +44,7 @@ class PatronController extends Controller
 //        }
         try {
             $messages = [
-                'company_name.required' =>'公司名称不能为空',
+                'company_name.required' => '公司名称不能为空',
                 'name.required' => '联系人不能为空',
                 'phone.required' => '联系人电话不能为空',
                 'phone.unique' => '联系人已经存在',
@@ -79,13 +80,13 @@ class PatronController extends Controller
     {
         $patron = Patron::find($id);
 //        $patron->start_time = str_replace(' ', 'T', $patron->start_time);
-        $patron->start_time = date('Y-m-d',strtotime($patron->start_time));
+        $patron->start_time = date('Y-m-d', strtotime($patron->start_time));
 
         $customer_id = auth()->user()->id;
         $parent_id = auth()->user()->parent_id;
-        $customers=Customer::where('parent_id',$customer_id)->orwhere('id',$customer_id)->where('status',1)->get();
+        $customers = Customer::where('parent_id', $customer_id)->orwhere('id', $customer_id)->where('status', 1)->get();
 
-        return view('edit_patron', compact('patron','parent_id','customers'));
+        return view('edit_patron', compact('patron', 'parent_id', 'customers'));
     }
 
     public function update(Request $request, $id)
@@ -93,7 +94,7 @@ class PatronController extends Controller
         $patron = Patron::find($id);
 
         $messages = [
-            'company_name.required' =>'公司名称不能为空',
+            'company_name.required' => '公司名称不能为空',
             'name.required' => '联系人不能为空',
             'phone.unique' => '联系人已经存在',
             'phone.required' => '联系人电话不能为空',
@@ -103,7 +104,7 @@ class PatronController extends Controller
         $rules = [
             'company_name' => 'required',
             'name' => 'required',
-            'phone' => 'required|unique:wechat_patron,phone,'.$patron->id,
+            'phone' => 'required|unique:wechat_patron,phone,' . $patron->id,
             'job' => 'required',
             'need' => 'required',
         ];
@@ -116,14 +117,14 @@ class PatronController extends Controller
 
         $customer_id = auth()->user()->id;
         $parent_id = auth()->user()->parent_id;
-        if ($patron->customer_id != $customer_id && $parent_id>0) {
+        if ($patron->customer_id != $customer_id && $parent_id > 0) {
             return back()->with('notice', '您没用权限修改,请联系主管');
         }
 //        $start_time = str_replace('T', ' ', $request->start_time);
 //        $request->merge(['start_time' => $start_time]);
 
 
-        $patron->update($request->only('customer_id','company_name','name','phone','job','need','money','start_time','relation','remark'));
+        $patron->update($request->only('customer_id', 'company_name', 'name', 'phone', 'job', 'need', 'money', 'start_time', 'relation', 'remark'));
 
         return back()->with('success', '成功');
     }
@@ -147,7 +148,7 @@ class PatronController extends Controller
             ->performedOn($patron)
             ->causedBy(auth()->user())
             ->withProperties([])
-            ->log(auth()->user()->name.'与客户'.$patron->name.'已签约');
+            ->log(auth()->user()->name . '与客户' . $patron->name . '已签约');
 
         $lastLoggedActivity = Activity::all()->last();
         $staffs = Staff::where('is_notice', 1)->get();
@@ -159,12 +160,13 @@ class PatronController extends Controller
     {
         $patron = Patron::find($request->id);
 
-        $arr=[[
-            'time'=>date('Y-m-d H:i:s'),
-            'content'=>$request->input('content')
+        $arr = [[
+            'time' => date('Y-m-d H:i:s'),
+            'content' => $request->input('content')
         ]];
-        $patron->follow=array_merge($patron->follow,$arr);
+        $patron->follow = array_merge($patron->follow, $arr);
 
         $patron->save();
     }
+
 }
