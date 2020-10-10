@@ -427,6 +427,9 @@ class VisualizationController extends Controller
         $arr =[];
         if (!empty($request->follow_content)){
             foreach ($request->follow_content as $k=>$v){
+                if (empty($v['value'])){
+                    continue;
+                }
                 $arr[$k]['time']=$request->follow_time[$k]['value'];
                 $arr[$k]['content']=$v['value'];
             }
