@@ -436,27 +436,27 @@ class ProjectController extends AdminController
 
 
             // 弄一个触发事件的Script对象。
-            $triggerScript = $this->createTriggerScript($form);
+//            $triggerScript = $this->createTriggerScript($form);
 // 弄-个接收并处理事件的Script对象。
-            $subscribeScript = $this->createSubscriberScript($form, function($builder){
-                // 添加事件响应函数
-                $builder->subscribe('money', 'change', function($event){
+//            $subscribeScript = $this->createSubscriberScript($form, function($builder){
+//                // 添加事件响应函数
+//                $builder->subscribe('money', 'change', function($event){
+//
+//                    // 这里填写处理事件的javascript脚本，注意：一定要返回一个完整的 javascript function ，否则报错！！！！
+//                    return <<< EOT
+//
+//               // function中的参数data，是事件自带数据，方便做逻辑处理！data会因为事件不同而类型不同，具体可以在chrome中的console中查看。
+//
+//                function (data) {
+//                        console.log ('catch an event -> {$event}');
+//                       console.log(data);
+//                }
+//
+//EOT;
+//                });
+//            });
 
-                    // 这里填写处理事件的javascript脚本，注意：一定要返回一个完整的 javascript function ，否则报错！！！！
-                    return <<< EOT
-               
-               // function中的参数data，是事件自带数据，方便做逻辑处理！data会因为事件不同而类型不同，具体可以在chrome中的console中查看。
-               
-                function (data) {
-                        console.log ('catch an event -> {$event}');
-                       console.log(data);
-                }
-               
-EOT;
-                });
-            });
-
-            $form->tab('基础信息', function ($form)use ($triggerScript, $subscribeScript) {
+            $form->tab('基础信息', function ($form){
 
                 $form->text('name', __('Name'))->rules('required');
 
@@ -509,7 +509,7 @@ EOT;
 
                 // 最后把 $triggerScript 和 $subscribeScript 注入到Form中去。
                 // scriptinjecter 第一个参数可以为任何字符，但不能为空！！！！
-                $form->scriptinjecter('anyname_but_not_null', $triggerScript, $subscribeScript);
+//                $form->scriptinjecter('anyname_but_not_null', $triggerScript, $subscribeScript);
 
             }, true);
 
@@ -613,15 +613,15 @@ EOT;
         //保存前回调
         $form->saving(function (Form $form) {
 
-            $project_nodes = \Request('project_nodes');
-            if ($project_nodes==null){
-                $error = new MessageBag([
-                    'title'   => '错误...',
-                    'message' => '项目节点不能为空....',
-                ]);
-
-                return back()->with(compact('error'));
-            }
+//            $project_nodes = \Request('project_nodes');
+//            if ($project_nodes==null){
+//                $error = new MessageBag([
+//                    'title'   => '错误...',
+//                    'message' => '项目节点不能为空....',
+//                ]);
+//
+//                return back()->with(compact('error'));
+//            }
 
             $is_check = \Request('is_check');
             if ($is_check == 'on') {
