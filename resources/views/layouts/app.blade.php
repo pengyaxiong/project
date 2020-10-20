@@ -83,6 +83,9 @@
                         </ul>
                     </li>
                 @endguest
+                @if(request()->route()->getName()=='home')
+                    <li class="nav-item"><a class="nav-link" href="{{url('/patron/create')}}">新增客户</a></li>
+                @endif
             </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
