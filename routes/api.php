@@ -32,6 +32,8 @@ Route::group(['namespace' => 'Api','as'=>'api.'], function () {
     Route::get('task_count', 'VisualizationController@task_count');
     //项目情况统计
     Route::get('project_count', 'VisualizationController@project_count');
+    //产品项目分布图
+    Route::get('project_p', 'VisualizationController@project_p');
     //员工项目情况分析图
     Route::get('staff_project', 'VisualizationController@staff_project');
     //项目状态统计

@@ -9,6 +9,7 @@ use App\Models\Node;
 use App\Models\Patron;
 use App\Models\Project;
 use App\Models\ProjectNode;
+use App\Models\ProjectStaff;
 use App\Models\Staff;
 use App\Models\Task;
 use DB, Cache;
@@ -93,6 +94,34 @@ class VisualizationController extends Controller
             ];
             return $data;
         });
+    }
+
+    //产品项目分布图
+    function project_p()
+    {
+        //产品
+        $products = Staff::where('department_id', 18)->get();
+        $name=Staff::where('department_id', 18)->pluck('name')->toarray();
+        $count = [];
+        foreach ($products as $product) {
+
+            $project_ids=ProjectStaff::where('staff_id',$product->id)->pluck('project_id')->toarray();
+            //已立项
+            $count['create'][]=Project::where('status',1)->wherein('id',$project_ids)->count();
+            //进行中
+            $count['doing'][]=Project::where('status',2)->wherein('id',$project_ids)->count();
+            //已暂停
+            $count['stop'][]=Project::where('status',3)->wherein('id',$project_ids)->count();
+            //已结项
+            $count['finish'][]=Project::where('status',4)->wherein('id',$project_ids)->count();
+        }
+        $data = [
+            'week_start' => date("Y年m月d日", $this->week_start),
+            'week_end' => date("Y年m月d日", $this->week_end),
+            'count' => $count,
+            'name' => $name,
+        ];
+        return $data;
     }
 
     /**
@@ -424,17 +453,17 @@ class VisualizationController extends Controller
         if ($customer_id != $patron->customer_id) {
             return $this->error(500, '您没有权限权限！');
         }
-        $arr =[];
-        if (!empty($request->follow_content)){
-            foreach ($request->follow_content as $k=>$v){
-                if (empty($v['value'])){
+        $arr = [];
+        if (!empty($request->follow_content)) {
+            foreach ($request->follow_content as $k => $v) {
+                if (empty($v['value'])) {
                     continue;
                 }
-                $arr[$k]['time']=$request->follow_time[$k]['value'];
-                $arr[$k]['content']=$v['value'];
+                $arr[$k]['time'] = $request->follow_time[$k]['value'];
+                $arr[$k]['content'] = $v['value'];
             }
         }
-        $patron->follow =$arr;
+        $patron->follow = $arr;
 
         $patron->save();
 
@@ -492,7 +521,7 @@ class VisualizationController extends Controller
 //        $staff->readNotifications; // 获取所有已读通知
 //        $staff->notifications; // 获取所有通知
         // 处理逻辑
-        $count = isset($staff->unreadNotifications)?count($staff->unreadNotifications):0;   // 获取的结果
+        $count = isset($staff->unreadNotifications) ? count($staff->unreadNotifications) : 0;   // 获取的结果
 
         if ($count > 0) {
             $staff->markAsRead();
@@ -503,12 +532,11 @@ class VisualizationController extends Controller
     }
 
 
-
     public function customer_patron(Request $request)
     {
         $customerId = $request->get('q');
 
-        $patrons=Patron::where('customer_id',$customerId)->get(['id', \DB::raw('name as text')]);
+        $patrons = Patron::where('customer_id', $customerId)->get(['id', \DB::raw('name as text')]);
 
         return $patrons;
     }

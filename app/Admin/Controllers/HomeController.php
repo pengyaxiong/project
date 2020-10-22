@@ -72,8 +72,11 @@ class HomeController extends Controller
                             $row->column(6, function (Column $column) {
                                 $column->append(new Box('本月任务量统计', view('admin.task_count')));
                             });
+//                            $row->column(6, function (Column $column) {
+//                                $column->append(new Box('员工性别统计', view('admin.sex_count')));
+//                            });
                             $row->column(6, function (Column $column) {
-                                $column->append(new Box('员工性别统计', view('admin.sex_count')));
+                                $column->append(new Box('产品项目分布图', view('admin.project_p')));
                             });
                         });
                     });
