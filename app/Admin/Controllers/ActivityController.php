@@ -57,7 +57,7 @@ class ActivityController extends AdminController
             ];
             return new Table([], $properties);
         });
-        $grid->column('created_at', __('Created at'));
+        $grid->column('created_at', __('Created at'))->sortable();
         $grid->column('updated_at', __('Updated at'));
 
         $grid->filter(function ($filter) {

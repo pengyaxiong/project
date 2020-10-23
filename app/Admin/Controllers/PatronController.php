@@ -71,7 +71,7 @@ class PatronController extends AdminController
                     return '<span class="label" style="font-weight:unset; color: #444; background-color: #FFA3BE"><i class="fa fa-pause-circle"></i>&nbsp;已审核</span>';
             }
         });
-        $grid->column('start_time', __('开始时间'))->display(function ($model){
+        $grid->column('start_time', __('开始时间'))->sortable()->display(function ($model){
             if ($model){
                 return date('Y-m-d',strtotime($model));
             }
@@ -91,7 +91,7 @@ class PatronController extends AdminController
         });
         $grid->column('images', __('Images'))->carousel();
         $grid->column('remark', __('Remark'))->limit(10);
-        $grid->column('created_at', __('Created at'));
+        $grid->column('created_at', __('Created at'))->sortable();
         $grid->column('updated_at', __('Updated at'));
 
         $grid->exporter(new PatronImport());

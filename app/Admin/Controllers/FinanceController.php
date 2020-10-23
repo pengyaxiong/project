@@ -84,7 +84,7 @@ class FinanceController extends AdminController
         $grid->column('debtors', __('未结余额'));
         $grid->column('description', __('开票情况'))->limit(10);
         $grid->column('remark', __('Remark'))->limit(10);
-        $grid->column('created_at', __('Created at'))->display(function ($model){
+        $grid->column('created_at', __('Created at'))->sortable()->display(function ($model){
             if ($model){
                 return date('Y-m-d',strtotime($model));
             }

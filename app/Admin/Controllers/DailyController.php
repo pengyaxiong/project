@@ -62,7 +62,7 @@ class DailyController extends AdminController
         $grid->column('work', __('今日工作内容'))->limit(10);
         $grid->column('problem', __('待处理问题'))->limit(10);
         $grid->column('done', __('完成情况'))->limit(10);
-        $grid->column('created_at', __('Created at'));
+        $grid->column('created_at', __('Created at'))->sortable();
         $grid->column('updated_at', __('Updated at'));
 
         $grid->exporter(new DailyImport());

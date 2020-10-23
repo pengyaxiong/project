@@ -240,29 +240,29 @@ class ProjectController extends AdminController
         ];
         if (!in_array($auth->id, [1, 2])) {
             $grid->column('is_check', __('是否交付'))->bool();
-            $grid->column('check_time', __('交付时间'))->display(function ($model) {
+            $grid->column('check_time', __('交付时间'))->sortable()->display(function ($model) {
                 if ($model) {
                     return date('Y-m-d', strtotime($model));
                 }
             });
-            $grid->column('y_check_time', __('预计交付时间'))->display(function ($model) {
+            $grid->column('y_check_time', __('预计交付时间'))->sortable()->display(function ($model) {
                 if ($model) {
                     return date('Y-m-d', strtotime($model));
                 }
             });
         } else {
             $grid->column('is_check', __('是否交付'))->switch($states);
-            $grid->column('contract_time', __('Contract time'))->display(function ($model) {
+            $grid->column('contract_time', __('Contract time'))->sortable()->display(function ($model) {
                 if ($model) {
                     return date('Y-m-d', strtotime($model));
                 }
             });
-            $grid->column('check_time', __('交付时间'))->display(function ($model) {
+            $grid->column('check_time', __('交付时间'))->sortable()->display(function ($model) {
                 if ($model) {
                     return date('Y-m-d', strtotime($model));
                 }
             });
-            $grid->column('y_check_time', __('预计交付时间'))->display(function ($model) {
+            $grid->column('y_check_time', __('预计交付时间'))->sortable()->display(function ($model) {
                 if ($model) {
                     return date('Y-m-d', strtotime($model));
                 }

@@ -58,9 +58,9 @@ class TaskController extends AdminController
             $grid->column('is_contract', __('是否签约'))->switch($states);
         }
         $grid->column('is_finish', __('是否完成'))->switch($states);
-        $grid->column('start_time', __('开始时间'));
-        $grid->column('contract_time', __('Contract time'));
-        $grid->column('created_at', __('Created at'))->hide();
+        $grid->column('start_time', __('开始时间'))->sortable();
+        $grid->column('contract_time', __('Contract time'))->sortable();
+        $grid->column('created_at', __('Created at'))->sortable()->hide();
         $grid->column('updated_at', __('Updated at'))->hide();
 
         $grid->filter(function ($filter) {
