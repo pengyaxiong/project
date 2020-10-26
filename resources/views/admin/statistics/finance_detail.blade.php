@@ -27,40 +27,53 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-
-<table class="table">
-    <thead>
-    <tr>
-        <th>项目名称</th>
-        <th>交付情况</th>
-        <th>项目状态</th>
-        <th>合同金额</th>
-        <th>回款金额</th>
-        <th>回款进度</th>
-    </tr>
-    </thead>
-    <tbody>
-    @if(!empty($projects))
-        @foreach($projects as $project)
-            <tr>
-                <td><a href="/admin/finances?project_id={{$project->id}}">{{$project->name}}</a></td>
-                <td>{!! $project->is_check !!}</td>
-                <td>{!! $project->status !!}</td>
-                <td>{{$project->money}}</td>
-                <td>{{$project->returned_money}}</td>
-                <td data-toggle="tooltip" data-placement="top" title="{{$project->check_status}}">
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
-                             aria-valuenow="{{$project->rate}}" aria-valuemin="0" aria-valuemax="100" style="width: {{$project->rate}}%;">
-                            {{$project->rate}}%
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">未交付项目情况
+        <button type="button" class="btn btn-info btn-sm download" data-time="{{$time}}">EXCEL下载</button>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>项目名称</th>
+            <th>交付情况</th>
+            <th>项目状态</th>
+            <th>合同金额</th>
+            <th>回款金额</th>
+            <th>回款进度</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if(!empty($projects))
+            @foreach($projects as $project)
+                <tr>
+                    <td><a href="/admin/finances?project_id={{$project->id}}">{{$project->name}}</a></td>
+                    <td>{!! $project->is_check !!}</td>
+                    <td>{!! $project->status !!}</td>
+                    <td>{{$project->money}}</td>
+                    <td>{{$project->returned_money}}</td>
+                    <td data-toggle="tooltip" data-placement="top" title="{{$project->check_status}}">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
+                                 aria-valuenow="{{$project->rate}}" aria-valuemin="0" aria-valuemax="100"
+                                 style="width: {{$project->rate}}%;">
+                                {{$project->rate}}%
+                            </div>
                         </div>
-                    </div>
-                </td>
-            </tr>
-        @endforeach
-    @endif
-    </tbody>
-</table>
-
+                    </td>
+                </tr>
+            @endforeach
+        @endif
+        </tbody>
+    </table>
+</div>
 </body>
+<script>
+    $(function () {
+        $(".download").click(function () {
+            var time = $(this).data('time');
+            location.href = '/api/finance_export?time=' + time;
+        })
+    })
+</script>
 </html>

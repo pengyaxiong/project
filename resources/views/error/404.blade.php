@@ -54,7 +54,7 @@
         <div class="in">
             <div class="textThis">
                 <h2>出错啦404！</h2>
-                <p><span>自动返回<a id="href" href="/">首页</a></span><span>等待<b id="wait">6</b>秒</span></p>
+                <p><span>自动返回<a id="href" href="/admin">首页</a></span><span>等待<b id="wait">6</b>秒</span></p>
                 <script type="text/javascript">                            (function () {
                         var wait = document.getElementById('wait'), href = document.getElementById('href').href;
                         var interval = setInterval(function () {

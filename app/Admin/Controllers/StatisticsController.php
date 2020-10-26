@@ -48,7 +48,7 @@ class StatisticsController extends AdminController
                     //欠款
                     $money = Project::all()->sum('money');
                     $returned_money = Finance::all()->sum('returned_money');
-                    $debtors = $money-$returned_money;
+                    $debtors = $money - $returned_money;
 
                     $column->append(new Box('', view('admin.statistics.finance', compact('debtors'))));
                 });
@@ -88,15 +88,17 @@ class StatisticsController extends AdminController
                         $color = [1 => 'info', 2 => 'primary', 3 => 'danger', 4 => 'success'];
                         $check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功', 5 => '设计评审成功', 6 => '前端评审成功'];
 
-                        $returned_money=Finance::where('project_id',$project->id)->sum('returned_money');
-                        $project->status='<span class="label label-'.$color[$project->status].'">'.$status[$project->status].'</span>';
-                        $project->returned_money=$returned_money;
-                        $project->check_status=$check_status[$project->check_status];
-                        $project->is_check=$project->is_check?'<span class="label label-success">已交付</span>':'<span class="label label-danger">未交付</span>';
-                        $project->rate=floor($returned_money/($project->money+1)*1000)/10;
+                        $returned_money = Finance::where('project_id', $project->id)->sum('returned_money');
+                        $project->status = '<span class="label label-' . $color[$project->status] . '">' . $status[$project->status] . '</span>';
+                        $project->returned_money = $returned_money;
+                        $project->check_status = $check_status[$project->check_status];
+                        $project->is_check = $project->is_check ? '<span class="label label-success">已交付</span>' : '<span class="label label-danger">未交付</span>';
+                        $project->rate = floor($returned_money / ($project->money + 1) * 1000) / 10;
                         return $project;
                     });
-                    $column->append(new Box('未交付项目情况', view('admin.statistics.finance_detail', compact('projects'))));
+
+                    $time='all';
+                    $column->append(new Box('', view('admin.statistics.finance_detail', compact('projects','time'))));
                 });
 
             });
@@ -115,7 +117,7 @@ class StatisticsController extends AdminController
                     //欠款
                     $money = Project::wherebetween('contract_time', [$this->month_start, $this->month_end])->sum('money');
                     $returned_money = Finance::wherebetween('created_at', [$this->month_start, $this->month_end])->sum('returned_money');
-                    $debtors = $money-$returned_money;
+                    $debtors = $money - $returned_money;
 
                     $column->append(new Box('', view('admin.statistics.finance_month', compact('month', 'quarter', 'year', 'debtors'))));
                 });
@@ -155,15 +157,16 @@ class StatisticsController extends AdminController
                         $color = [1 => 'info', 2 => 'primary', 3 => 'danger', 4 => 'success'];
                         $check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功', 5 => '设计评审成功', 6 => '前端评审成功'];
 
-                        $returned_money=Finance::where('project_id',$project->id)->wherebetween('created_at', [$this->month_start, $this->month_end])->sum('returned_money');
-                        $project->status='<span class="label label-'.$color[$project->status].'">'.$status[$project->status].'</span>';
-                        $project->returned_money=$returned_money;
-                        $project->check_status=$check_status[$project->check_status];
-                        $project->is_check=$project->is_check?'<span class="label label-success">已交付</span>':'<span class="label label-danger">未交付</span>';
-                        $project->rate=floor($returned_money/($project->money+1)*1000)/10;
+                        $returned_money = Finance::where('project_id', $project->id)->wherebetween('created_at', [$this->month_start, $this->month_end])->sum('returned_money');
+                        $project->status = '<span class="label label-' . $color[$project->status] . '">' . $status[$project->status] . '</span>';
+                        $project->returned_money = $returned_money;
+                        $project->check_status = $check_status[$project->check_status];
+                        $project->is_check = $project->is_check ? '<span class="label label-success">已交付</span>' : '<span class="label label-danger">未交付</span>';
+                        $project->rate = floor($returned_money / ($project->money + 1) * 1000) / 10;
                         return $project;
                     });
-                    $column->append(new Box('未交付项目情况', view('admin.statistics.finance_detail', compact('projects'))));
+                    $time='month';
+                    $column->append(new Box('', view('admin.statistics.finance_detail', compact('projects','time'))));
                 });
             });
     }
@@ -181,7 +184,7 @@ class StatisticsController extends AdminController
 
                     $money = Project::wherebetween('contract_time', [$this->quarter_start, $this->quarter_end])->sum('money');
                     $returned_money = Finance::wherebetween('created_at', [$this->quarter_start, $this->quarter_end])->sum('returned_money');
-                    $debtors = $money-$returned_money;
+                    $debtors = $money - $returned_money;
 
                     $column->append(new Box('', view('admin.statistics.finance_quarter', compact('month', 'quarter', 'year', 'debtors'))));
                 });
@@ -220,15 +223,16 @@ class StatisticsController extends AdminController
                         $color = [1 => 'info', 2 => 'primary', 3 => 'danger', 4 => 'success'];
                         $check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功', 5 => '设计评审成功', 6 => '前端评审成功'];
 
-                        $returned_money=Finance::where('project_id',$project->id)->wherebetween('created_at', [$this->quarter_start, $this->quarter_end])->sum('returned_money');
-                        $project->status='<span class="label label-'.$color[$project->status].'">'.$status[$project->status].'</span>';
-                        $project->returned_money=$returned_money;
-                        $project->check_status=$check_status[$project->check_status];
-                        $project->is_check=$project->is_check?'<span class="label label-success">已交付</span>':'<span class="label label-danger">未交付</span>';
-                        $project->rate=floor($returned_money/($project->money+1)*1000)/10;
+                        $returned_money = Finance::where('project_id', $project->id)->wherebetween('created_at', [$this->quarter_start, $this->quarter_end])->sum('returned_money');
+                        $project->status = '<span class="label label-' . $color[$project->status] . '">' . $status[$project->status] . '</span>';
+                        $project->returned_money = $returned_money;
+                        $project->check_status = $check_status[$project->check_status];
+                        $project->is_check = $project->is_check ? '<span class="label label-success">已交付</span>' : '<span class="label label-danger">未交付</span>';
+                        $project->rate = floor($returned_money / ($project->money + 1) * 1000) / 10;
                         return $project;
                     });
-                    $column->append(new Box('未交付项目情况', view('admin.statistics.finance_detail', compact('projects'))));
+                    $time='quarter';
+                    $column->append(new Box('', view('admin.statistics.finance_detail', compact('projects','time'))));
                 });
             });
     }
@@ -246,7 +250,7 @@ class StatisticsController extends AdminController
 
                     $money = Project::wherebetween('contract_time', [$this->year_start, $this->year_end])->sum('money');
                     $returned_money = Finance::wherebetween('created_at', [$this->year_start, $this->year_end])->sum('returned_money');
-                    $debtors = $money-$returned_money;
+                    $debtors = $money - $returned_money;
 
                     $column->append(new Box('', view('admin.statistics.finance_year', compact('month', 'quarter', 'year', 'debtors'))));
                 });
@@ -285,15 +289,16 @@ class StatisticsController extends AdminController
                         $color = [1 => 'info', 2 => 'primary', 3 => 'danger', 4 => 'success'];
                         $check_status = [1 => '签约审核成功', 2 => '设计验收成功', 3 => '前端验收成功', 4 => '整体验收成功', 5 => '设计评审成功', 6 => '前端评审成功'];
 
-                        $returned_money=Finance::where('project_id',$project->id)->wherebetween('created_at', [$this->year_start, $this->year_end])->sum('returned_money');
-                        $project->status='<span class="label label-'.$color[$project->status].'">'.$status[$project->status].'</span>';
-                        $project->returned_money=$returned_money;
-                        $project->is_check=$project->is_check?'<span class="label label-success">已交付</span>':'<span class="label label-danger">未交付</span>';
-                        $project->check_status=$check_status[$project->check_status];
-                        $project->rate=floor($returned_money/($project->money+1)*1000)/10;
+                        $returned_money = Finance::where('project_id', $project->id)->wherebetween('created_at', [$this->year_start, $this->year_end])->sum('returned_money');
+                        $project->status = '<span class="label label-' . $color[$project->status] . '">' . $status[$project->status] . '</span>';
+                        $project->returned_money = $returned_money;
+                        $project->is_check = $project->is_check ? '<span class="label label-success">已交付</span>' : '<span class="label label-danger">未交付</span>';
+                        $project->check_status = $check_status[$project->check_status];
+                        $project->rate = floor($returned_money / ($project->money + 1) * 1000) / 10;
                         return $project;
                     });
-                    $column->append(new Box('未交付项目情况', view('admin.statistics.finance_detail', compact('projects'))));
+                    $time='year';
+                    $column->append(new Box('', view('admin.statistics.finance_detail', compact('projects','time'))));
                 });
             });
     }

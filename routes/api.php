@@ -49,6 +49,8 @@ Route::group(['namespace' => 'Api','as'=>'api.'], function () {
 
     //消息通知
     Route::get('notifications', 'VisualizationController@notifications');
+    //导出excel
+    Route::get('finance_export', 'VisualizationController@finance_export');
 
 
     //select联动

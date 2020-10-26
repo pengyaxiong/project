@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\StatisticsExport;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Department;
@@ -14,6 +15,7 @@ use App\Models\Staff;
 use App\Models\Task;
 use DB, Cache;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class VisualizationController extends Controller
 {
@@ -539,5 +541,24 @@ class VisualizationController extends Controller
         $patrons = Patron::where('customer_id', $customerId)->get(['id', \DB::raw('name as text')]);
 
         return $patrons;
+    }
+
+
+    public function finance_export(Request $request)
+    {
+        $time=$request->time;
+        try {
+            return Excel::download(new StatisticsExport($time), '未交付项目情况.xlsx');
+        }
+        catch (\Exception $e) {
+            return [
+                'code' => 500,
+                'data' => [
+                    'err' => 'export_failed',
+                    'err_msg' => $e -> getMessage()
+                ],
+                'msg' => '导出失败'
+            ];
+        }
     }
 }
