@@ -60,7 +60,16 @@ class HomeController extends Controller
                         $row->column(2, function (Column $column) {
                             $column->append($this->info_6());
                         });
+
+                        @$bibels = file('bibel.txt');
+                        $size = count($bibels) / 2 - 1;
+                        $rand = rand(0, $size) * 2;
+                        $cn=$bibels[$rand + 1];
+                        $en=$bibels[$rand];
+
+                        admin_success($en, $cn);
                     });
+
                 });
 
                 if (in_array($auth->id,[1,2])) {
@@ -97,9 +106,9 @@ class HomeController extends Controller
                         $column->append(new Box('员工项目情况分析', view('admin.staff_project')));
                     });
 
-                    $row->column(12, function (Column $column) {
-                        $column->append(Dashboard::environment());
-                    });
+//                    $row->column(12, function (Column $column) {
+//                        $column->append(Dashboard::environment());
+//                    });
                 } else {
                     $row->column(12, function (Column $column) {
 //                        /**
